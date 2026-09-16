@@ -2206,7 +2206,8 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .survival-roles th{color:#08628e;background:#eaf6fc;}.survival-roles td:not(:first-child){white-space:nowrap;font-weight:700;}
 .gp-screen.survival-playing>.gp-field-area{margin-top:calc(46 * var(--u)) !important;} /* v261 ディーラーの手札と場のあいだに間をとる */
 .gp-screen.survival-playing{position:relative;} /* v262 */
-.gp-screen.survival-playing>.gp-hand-area{position:absolute !important;left:0;right:0;bottom:max(env(safe-area-inset-bottom,0px),calc(10 * var(--u))) !important;margin:0 !important;} /* v262 手札マットを画面の一番下に固定（機種の高さに左右されない） */
+.gp-screen.survival-playing>.gp-dealer-area{margin-top:calc(62 * var(--u)) !important;} /* v268 相手の手札をほんの少しだけ下げる */
+.gp-screen.survival-playing>.gp-hand-area{position:absolute !important;left:0;right:0;bottom:max(env(safe-area-inset-bottom,0px),calc(26 * var(--u))) !important;margin:0 !important;} /* v262/v268 下固定のまま、ほんの少しだけ持ち上げる */
 .surv-measure{margin-top:14px;text-align:left;}
 .surv-measure-toggle{width:100%;padding:10px;border-radius:12px;border:1px solid #bcd6e6;background:#f2fafe;color:#18628f;font-weight:700;}
 .surv-measure-note{margin:8px 0;font-size:13px;color:#4a6274;}
@@ -3352,7 +3353,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v267'; // v267(2026/09/16): v266のディーラー手札下げを取り消し、v265の配置に戻した
+const APP_VER='v268'; // v268(2026/09/16): 役サバイバルだけ、相手の手札をほんの少し下げ(62u)、自分の手札マットをほんの少し持ち上げた(下端10u→26u)
+// const APP_VER='v267'; // v267(2026/09/16): v266のディーラー手札下げを取り消し、v265の配置に戻した
 // const APP_VER='v266'; // v266(2026/09/16): 役サバイバルだけ、ディーラーの手札と場をまとめて下へ移動（自分の手札との視線の距離を縮める）。背景のズレはこのあと調整
 // const APP_VER='v265'; // v265(2026/09/16): 役サバイバルに計測モードを追加。対戦画面には出さず、結果画面の「計測を見る」で1手ずつのログ（相手が何を狙って選んだかの理由つき）と集計を確認できる
 // const APP_VER='v264'; // v264(2026/09/16): 役サバイバル専用のAI思考を追加（補充につながる役を狙う／補充ゼロの完成は手札が少ないうちは見送る／相手に10を渡す置き方を避ける／小さい札から出す）

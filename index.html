@@ -3343,7 +3343,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v263'; // v263(2026/09/16): 役サバイバルに予備カード（手札10枚を超えた補充は予備に無制限ストック→手札が空いたら自動で入る。手札マット右上とディーラー側に枚数表示）と、手札を左→右になぞって発動するシャッフル（何回でも・枚数は変わらず数字だけ入れ替わる）を追加
+const APP_VER='v264'; // v264(2026/09/16): 役サバイバル専用のAI思考を追加（補充につながる役を狙う／補充ゼロの完成は手札が少ないうちは見送る／相手に10を渡す置き方を避ける／小さい札から出す）
+// const APP_VER='v263'; // v263(2026/09/16): 役サバイバルに予備カード（手札10枚を超えた補充は予備に無制限ストック→手札が空いたら自動で入る。手札マット右上とディーラー側に枚数表示）と、手札を左→右になぞって発動するシャッフル（何回でも・枚数は変わらず数字だけ入れ替わる）を追加
 // const APP_VER='v262'; // v262(2026/09/16): 役サバイバルの手札マットを画面下端に固定（機種の画面高さに左右されないように）。通常マップは変更なし
 // const APP_VER='v261'; // v261(2026/09/16): 役サバイバルだけ、ディーラーの手札と場のあいだに間隔(46u)を入れ、手札を下(70u)へ移動。通常マップの配置は変えていない
 // const APP_VER='v260'; // v260(2026/09/16): 役サバイバルの対戦フィールドを通常マップと同じ見た目に戻した（専用の得点ボックス・補充テロップ・手札ヘッダー・脚注・役一覧ボタン・空き枠・専用レイアウトCSSを撤去し、通常のYOU/DEALER得点表示に統一）
@@ -6134,6 +6135,36 @@ function App(){
     return true;
   }
   function denyActive(){const so=stageOptsR.current;return !!(so&&so.deny);}
+  // v264 役サバイバル専用の思考。カードは役を作らないと増えないので「補充につながる10」を狙い、
+  // 補充ゼロ（役なし）の完成はできるだけ避け、相手に10を渡す置き方も嫌う
+  function survivalPick(playable,cs,cf){
+    const diff=diffRef.current,sharp=diff==='hard';
+    const wins=playable.filter(v=>cs+v===10);
+    const safe=playable.filter(v=>cs+v<10);
+    const stock=dHR.current.length+dResR.current.length;
+    const gainOf=v=>calcPts([...cf,v]).total-1; // 補充枚数＝得点-1
+    if(wins.length){
+      const best=wins.reduce((b,v)=>gainOf(v)>gainOf(b)?v:b,wins[0]);
+      const g=gainOf(best);
+      // 補充ゼロの完成は手札を1枚減らすだけ。余裕がないうちは見送って育てる
+      const skip=g===0&&safe.length&&stock<=6&&Math.random()<(sharp?0.8:0.5);
+      if(!skip&&(g>0||Math.random()<(sharp?0.97:0.85)))return best;
+    }
+    if(!safe.length)return wins.length?wins[0]:null;
+    const score=v=>{
+      const nf=[...cf,v],ns=cs+v,need=10-ns;
+      let sc=0;
+      let bestRole=0;
+      for(let k=1;k<=5;k++)if(ns+k===10&&canPlay(k,ns,nf))bestRole=Math.max(bestRole,calcPts([...nf,k]).total-1);
+      sc+=bestRole*1.6;                                   // このあと作れる役の大きさ
+      if(dHR.current.includes(need))sc+=3.2;              // 自分で仕上げられる
+      if(need>=1&&need<=5)sc-=2.0;                        // 相手にも仕上げられてしまう
+      sc-=v*0.12;                                         // 小さい札から出して選択肢を残す
+      if(cf.length>=3)sc-=1.2;                            // 4枚目は慎重に
+      return sc+(sharp?0:Math.random()*1.6);              // ふつうは少しブレる
+    };
+    return safe.reduce((b,v)=>score(v)>score(b)?v:b,safe[0]);
+  }
   function aiPlay(rn){
     if(isTimedMode()&&rushExpired())return;
     // 場が完成した直後にAIの出す動作が間に合ってしまった場合 → カード返却（出さない）
@@ -6166,6 +6197,7 @@ function App(){
       chosen=smartPick(playable,cs,cf);
       if(chosen==null){scheduleAi(rn);return;} // 出さずに待つ
     }
+    else if(isSurvival()){chosen=survivalPick(playable,cs,cf);if(chosen==null){scheduleAi(rn);return;}}
     else if(wins.length&&Math.random()<winRate)chosen=wins.reduce((b,v)=>calcPts([...cf,v]).total>calcPts([...cf,b]).total?v:b,wins[0]);
     else if(diff==='master'&&safe.length&&dHand.includes(1)&&cs<9&&safe.includes(9-cs)&&Math.random()<0.65){
       // MASTERの妨害プレイ：手札に1がある時、場を合計9にして「1でしか完成できない場」の罠を張り、自分の1で刈り取る

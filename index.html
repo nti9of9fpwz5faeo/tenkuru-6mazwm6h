@@ -3353,7 +3353,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v268'; // v268(2026/09/16): 役サバイバルだけ、相手の手札をほんの少し下げ(62u)、自分の手札マットをほんの少し持ち上げた(下端10u→26u)
+const APP_VER='v269'; // v269(2026/09/16): 役サバイバルの補充枚数を1段ずつ増やした（役なし1／ワンペア2／ツーペア3／スリーカード4／ストレート5）。得点はそのまま。AIの見積りとルール表記も合わせて更新
+// const APP_VER='v268'; // v268(2026/09/16): 役サバイバルだけ、相手の手札をほんの少し下げ(62u)、自分の手札マットをほんの少し持ち上げた(下端10u→26u)
 // const APP_VER='v267'; // v267(2026/09/16): v266のディーラー手札下げを取り消し、v265の配置に戻した
 // const APP_VER='v266'; // v266(2026/09/16): 役サバイバルだけ、ディーラーの手札と場をまとめて下へ移動（自分の手札との視線の距離を縮める）。背景のズレはこのあと調整
 // const APP_VER='v265'; // v265(2026/09/16): 役サバイバルに計測モードを追加。対戦画面には出さず、結果画面の「計測を見る」で1手ずつのログ（相手が何を狙って選んだかの理由つき）と集計を確認できる
@@ -3930,7 +3931,7 @@ function RushResult({data,onRetry,onBack}){
 }
 
 // v259: isolated 60-second hand-survival experiment.
-const SURVIVAL_ROLES=[['役なし（5・5も含む）',0,1],['ワンペア',1,2],['ツーペア',2,3],['スリーカード',3,4],['ストレート',4,5]];
+const SURVIVAL_ROLES=[['役なし（5・5も含む）',1,1],['ワンペア',2,2],['ツーペア',3,3],['スリーカード',4,4],['ストレート',5,5]];
 function survivalStage(diff){return {...rushStage(diff),rush:false,survival:true,name:'役サバイバル',timeLimit:60};}
 function SurvivalRoles(){return h('table',{className:'survival-roles'},h('thead',null,h('tr',null,['役','補充','得点'].map(t=>h('th',{key:t},t)))),h('tbody',null,SURVIVAL_ROLES.map(([role,n,pt])=>h('tr',{key:role},h('td',null,role),h('td',null,n+'枚'),h('td',null,'＋'+pt+'点')))));}
 function SurvivalScreen({onBattle,onBack}){
@@ -3938,7 +3939,7 @@ function SurvivalScreen({onBattle,onBack}){
  return h('main',{className:'rush-screen survival-screen'},h('section',{className:'rush-card'},
  h('p',{className:'rush-eyebrow'},'TEN-KURU · お試し'),h('h1',null,'役サバイバル'),h('p',{className:'rush-lead'},'役を作って、手札をつなごう。'),
  h('div',{className:'rush-rule-grid'},h('div',null,h('b',null,'60秒'),'得点勝負'),h('div',null,h('b',null,'10枚'),'開始時・手札上限')),
- h(SurvivalRoles),h('ul',{className:'rush-rules'},h('li',null,'10を完成させた側が、得点と補充を獲得。'),h('li',null,'手札は上限10枚。8枚でストレートなら2枚だけ補充。'),h('li',null,'補充後に手札0枚なら、その時点で敗北。'),h('li',null,'時間での補充・チャージはなし。バーストは相手に1点。'),h('li',null,'双方が手詰まりなら、手札を残して場だけリセット。'),h('li',null,'60秒終了時は得点が多い側の勝ち。同点は引き分け。')),
+ h(SurvivalRoles),h('ul',{className:'rush-rules'},h('li',null,'10を完成させた側が、得点と補充を獲得。'),h('li',null,'手札は上限10枚。あふれた補充は予備にたまり、手札が空くと自動で入る。'),h('li',null,'補充後に手札0枚なら、その時点で敗北。'),h('li',null,'時間での補充・チャージはなし。バーストは相手に1点。'),h('li',null,'双方が手詰まりなら、手札を残して場だけリセット。'),h('li',null,'60秒終了時は得点が多い側の勝ち。同点は引き分け。')),
  h('fieldset',{className:'rush-difficulty'},h('legend',null,'相手の強さ'),[['normal','ふつう'],['hard','むずかしい']].map(([value,label])=>h('label',{key:value},h('input',{type:'radio',name:'survival-difficulty',checked:diff===value,onChange:()=>setDiff(value)}),label))),
  h('button',{className:'rush-primary',onClick:()=>onBattle(diff)},'遊んでみる'),h('button',{className:'rush-secondary',onClick:onBack},'ホームへ')));
 }
@@ -6177,27 +6178,27 @@ function App(){
     if(survLogR.current.length>400)survLogR.current.shift();
   }
   // v264 役サバイバル専用の思考。カードは役を作らないと増えないので「補充につながる10」を狙い、
-  // 補充ゼロ（役なし）の完成はできるだけ避け、相手に10を渡す置き方も嫌う
+  // 大きい役ほど補充が多い。相手に10を渡す置き方は嫌う
   function survivalPick(playable,cs,cf){
     const diff=diffRef.current,sharp=diff==='hard';
     const wins=playable.filter(v=>cs+v===10);
     const safe=playable.filter(v=>cs+v<10);
     const stock=dHR.current.length+dResR.current.length;
-    const gainOf=v=>calcPts([...cf,v]).total-1; // 補充枚数＝得点-1
+    const gainOf=v=>calcPts([...cf,v]).total; // 補充枚数＝得点と同じ
     if(wins.length){
       const best=wins.reduce((b,v)=>gainOf(v)>gainOf(b)?v:b,wins[0]);
       const g=gainOf(best);
-      // 補充ゼロの完成は手札を1枚減らすだけ。余裕がないうちは見送って育てる
-      const skip=g===0&&safe.length&&stock<=6&&Math.random()<(sharp?0.8:0.5);
-      if(!skip&&(g>0||Math.random()<(sharp?0.97:0.85))){survLog('dealer',best+'を出す ← 完成ねらい（補充+'+g+'）');return best;}
-      if(skip){survStatR.current&&survStatR.current.dealer.skip++;survLog('dealer','完成を見送り（役なし＝補充0・在庫'+stock+'枚）');}
+      // v269 補充が1枚以上になったので完成は常に得。ただし手札に余裕があるときだけ、より大きい役を狙って1手待つ
+      const better=safe.length&&g<=1&&stock>=7&&Math.random()<(sharp?0.55:0.3);
+      if(!better&&(g>=2||Math.random()<(sharp?0.97:0.85))){survLog('dealer',best+'を出す ← 完成ねらい（補充+'+g+'）');return best;}
+      if(better){survStatR.current&&survStatR.current.dealer.skip++;survLog('dealer','完成を見送り（役なし止まり・在庫'+stock+'枚あるので大きい役を狙う）');}
     }
     if(!safe.length)return wins.length?wins[0]:null;
     const score=v=>{
       const nf=[...cf,v],ns=cs+v,need=10-ns;
       let sc=0;
       let bestRole=0;
-      for(let k=1;k<=5;k++)if(ns+k===10&&canPlay(k,ns,nf))bestRole=Math.max(bestRole,calcPts([...nf,k]).total-1);
+      for(let k=1;k<=5;k++)if(ns+k===10&&canPlay(k,ns,nf))bestRole=Math.max(bestRole,calcPts([...nf,k]).total);
       sc+=bestRole*1.6;                                   // このあと作れる役の大きさ
       if(dHR.current.includes(need))sc+=3.2;              // 自分で仕上げられる
       if(need>=1&&need<=5)sc-=2.0;                        // 相手にも仕上げられてしまう
@@ -6207,7 +6208,7 @@ function App(){
     };
     const pick=safe.reduce((b,v)=>score(v)>score(b)?v:b,safe[0]);
     const ns=cs+pick,need=10-ns;let br=0;
-    for(let k=1;k<=5;k++)if(ns+k===10&&canPlay(k,ns,[...cf,pick]))br=Math.max(br,calcPts([...cf,pick,k]).total-1);
+    for(let k=1;k<=5;k++)if(ns+k===10&&canPlay(k,ns,[...cf,pick]))br=Math.max(br,calcPts([...cf,pick,k]).total);
     survLog('dealer',pick+'を出す ← 場'+cs+'→'+ns+'／次に最大+'+br+'補充'+(dHR.current.includes(need)?'／自分で仕上げ可':'')+((need>=1&&need<=5)?'／相手も仕上げ可':''));
     return pick;
   }
@@ -6461,10 +6462,10 @@ function App(){
         if(rushExpired()||resolvingR.current||pausedR.current)return;
         const pts=calcPts(nf);
         // Complete the role and refill BEFORE testing last-card defeat.
-        const reward=refillSurvival(who,pts.total-1);
+        const reward=refillSurvival(who,pts.total); // v269 補充＝得点と同じ枚数
         const _st=survStatR.current;
-        if(_st){const w=_st[who];w.ten++;w.add+=reward.added+Math.max(0,(pts.total-1)-reward.added);if(pts.total===1)w.none++;}
-        survLog(who,'10完成 '+(pts.voice||'役なし')+' +'+pts.total+'点／補充'+(pts.total-1)+'枚（手札'+reward.before+'→'+reward.after+((pts.total-1)-reward.added>0?'＋予備'+((pts.total-1)-reward.added):'')+'）');
+        if(_st){const w=_st[who];w.ten++;w.add+=pts.total;if(pts.total===1)w.none++;}
+        survLog(who,'10完成 '+(pts.voice||'役なし')+' +'+pts.total+'点／補充'+pts.total+'枚（手札'+reward.before+'→'+reward.after+(pts.total-reward.added>0?'＋予備'+(pts.total-reward.added):'')+'）');
         setSurvivalReward({...reward,who,role:pts.voice,pts:pts.total,until:performance.now()+1600});
         playComboSfx(pts.voice||'役なし');finishRushBoard(who,pts.total,pts.voice);checkSurvivalEmpty();return;
       }

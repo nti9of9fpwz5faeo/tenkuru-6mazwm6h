@@ -2205,7 +2205,8 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .survival-roles th,.survival-roles td{padding:11px 7px;border-bottom:1px solid #d6e1ea;}
 .survival-roles th{color:#08628e;background:#eaf6fc;}.survival-roles td:not(:first-child){white-space:nowrap;font-weight:700;}
 .gp-screen.survival-playing>.gp-field-area{margin-top:calc(46 * var(--u)) !important;} /* v261 ディーラーの手札と場のあいだに間をとる */
-.gp-screen.survival-playing>.gp-hand-area{margin-top:calc(70 * var(--u)) !important;} /* v261 手札をもう少し下へ */
+.gp-screen.survival-playing{position:relative;} /* v262 */
+.gp-screen.survival-playing>.gp-hand-area{position:absolute !important;left:0;right:0;bottom:max(env(safe-area-inset-bottom,0px),calc(10 * var(--u))) !important;margin:0 !important;} /* v262 手札マットを画面の一番下に固定（機種の高さに左右されない） */
 .survival-new .card{box-shadow:0 0 calc(9 * var(--u)) #00aeee!important;outline:calc(2 * var(--u)) solid #36c8f0;}
 .survival-new:after{content:'NEW';position:absolute;bottom:calc(-3 * var(--u));left:50%;transform:translateX(-50%);font-size:calc(9 * var(--u));font-weight:800;color:white;background:#078ad0;border-radius:calc(5 * var(--u));padding:calc(1 * var(--u)) calc(5 * var(--u));z-index:8;pointer-events:none;}
 
@@ -3338,7 +3339,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v261'; // v261(2026/09/16): 役サバイバルだけ、ディーラーの手札と場のあいだに間隔(46u)を入れ、手札を下(70u)へ移動。通常マップの配置は変えていない
+const APP_VER='v262'; // v262(2026/09/16): 役サバイバルの手札マットを画面下端に固定（機種の画面高さに左右されないように）。通常マップは変更なし
+// const APP_VER='v261'; // v261(2026/09/16): 役サバイバルだけ、ディーラーの手札と場のあいだに間隔(46u)を入れ、手札を下(70u)へ移動。通常マップの配置は変えていない
 // const APP_VER='v260'; // v260(2026/09/16): 役サバイバルの対戦フィールドを通常マップと同じ見た目に戻した（専用の得点ボックス・補充テロップ・手札ヘッダー・脚注・役一覧ボタン・空き枠・専用レイアウトCSSを撤去し、通常のYOU/DEALER得点表示に統一）
 // const APP_VER='v259'; // v259: 役サバイバル（60秒・役で補充・手札上限10枚）
 // const APP_VER='v256'; // v256: 自分のチャージと場の4枠を画面中央へ

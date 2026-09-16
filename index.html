@@ -3354,7 +3354,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v274'; // v274(2026/09/16): 役サバイバルの難易度選択を廃止（常に強い方）。AIが自分から空の場を開けないように変更（開けた側が損なので相手に開けさせる）。完成できる場面の反応も速く
+const APP_VER='v275'; // v275(2026/09/16): 役サバイバルでAIのカーソル移動とカード飛行を短縮（決めてから場に届くまで約0.5秒かかり、毎回プレイヤーに先取りされていた）。待ちログの重複も抑制
+// const APP_VER='v274'; // v274(2026/09/16): 役サバイバルの難易度選択を廃止（常に強い方）。AIが自分から空の場を開けないように変更（開けた側が損なので相手に開けさせる）。完成できる場面の反応も速く
 // const APP_VER='v273'; // v273(2026/09/16): 役サバイバルの手札マットをさらに持ち上げた（下端26u→56u）
 // const APP_VER='v272'; // v272(2026/09/16): 役サバイバルのステージ設定から smart:true と winMsAbs を外した。これらが残っていたため v271 の専用AI・専用の速さが一度も使われていなかった
 // const APP_VER='v271'; // v271(2026/09/16): 役サバイバルのAIを修正。仕上げ札を持っていない場面で場を育てない（相手に10を渡す置き方を強く嫌い、どれを置いても渡すなら待つ）。出す速さも専用に大幅短縮
@@ -3937,7 +3938,7 @@ function RushResult({data,onRetry,onBack}){
 
 // v259: isolated 60-second hand-survival experiment.
 const SURVIVAL_ROLES=[['役なし（5・5も含む）',1,1],['ワンペア',2,2],['ツーペア',3,3],['スリーカード',4,4],['ストレート',5,5]];
-function survivalStage(diff){return {...rushStage(diff),rush:false,survival:true,name:'役サバイバル',timeLimit:60,smart:false,firstMs:null,firstJit:0,winMsAbs:null,winMs:null};} // v272 ラッシュ設定のうち、セトラ用の思考(smart)と決定打の待ち時間(winMsAbs)を外す。これが残っていたため専用AIも専用の速さも効いていなかった
+function survivalStage(diff){return {...rushStage(diff),rush:false,survival:true,name:'役サバイバル',timeLimit:60,smart:false,firstMs:null,firstJit:0,winMsAbs:null,winMs:null,flyMs:140,flyMsFirst:140,curStep:18,curArr:22,curHold:18};} // v275 カーソル移動とカードの飛行時間を短縮。決めてから場に届くまでが遅く、毎回プレイヤーに先に取られていたため // v272 ラッシュ設定のうち、セトラ用の思考(smart)と決定打の待ち時間(winMsAbs)を外す。これが残っていたため専用AIも専用の速さも効いていなかった
 function SurvivalRoles(){return h('table',{className:'survival-roles'},h('thead',null,h('tr',null,['役','補充','得点'].map(t=>h('th',{key:t},t)))),h('tbody',null,SURVIVAL_ROLES.map(([role,n,pt])=>h('tr',{key:role},h('td',null,role),h('td',null,n+'枚'),h('td',null,'＋'+pt+'点')))));}
 function SurvivalScreen({onBattle,onBack}){
  const[diff,setDiff]=useState('normal');
@@ -4766,7 +4767,7 @@ function App(){
   // v140 オルビィ: 手札が裏返っている残りラウンド数
   const[hideLeft,setHideLeft]=useState(0);const hideLeftR=useRef(0);
   const[justStolen,setJustStolen]=useState([]); // v141 奪った直後の強調
-  const survLogR=useRef([]),survStatR=useRef(null); // v265 計測モード
+  const survLogR=useRef([]),survStatR=useRef(null),waitLogR=useRef(null); // v265 計測モード / v275 待ちログの重複よけ
   const shufTmR=useRef(null);
   const pResR=useRef([]),dResR=useRef([]);          // v263 役サバイバル：手札に入りきらない分の予備
   const[resv,setResv]=useState({p:0,d:0});          // v263 予備の枚数表示
@@ -6222,7 +6223,7 @@ function App(){
     //      手札で負けているうちは自分からは開けず、相手に開けさせて刈り取る側にまわる
     if(!cf.length){
       const pN=pHR.current.filter(v=>v!=null).length;
-      if(stock<=pN+1&&Math.random()<0.9){survLog('dealer','場を開けずに待つ（自分'+stock+'枚 / 相手'+pN+'枚・開けた側が損）');return null;}
+      if(stock<=pN+1&&Math.random()<0.9){if(waitLogR.current!=='open'){waitLogR.current='open';survLog('dealer','場を開けずに待つ（自分'+stock+'枚 / 相手'+pN+'枚・開けた側が損）');}return null;}
       const opener=safe.filter(v=>10-v>5); // 出しても1枚では10にされない札（1〜4）
       if(opener.length){const o=opener.sort((a,b)=>a-b)[0];survLog('dealer',o+'を出す ← 場を開ける（1枚では取られない）');return o;}
     }
@@ -6233,7 +6234,7 @@ function App(){
     const okList=safe.filter(v=>mine(v)||!gift(v));
     if(!okList.length){
       // どれを置いても相手に渡してしまう。手札に余裕がなければ置かずに待つ
-      if(stock<=8&&Math.random()<(sharp?0.92:0.7)){survLog('dealer','置かずに待つ（どれを出しても相手に10を渡す・在庫'+stock+'枚）');return null;}
+      if(stock<=8&&Math.random()<(sharp?0.92:0.7)){const k='hold'+cs;if(waitLogR.current!==k){waitLogR.current=k;survLog('dealer','置かずに待つ（どれを出しても相手に10を渡す・在庫'+stock+'枚）');}return null;}
     }
     const pool=okList.length?okList:safe;
     const score=v=>{
@@ -6249,6 +6250,7 @@ function App(){
       if(cf.length>=3)sc-=1.2;                            // 4枚目は慎重に
       return sc+(sharp?0:Math.random()*1.2);              // ふつうは少しブレる
     };
+    waitLogR.current=null;
     const pick=pool.reduce((b,v)=>score(v)>score(b)?v:b,pool[0]);
     const ns=cs+pick,need=10-ns;let br=0;
     for(let k=1;k<=5;k++)if(ns+k===10&&canPlay(k,ns,[...cf,pick]))br=Math.max(br,calcPts([...cf,pick,k]).total);

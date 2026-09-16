@@ -2207,7 +2207,7 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .gp-screen.survival-playing>.gp-field-area{margin-top:calc(46 * var(--u)) !important;} /* v261 ディーラーの手札と場のあいだに間をとる */
 .gp-screen.survival-playing{position:relative;} /* v262 */
 .gp-screen.survival-playing>.gp-dealer-area{margin-top:calc(62 * var(--u)) !important;} /* v268 相手の手札をほんの少しだけ下げる */
-.gp-screen.survival-playing>.gp-hand-area{position:absolute !important;left:0;right:0;bottom:max(env(safe-area-inset-bottom,0px),calc(26 * var(--u))) !important;margin:0 !important;} /* v262/v268 下固定のまま、ほんの少しだけ持ち上げる */
+.gp-screen.survival-playing>.gp-hand-area{position:absolute !important;left:0;right:0;bottom:max(env(safe-area-inset-bottom,0px),calc(56 * var(--u))) !important;margin:0 !important;} /* v262/v268/v273 下固定のまま、さらに持ち上げる */
 .surv-measure{margin-top:14px;text-align:left;}
 .surv-measure-toggle.copy{margin-top:8px;background:#e9f6ff;}
 .surv-measure-toggle{width:100%;padding:10px;border-radius:12px;border:1px solid #bcd6e6;background:#f2fafe;color:#18628f;font-weight:700;}
@@ -3354,7 +3354,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v272'; // v272(2026/09/16): 役サバイバルのステージ設定から smart:true と winMsAbs を外した。これらが残っていたため v271 の専用AI・専用の速さが一度も使われていなかった
+const APP_VER='v273'; // v273(2026/09/16): 役サバイバルの手札マットをさらに持ち上げた（下端26u→56u）
+// const APP_VER='v272'; // v272(2026/09/16): 役サバイバルのステージ設定から smart:true と winMsAbs を外した。これらが残っていたため v271 の専用AI・専用の速さが一度も使われていなかった
 // const APP_VER='v271'; // v271(2026/09/16): 役サバイバルのAIを修正。仕上げ札を持っていない場面で場を育てない（相手に10を渡す置き方を強く嫌い、どれを置いても渡すなら待つ）。出す速さも専用に大幅短縮
 // const APP_VER='v270'; // v270(2026/09/16): 計測パネルに「計測をコピー」ボタンを追加（集計＋全ログをテキストで書き出す）。ログの表示領域も広げた
 // const APP_VER='v269'; // v269(2026/09/16): 役サバイバルの補充枚数を1段ずつ増やした（役なし1／ワンペア2／ツーペア3／スリーカード4／ストレート5）。得点はそのまま。AIの見積りとルール表記も合わせて更新

@@ -3354,7 +3354,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v273'; // v273(2026/09/16): 役サバイバルの手札マットをさらに持ち上げた（下端26u→56u）
+const APP_VER='v274'; // v274(2026/09/16): 役サバイバルの難易度選択を廃止（常に強い方）。AIが自分から空の場を開けないように変更（開けた側が損なので相手に開けさせる）。完成できる場面の反応も速く
+// const APP_VER='v273'; // v273(2026/09/16): 役サバイバルの手札マットをさらに持ち上げた（下端26u→56u）
 // const APP_VER='v272'; // v272(2026/09/16): 役サバイバルのステージ設定から smart:true と winMsAbs を外した。これらが残っていたため v271 の専用AI・専用の速さが一度も使われていなかった
 // const APP_VER='v271'; // v271(2026/09/16): 役サバイバルのAIを修正。仕上げ札を持っていない場面で場を育てない（相手に10を渡す置き方を強く嫌い、どれを置いても渡すなら待つ）。出す速さも専用に大幅短縮
 // const APP_VER='v270'; // v270(2026/09/16): 計測パネルに「計測をコピー」ボタンを追加（集計＋全ログをテキストで書き出す）。ログの表示領域も広げた
@@ -3914,8 +3915,7 @@ function rushRoundResult(match,pp,dp,rn){
 }
 function rushStage(diff){return {no:1,name:'10秒ラッシュ',rivalName:'DEALER',rush:true,diff:diff==='hard'?'hard':'normal',noBoost:true,winPt:RUSH_CFG.target,timeLimit:RUSH_CFG.roundSec,smart:true,firstMs:400,firstJit:150,winMsAbs:diff==='hard'?400:650,flyMs:300,curStep:70,curArr:80,curHold:80};}
 function RushScreen({onBattle,onBack}){
-  const[diff,setDiff]=useState('normal');
-  return h('main',{className:'rush-screen'},h('section',{className:'rush-card'},
+   return h('main',{className:'rush-screen'},h('section',{className:'rush-card'},
     h('p',{className:'rush-eyebrow'},'TEN-KURU'),h('h1',null,'10秒ラッシュ'),
     h('p',{className:'rush-lead'},'取られても、すぐ取り返せる。'),
     h('div',{className:'rush-rule-grid'},h('div',null,h('b',null,'10秒'),'1ラウンド'),h('div',null,h('b',null,'5勝'),'先に取れば勝利')),
@@ -3945,8 +3945,7 @@ function SurvivalScreen({onBattle,onBack}){
  h('p',{className:'rush-eyebrow'},'TEN-KURU · お試し'),h('h1',null,'役サバイバル'),h('p',{className:'rush-lead'},'役を作って、手札をつなごう。'),
  h('div',{className:'rush-rule-grid'},h('div',null,h('b',null,'60秒'),'得点勝負'),h('div',null,h('b',null,'10枚'),'開始時・手札上限')),
  h(SurvivalRoles),h('ul',{className:'rush-rules'},h('li',null,'10を完成させた側が、得点と補充を獲得。'),h('li',null,'手札は上限10枚。あふれた補充は予備にたまり、手札が空くと自動で入る。'),h('li',null,'補充後に手札0枚なら、その時点で敗北。'),h('li',null,'時間での補充・チャージはなし。バーストは相手に1点。'),h('li',null,'双方が手詰まりなら、手札を残して場だけリセット。'),h('li',null,'60秒終了時は得点が多い側の勝ち。同点は引き分け。')),
- h('fieldset',{className:'rush-difficulty'},h('legend',null,'相手の強さ'),[['normal','ふつう'],['hard','むずかしい']].map(([value,label])=>h('label',{key:value},h('input',{type:'radio',name:'survival-difficulty',checked:diff===value,onChange:()=>setDiff(value)}),label))),
- h('button',{className:'rush-primary',onClick:()=>onBattle(diff)},'遊んでみる'),h('button',{className:'rush-secondary',onClick:onBack},'ホームへ')));
+ h('button',{className:'rush-primary',onClick:()=>onBattle('hard')},'遊んでみる'),h('button',{className:'rush-secondary',onClick:onBack},'ホームへ')));
 }
 function SurvivalResult({data,onRetry,onBack}){
  return h('main',{className:'rush-screen survival-screen'},h('section',{className:'rush-card'},h('p',{className:'rush-eyebrow'},'役サバイバル'),h('h1',null,data.winner==='draw'?'引き分け':data.winner==='player'?'勝利！':'敗北'),
@@ -5898,7 +5897,7 @@ function App(){
       // 10完成できる時も人間が反応できる程度の「間」を必ず空ける(v40)
       if(isSurvival()){ // v271 役サバイバルはテンポ勝負。通常モードより明確に速くする
         const sh=diff==='hard';
-        if(canWin)d=sh?170+Math.random()*130:260+Math.random()*180;
+        if(canWin)d=sh?100+Math.random()*90:180+Math.random()*140;
         else if(fl===0)d=sh?120+Math.random()*130:200+Math.random()*180;
         else d=sh?200+Math.random()*180:320+Math.random()*220;
       }
@@ -6219,6 +6218,14 @@ function App(){
       if(better){survStatR.current&&survStatR.current.dealer.skip++;survLog('dealer','完成を見送り（役なし止まり・在庫'+stock+'枚あるので大きい役を狙う）');}
     }
     if(!safe.length)return wins.length?wins[0]:null;
+    // v274 このモードは「先に場を開けた側が損」。開けた1枚は相手の完成材料になりやすいので、
+    //      手札で負けているうちは自分からは開けず、相手に開けさせて刈り取る側にまわる
+    if(!cf.length){
+      const pN=pHR.current.filter(v=>v!=null).length;
+      if(stock<=pN+1&&Math.random()<0.9){survLog('dealer','場を開けずに待つ（自分'+stock+'枚 / 相手'+pN+'枚・開けた側が損）');return null;}
+      const opener=safe.filter(v=>10-v>5); // 出しても1枚では10にされない札（1〜4）
+      if(opener.length){const o=opener.sort((a,b)=>a-b)[0];survLog('dealer',o+'を出す ← 場を開ける（1枚では取られない）');return o;}
+    }
     // v271 場を育てるのは「自分で仕上げられる時」だけ。仕上げ札がないのに置くと、相手に10をプレゼントして
     //      こっちは1枚失うだけになる（計測で相手が11枚出して完成1回だった原因）
     const mine=v=>dHR.current.includes(10-(cs+v));        // 出したあと自分で10にできる

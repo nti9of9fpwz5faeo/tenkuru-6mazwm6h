@@ -2204,6 +2204,8 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .survival-roles{width:100%;border-collapse:collapse;text-align:left;font-size:16px;color:#243b56;}
 .survival-roles th,.survival-roles td{padding:11px 7px;border-bottom:1px solid #d6e1ea;}
 .survival-roles th{color:#08628e;background:#eaf6fc;}.survival-roles td:not(:first-child){white-space:nowrap;font-weight:700;}
+.gp-screen.survival-playing>.gp-field-area{margin-top:calc(46 * var(--u)) !important;} /* v261 ディーラーの手札と場のあいだに間をとる */
+.gp-screen.survival-playing>.gp-hand-area{margin-top:calc(70 * var(--u)) !important;} /* v261 手札をもう少し下へ */
 .survival-new .card{box-shadow:0 0 calc(9 * var(--u)) #00aeee!important;outline:calc(2 * var(--u)) solid #36c8f0;}
 .survival-new:after{content:'NEW';position:absolute;bottom:calc(-3 * var(--u));left:50%;transform:translateX(-50%);font-size:calc(9 * var(--u));font-weight:800;color:white;background:#078ad0;border-radius:calc(5 * var(--u));padding:calc(1 * var(--u)) calc(5 * var(--u));z-index:8;pointer-events:none;}
 
@@ -3336,7 +3338,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v260'; // v260(2026/09/16): 役サバイバルの対戦フィールドを通常マップと同じ見た目に戻した（専用の得点ボックス・補充テロップ・手札ヘッダー・脚注・役一覧ボタン・空き枠・専用レイアウトCSSを撤去し、通常のYOU/DEALER得点表示に統一）
+const APP_VER='v261'; // v261(2026/09/16): 役サバイバルだけ、ディーラーの手札と場のあいだに間隔(46u)を入れ、手札を下(70u)へ移動。通常マップの配置は変えていない
+// const APP_VER='v260'; // v260(2026/09/16): 役サバイバルの対戦フィールドを通常マップと同じ見た目に戻した（専用の得点ボックス・補充テロップ・手札ヘッダー・脚注・役一覧ボタン・空き枠・専用レイアウトCSSを撤去し、通常のYOU/DEALER得点表示に統一）
 // const APP_VER='v259'; // v259: 役サバイバル（60秒・役で補充・手札上限10枚）
 // const APP_VER='v256'; // v256: 自分のチャージと場の4枠を画面中央へ
 // const APP_VER='v255'; // v255: 手札チャージと綱引きゲージ、20点差で即決着
@@ -6447,7 +6450,7 @@ function App(){
   const chargeEmpty=so.charge&&charge.player+1e-9<1;
   const rival=(form2&&so.form2Name)||so.rivalName||'DEALER';
   // v62: 第7は「ルナ」／v70: 第2形態は「レイピア」
-  return h('div',{className:'gp-screen'+(so.charge?' charge-playing':'')+(so.rush?' rush-playing':'')+(endHold?' end-hold':'')+(so.challenge?' ch7':'')+(so.ch8?' ch8':'')+(so.ch9?' ch9':'')+(so.ch10?' ch10':'')+(form2?' f2':'')+(screenPop?' form2-pop':'')+(lkFx?' lk-on':'')},
+  return h('div',{className:'gp-screen'+(so.charge?' charge-playing':'')+(so.survival?' survival-playing':'')+(so.rush?' rush-playing':'')+(endHold?' end-hold':'')+(so.challenge?' ch7':'')+(so.ch8?' ch8':'')+(so.ch9?' ch9':'')+(so.ch10?' ch10':'')+(form2?' f2':'')+(screenPop?' form2-pop':'')+(lkFx?' lk-on':'')},
     h(ChampionLayer,{champ:stageOptsR.current&&stageOptsR.current.champion?CHAMPIONS[stageOptsR.current.champion]:null}), // v61 チャンピオン戦は立ち絵
     so.challenge&&h('div',{className:'champ-layer'},
       form2

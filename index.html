@@ -2197,6 +2197,7 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .charge-result-balance .victory-end{font-size:13px;}.charge-result-balance .victory-end b{font-size:17px;}
 @media(prefers-reduced-motion:reduce){.victory-marker,.victory-advantage{transition:none;}}
 
+.gp-screen.charge-playing>.charge-reset-notice{position:absolute;left:50%;top:calc(202 * var(--u));transform:translateX(-50%);z-index:40;padding:calc(7 * var(--u)) calc(14 * var(--u));border:1px solid #fff;border-radius:calc(10 * var(--u));background:#eaf3fcf2;color:#294665;font-size:calc(13 * var(--u));font-weight:800;box-shadow:0 2px 10px #46678a33;pointer-events:none;white-space:nowrap;}
 </style>
 </head>
 <body>
@@ -3326,7 +3327,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v256'; // v256: 自分のチャージと場の4枠を画面中央へ
+const APP_VER='v257'; // v257: 60秒チャージで双方の手詰まり時は場だけリセット
+// const APP_VER='v256'; // v256: 自分のチャージと場の4枠を画面中央へ
 // const APP_VER='v255'; // v255: 手札チャージと綱引きゲージ、20点差で即決着
 // const APP_VER='v254'; // v254: 60秒チャージ（4個ゲージ・1.5秒回復・ラウンドなし）
 // const APP_VER='v253'; // v253: ホームに10秒ラッシュ（10秒間の得点勝負・5ラウンド先取）
@@ -3892,7 +3894,7 @@ function RushResult({data,onRetry,onBack}){
 }
 
 // ── v254 60秒チャージ ──
-const CHARGE_CFG={matchSec:60,max:4,initial:2,refillMs:1500,leadToWin:20};
+const CHARGE_CFG={matchSec:60,max:4,initial:2,refillMs:1500,leadToWin:20,stuckMs:700};
 function chargeStage(diff){return {...rushStage(diff),rush:false,charge:true,name:'60秒チャージ',timeLimit:CHARGE_CFG.matchSec};}
 function chargeAdvance(pool,now){
   const elapsed=Math.max(0,now-pool.at)/CHARGE_CFG.refillMs;
@@ -3922,7 +3924,7 @@ function ChargeScreen({onBattle,onBack}){
   return h('main',{className:'rush-screen charge-screen'},h('section',{className:'rush-card'},
     h('p',{className:'rush-eyebrow'},'TEN-KURU'),h('h1',null,'60秒チャージ'),h('p',{className:'rush-lead'},'貯めるか、今出すか。'),
     h('div',{className:'rush-rule-grid'},h('div',null,h('b',null,'20点差'),'端に届けば即決着'),h('div',null,h('b',null,'4個'),'ゲージの上限')),
-    h('ul',{className:'rush-rules'},h('li',null,'ゲージは2個から開始。札1枚で1個消費。'),h('li',null,'1.5秒で1個回復。相手のゲージも見える。'),h('li',null,'10を作ると役の得点。バーストは相手に1点。'),h('li',null,'場が空になっても続行。ラウンドの区切りはなし。'),h('li',null,'手札は使い切ったら補充。ゲージは全回復しない。'),h('li',null,'勝敗ゲージは中央0から。20点差で即決着。'),h('li',null,'端に届かなければ60秒時点の優勢側が勝ち。中央なら引き分け。')),
+    h('ul',{className:'rush-rules'},h('li',null,'ゲージは2個から開始。札1枚で1個消費。'),h('li',null,'1.5秒で1個回復。相手のゲージも見える。'),h('li',null,'10を作ると役の得点。バーストは相手に1点。'),h('li',null,'双方に安全な札がなければ場だけリセット。手札・チャージはそのまま。'),h('li',null,'手札は使い切ったら補充。ゲージは全回復しない。'),h('li',null,'勝敗ゲージは中央0から。20点差で即決着。'),h('li',null,'端に届かなければ60秒時点の優勢側が勝ち。中央なら引き分け。')),
     h('fieldset',{className:'rush-difficulty'},h('legend',null,'相手の強さ'),[['normal','ふつう'],['hard','むずかしい']].map(([value,label])=>h('label',{key:value},h('input',{type:'radio',name:'charge-difficulty',value,checked:diff===value,onChange:()=>setDiff(value)}),label))),
     h('button',{className:'rush-primary',onClick:()=>onBattle(diff)},'チャレンジする'),h('button',{className:'rush-secondary',onClick:onBack},'ホームへ')
   ));
@@ -4622,6 +4624,7 @@ function App(){
   function isTimedMode(){return isRush()||isCharge();}
   const chargeR=useRef({player:CHARGE_CFG.initial,dealer:CHARGE_CFG.initial,at:0});
   const[charge,setCharge]=useState(chargeR.current);
+  const chargeStuckR=useRef(null);
   function updateCharge(){
     if(!isCharge()||rushClosedR.current||pausedR.current||countNumR.current>=0)return;
     chargeR.current=chargeAdvance(chargeR.current,Math.min(performance.now(),rushDeadlineR.current));setCharge(chargeR.current);
@@ -5584,7 +5587,7 @@ function App(){
     const f=flyR.current;if(f){refundCharge(f);setDealer([...dHR.current,f.value],[...dRingR.current,f.rf||false],[...dIdsR.current,f.id]);flyR.current=null;setFlyCard(null);}
     lockR.current=true;resolvingR.current=true;
     const tok=roundTokR.current;
-    if(pts){setPtFly({id:Date.now()+Math.random(),text,pts,who,color:who==='player'?'#2e7fe8':'#f5912a'});clearTimeout(rushToastR.current);rushToastR.current=setTimeout(()=>{if(tok===roundTokR.current)setPtFly(null);},850);}
+    if(pts||(isCharge()&&text==='場をリセット')){setPtFly({id:Date.now()+Math.random(),text,pts,who,color:who==='player'?'#2e7fe8':'#f5912a'});clearTimeout(rushToastR.current);rushToastR.current=setTimeout(()=>{if(tok===roundTokR.current)setPtFly(null);},850);}
     clearTimeout(rushSettleR.current);
     rushSettleR.current=setTimeout(()=>{
       if(tok!==roundTokR.current||!isTimedMode()||phaseR.current!=='playing'||rushExpired())return;
@@ -5622,12 +5625,13 @@ function App(){
     if(isTimedMode()){
       clearInterval(timerRef.current);rushClosedR.current=false;
       rushDeadlineR.current=performance.now()+(from==null?(isCharge()?CHARGE_CFG.matchSec:RUSH_CFG.roundSec):from)*1000;
-      if(isCharge())chargeR.current={...chargeR.current,at:performance.now()};
+      if(isCharge()){chargeR.current={...chargeR.current,at:performance.now()};chargeStuckR.current=null;}
       const update=()=>{
         if(!isTimedMode()||phaseR.current!=='playing'||rushClosedR.current)return;
         const left=Math.max(0,(rushDeadlineR.current-performance.now())/1000);
         timeLeftR.current=left;setTimeLeft(Math.ceil(left));updateCharge();
         if(left<=0){if(isCharge())finishChargeMatch();else finishRushRound(rn);}
+        else if(isCharge())checkChargeStuck();
       };
       update();if(!rushClosedR.current)timerRef.current=setInterval(update,50);return;
     }
@@ -5644,6 +5648,22 @@ function App(){
 
       if(t<=0){clearInterval(timerRef.current);clearTimeout(aiRef.current);doTimeUp(rn);}
     },1000);
+  }
+
+  // Charge checks run on its live match clock, independently of legacy FLOW_CFG.
+  // Energy shortages are not deadlocks: a numerically safe card can wait for recharge.
+  function checkChargeStuck(){
+    const field=fieldR.current,flight=flyR.current;
+    if(!isCharge()||phaseR.current!=='playing'||rushClosedR.current||pausedR.current||countNumR.current>=0||resolvingR.current||lockR.current||sceneOnR.current||pStopR.current||rStopR.current||eraseBusyR.current||!field.length){chargeStuckR.current=null;return;}
+    // Wait for an ordinary empty-hand refill, and count a card still in flight.
+    if(!pHR.current.some(v=>v!==null)||(!dHR.current.length&&!flight)){chargeStuckR.current=null;return;}
+    const safe=v=>v!=null&&canPlay(v,fieldSumR.current,field)&&fieldSumR.current+v<=10;
+    if(pHR.current.some(safe)||dHR.current.some(safe)||(flight&&safe(flight.value))){chargeStuckR.current=null;return;}
+    const now=performance.now(),pending=chargeStuckR.current;
+    if(!pending||pending.field!==field){chargeStuckR.current={field,at:now};return;}
+    if(now-pending.at<CHARGE_CFG.stuckMs)return;
+    chargeStuckR.current=null;
+    finishRushBoard(null,0,'場をリセット');
   }
 
   // v175 お互いに出せる札がない → 場を空けて両方の手札を配り直す
@@ -6379,7 +6399,8 @@ function App(){
     chronoFx==='out'&&h('div',{className:'chrono-flash'}),
     linkMode&&h('div',{className:'link-banner'},h('b',null,CHRONO_TEXT.en),CHRONO_TEXT.hint),
     endFx&&h('div',{key:'endfx',className:'end-fx '+(endFx.winner==='player'?(endFx.boss?'win boss':'win'):'lose')},h('div',{className:'dim'}),h('div',{className:'glow'}),endFx.boss&&endFx.winner==='player'&&[h('div',{key:'r1',className:'ring'}),h('div',{key:'r2',className:'ring r2'})],h('div',{className:'slash'}),h('div',{className:'big'},endFx.winner==='player'?(endFx.boss?'BOSS DOWN':'WIN'):'LOSE')), // v202
-    ptFly&&h('div',{key:'pf_'+ptFly.id,className:'ptfly',style:{'--ms':FLOW_CFG.flyMs+'ms','--c':ptFly.color,'--tx':so.charge?'calc(50% + 156 * var(--u))':ptFly.who==='player'?'14%':'86%','--ty':so.charge?'calc(274 * var(--u))':'9%'}},h('div',{className:'role'},ptFly.text),h('div',{className:'pt'},'+'+ptFly.pts)), // v175
+    ptFly&&so.charge&&ptFly.pts===0&&h('div',{className:'charge-reset-notice',role:'status'},ptFly.text),
+    ptFly&&ptFly.pts>0&&h('div',{key:'pf_'+ptFly.id,className:'ptfly',style:{'--ms':FLOW_CFG.flyMs+'ms','--c':ptFly.color,'--tx':so.charge?'calc(50% + 156 * var(--u))':ptFly.who==='player'?'14%':'86%','--ty':so.charge?'calc(274 * var(--u))':'9%'}},h('div',{className:'role'},ptFly.text),h('div',{className:'pt'},'+'+ptFly.pts)), // v175
     comboShow&&h(CyberComboDisplay,{key:'c_'+comboShow.id,combo:comboShow}), // v88: keyにDate.now()を使うと再描画のたびに演出が再発火してた
     timeUpShow&&h(TimeUpDisplay,{key:'tu_'+Date.now(),show:true}),
     countNum>=0&&h('div',{style:{position:'fixed',inset:0,zIndex:200,display:'flex',alignItems:'center',justifyContent:'center',background:'#2a103066',pointerEvents:'none'}},

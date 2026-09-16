@@ -113,4 +113,49 @@ for(const winner of ['player','dealer'])for(const cause of ['exact','role','burs
  const t=start();t.clock.advance(60000);assert.equal(t.render().props.data.winner,'draw');
  const late=start();late.app.pPtR.current=19;late.clock.jump(60000);late.app.completeTen([5,5],'player',1);assert.equal(late.app.pPtR.current,19);assert.equal(late.render().props.data.charge.reason,'time');
 }
-console.log('PASS: charge hand bars and single-row opponent; fixed-center victory meter; exact/overshoot/burst 20-point-lead finishes; timed wins/draws; equal energy; CPU; pause/retry; saves.');
+// v257: Reproduce the reported 2+1+5 board using the actual 50ms match timer.
+function deadlock(){
+ const e=start();e.app.dealPlayer([3,5,1,3,3,1,5]);e.app.setDealer([1,1,5,5]);
+ e.app.resolvePlay(5,[2,1],3,'dealer',1);return e;
+}
+{
+ const e=deadlock(),a=e.app;const ph=JSON.stringify(a.pHR.current),dh=JSON.stringify(a.dHR.current),ids=JSON.stringify(a.dIdsR.current),stats=JSON.stringify(a.matchStatsR.current),deadline=a.rushDeadlineR.current;
+ a.pPtR.current=7;a.dPtR.current=3;e.clock.advance(700);assert.equal(a.fieldSumR.current,8);
+ e.clock.advance(100);assert.ok(walk(e.render()).some(n=>n.props.className==='charge-reset-notice'&&n.children[0]==='場をリセット'));
+ e.clock.advance(200);assert.equal(a.fieldR.current.length,0);assert.equal(a.fieldSumR.current,0);assert.equal(a.resolvingR.current,false);
+ assert.equal(a.pPtR.current,7);assert.equal(a.dPtR.current,3);assert.equal(a.rushDeadlineR.current,deadline);near(a.timeLeftR.current,59);
+ assert.equal(JSON.stringify(a.pHR.current),ph);assert.equal(JSON.stringify(a.dHR.current),dh);assert.equal(JSON.stringify(a.dIdsR.current),ids);assert.equal(JSON.stringify(a.matchStatsR.current),stats);
+ near(a.chargeR.current.player,2+1/1.5);near(a.chargeR.current.dealer,2+1/1.5);
+ e.clock.advance(1000);assert.equal(walk(e.render()).filter(n=>n.props.className==='charge-reset-notice').length,0);assert.equal(a.fieldR.current.length,0);
+}
+// One safe card on either side prevents a reset, even while its gauge is empty.
+for(const who of ['player','dealer']){
+ const e=deadlock();if(who==='player')e.app.dealPlayer([2]);else e.app.setDealer([2]);
+ e.app.chargeR.current={player:0,dealer:0,at:e.clock.now()};e.clock.advance(1200);assert.equal(e.app.fieldSumR.current,8);assert.equal(e.app.resolvingR.current,false);
+}
+// An incomplete low total in slot three is also a deadlock; an empty field is not.
+{
+ const e=start();e.app.dealPlayer([1,1]);e.app.setDealer([1,1]);e.app.resolvePlay(1,[1],1,'dealer',1);e.clock.advance(1000);assert.equal(e.app.fieldR.current.length,0);
+ const hand=JSON.stringify(e.app.pHR.current);e.clock.advance(1500);assert.equal(JSON.stringify(e.app.pHR.current),hand);assert.equal(e.app.resolvingR.current,false);
+}
+// A safe flight remains eligible until it lands; an unsafe flight is returned once.
+{
+ const e=deadlock();e.app.setDealer([2,5]);e.app.stageOptsR.current.flyMs=1200;
+ e.app.commitDealerPlay({id:e.app.dIdsR.current[0],value:2},1);e.clock.advance(1000);assert.equal(e.app.fieldSumR.current,8);assert.ok(e.app.flyR.current);
+ e.clock.advance(400);assert.equal(e.app.fieldR.current.length,0);assert.ok(e.app.dPtR.current>0);
+}
+{
+ const e=deadlock();e.app.setDealer([5]);const id=e.app.dIdsR.current[0];e.clock.advance(700);e.app.commitDealerPlay({id,value:5},1);assert.ok(e.app.flyR.current);
+ e.clock.advance(300);assert.equal(e.app.fieldR.current.length,0);assert.equal(e.app.dHR.current.join(','),'5');assert.equal(e.app.dIdsR.current[0],id);near(e.app.chargeR.current.dealer,2+1/1.5);assert.equal(e.app.dPtR.current,0);assert.equal(e.app.pPtR.current,0);
+}
+// Pending checks cannot run during pause, after leaving, or at the match deadline.
+{
+ const e=deadlock();e.clock.advance(650);e.app.togglePause();e.clock.advance(10000);assert.equal(e.app.fieldSumR.current,8);
+ e.app.togglePause();e.clock.advance(650);assert.equal(e.app.fieldSumR.current,8);e.clock.advance(350);assert.equal(e.app.fieldR.current.length,0);
+}
+{
+ const e=deadlock();e.clock.advance(650);e.app.goHome();e.clock.advance(2000);assert.equal(e.app.phaseR.current,'charge');assert.equal(walk(e.render()).filter(n=>n.props.className==='charge-reset-notice').length,0);
+ const last=start();last.clock.advance(59400);last.app.dealPlayer([1,5]);last.app.setDealer([1,5]);last.app.resolvePlay(5,[2,1],3,'dealer',1);last.clock.advance(600);assert.equal(last.app.phaseR.current,'gameEnd');assert.equal(last.app.pPtR.current,0);assert.equal(last.app.dPtR.current,0);
+ const rush=engine();rush.app.startRushBattle('hard');while(rush.app.countNumR.current>=0)rush.clock.advance(1);rush.app.dealPlayer([1,5]);rush.app.setDealer([1,5]);rush.app.resolvePlay(5,[2,1],3,'dealer',1);rush.clock.advance(1500);assert.equal(rush.app.fieldSumR.current,8,'new rule is scoped to charge mode');
+}
+console.log('PASS: charge hand bars and single-row opponent; automatic deadlock reset preserving hands/charge/score/clock; fixed-center victory meter; exact/overshoot/burst 20-point-lead finishes; timed wins/draws; equal energy; CPU; pause/retry; saves.');

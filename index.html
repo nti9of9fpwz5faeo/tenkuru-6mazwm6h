@@ -2204,33 +2204,8 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .survival-roles{width:100%;border-collapse:collapse;text-align:left;font-size:16px;color:#243b56;}
 .survival-roles th,.survival-roles td{padding:11px 7px;border-bottom:1px solid #d6e1ea;}
 .survival-roles th{color:#08628e;background:#eaf6fc;}.survival-roles td:not(:first-child){white-space:nowrap;font-weight:700;}
-.gp-screen.survival-playing{grid-template-rows:calc(104 * var(--u)) calc(96 * var(--u)) calc(140 * var(--u)) calc(52 * var(--u)) calc(220 * var(--u));gap:0;}
-.gp-screen.survival-playing>.gp-top-bar{height:calc(94 * var(--u));width:100%;}
-.gp-screen.survival-playing .gp-time-box{position:absolute;left:50%;top:calc(30 * var(--u));transform:translateX(-50%);width:calc(90 * var(--u));height:calc(64 * var(--u));background:#f5fcffb8!important;color:#24344b;border:1px solid #fff!important;}
-.gp-screen.survival-playing .gp-time-box .val{color:#24344b!important;font-size:calc(34 * var(--u))!important;}
-.gp-screen.survival-playing .gp-icon-btn{position:absolute;left:0;top:0;width:calc(36 * var(--u));height:calc(32 * var(--u));font-size:calc(28 * var(--u));}
-.gp-screen.survival-playing .gp-track-btn{position:absolute;right:calc(44 * var(--u));top:0;width:calc(32 * var(--u));height:calc(32 * var(--u));}
-.gp-screen.survival-playing>.gp-pause-btn{top:calc(14 * var(--u));right:max(calc(12 * var(--u)),calc((100vw - 336 * var(--u))/2));width:calc(36 * var(--u));height:calc(32 * var(--u));color:#38516b!important;}
-.gp-screen.survival-playing>.survival-scores{position:absolute;top:calc(49 * var(--u));left:50%;transform:translateX(-50%);width:calc(326 * var(--u));display:flex;justify-content:space-between;pointer-events:none;}
-.survival-scores>div{width:calc(100 * var(--u));display:grid;justify-items:center;background:#ffffffb5;border:1px solid white;border-radius:calc(12 * var(--u));padding:calc(5 * var(--u));}
-.survival-scores span{font-size:calc(12 * var(--u));font-weight:700;}.survival-scores b{font-size:calc(29 * var(--u));line-height:1.15;}.survival-scores .opponent{color:#a54a07;}.survival-scores .self{color:#056fa8;}
-.gp-screen.survival-playing>.gp-dealer-area{padding:calc(8 * var(--u)) 0!important;align-self:center;}
-.gp-screen.survival-playing .gp-dealer-area .gp-area-label{font-size:calc(13 * var(--u))!important;letter-spacing:0;}
-.gp-screen.survival-playing .gp-dealer-card{width:calc(28 * var(--u))!important;}
-.gp-screen.survival-playing>.gp-field-area{--card-w:calc(66 * var(--u));gap:calc(8 * var(--u));justify-content:center;}
-.gp-screen.survival-playing>.survival-reward{grid-row:4;align-self:center;min-height:calc(42 * var(--u));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(3 * var(--u));background:#f5fcffe0;border:1px solid white;border-radius:calc(13 * var(--u));color:#12587f;font-size:calc(13 * var(--u));}
-.survival-reward strong{font-size:calc(16 * var(--u));}
-.gp-screen.survival-playing>.gp-hand-area{grid-row:5;--card-w:calc(56 * var(--u));padding-top:calc(8 * var(--u));}
-.survival-hand-header{display:flex;align-items:center;justify-content:space-between;min-height:calc(28 * var(--u));padding:0 calc(5 * var(--u));color:#115e91;font-size:calc(13 * var(--u));}
-.survival-hand-header button{font:inherit;min-height:calc(28 * var(--u));background:#effaff;border:1px solid white;border-radius:calc(12 * var(--u));color:#185b89;padding:0 calc(12 * var(--u));}
-.survival-hand-header button:disabled{opacity:.55;}
-.gp-screen.survival-playing .gp-hand-rows{padding:calc(8 * var(--u));gap:calc(8 * var(--u));}
 .survival-new .card{box-shadow:0 0 calc(9 * var(--u)) #00aeee!important;outline:calc(2 * var(--u)) solid #36c8f0;}
 .survival-new:after{content:'NEW';position:absolute;bottom:calc(-3 * var(--u));left:50%;transform:translateX(-50%);font-size:calc(9 * var(--u));font-weight:800;color:white;background:#078ad0;border-radius:calc(5 * var(--u));padding:calc(1 * var(--u)) calc(5 * var(--u));z-index:8;pointer-events:none;}
-.gp-screen.survival-playing>.survival-footnote{position:absolute;bottom:calc(4 * var(--u));width:100%;left:0;text-align:center;margin:0;font-size:calc(11 * var(--u));color:#455f77;}
-.gp-screen.survival-playing>.survival-help{position:fixed;inset:0;z-index:250;background:#18344b99;display:flex;align-items:center;justify-content:center;padding:18px;}
-.survival-help section{width:min(100%,430px);max-height:90dvh;overflow:auto;padding:24px;background:#f4fbff;border-radius:20px;color:#243b56;font-size:16px;}
-.survival-help h2{font-size:24px;margin:0 0 15px;}.survival-help button{display:block;width:100%;min-height:48px;background:#126c99;color:white;border:0;border-radius:12px;font-size:18px;}
 
 </style>
 </head>
@@ -3361,7 +3336,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v259'; // v259: 役サバイバル（60秒・役で補充・手札上限10枚）
+const APP_VER='v260'; // v260(2026/09/16): 役サバイバルの対戦フィールドを通常マップと同じ見た目に戻した（専用の得点ボックス・補充テロップ・手札ヘッダー・脚注・役一覧ボタン・空き枠・専用レイアウトCSSを撤去し、通常のYOU/DEALER得点表示に統一）
+// const APP_VER='v259'; // v259: 役サバイバル（60秒・役で補充・手札上限10枚）
 // const APP_VER='v256'; // v256: 自分のチャージと場の4枠を画面中央へ
 // const APP_VER='v255'; // v255: 手札チャージと綱引きゲージ、20点差で即決着
 // const APP_VER='v254'; // v254: 60秒チャージ（4個ゲージ・1.5秒回復・ラウンドなし）
@@ -6471,7 +6447,7 @@ function App(){
   const chargeEmpty=so.charge&&charge.player+1e-9<1;
   const rival=(form2&&so.form2Name)||so.rivalName||'DEALER';
   // v62: 第7は「ルナ」／v70: 第2形態は「レイピア」
-  return h('div',{className:'gp-screen'+(so.charge||so.survival?' charge-playing':'')+(so.survival?' survival-playing':'')+(so.rush?' rush-playing':'')+(endHold?' end-hold':'')+(so.challenge?' ch7':'')+(so.ch8?' ch8':'')+(so.ch9?' ch9':'')+(so.ch10?' ch10':'')+(form2?' f2':'')+(screenPop?' form2-pop':'')+(lkFx?' lk-on':'')},
+  return h('div',{className:'gp-screen'+(so.charge?' charge-playing':'')+(so.rush?' rush-playing':'')+(endHold?' end-hold':'')+(so.challenge?' ch7':'')+(so.ch8?' ch8':'')+(so.ch9?' ch9':'')+(so.ch10?' ch10':'')+(form2?' f2':'')+(screenPop?' form2-pop':'')+(lkFx?' lk-on':'')},
     h(ChampionLayer,{champ:stageOptsR.current&&stageOptsR.current.champion?CHAMPIONS[stageOptsR.current.champion]:null}), // v61 チャンピオン戦は立ち絵
     so.challenge&&h('div',{className:'champ-layer'},
       form2
@@ -6520,17 +6496,13 @@ function App(){
     ),
 
     so.rush&&rushBreak&&h('div',{className:'rush-break',role:'status'},h('div',null,h('small',null,'ROUND '+rushBreak.rn),h('h2',null,rushBreak.winner==='draw'?'引き分け':rushBreak.winner==='player'?'ラウンド獲得！':'相手が獲得'),h('p',null,'得点 ',h('strong',null,rushBreak.pp+' — '+rushBreak.dp)),h('p',null,'獲得ラウンド '+rushMatch.pWins+' — '+rushMatch.dWins),h('small',null,'次のラウンドへ…'))),
-    so.survival&&h('div',{className:'survival-scores'},h('div',{className:'opponent'},h('span',null,'相手の点数'),h('b',null,dPt)),h('div',{className:'self'},h('span',null,'自分の点数'),h('b',null,pPt))),
-    so.survival&&h('div',{className:'survival-reward',role:'status'},ptFly&&ptFly.text==='バースト'?h('strong',null,'バースト · '+(ptFly.who==='player'?'自分':'相手')+'に＋1点'):survivalReward&&performance.now()<survivalReward.until?h(React.Fragment,null,h('strong',null,(survivalReward.who==='player'?'自分':'相手')+' · '+survivalReward.role+' ＋'+survivalReward.pts+'点'),h('span',null,'手札 '+survivalReward.before+' → '+survivalReward.after+'　'+survivalReward.added+'枚補充')):h('span',null,'役を作ると得点 ＋ 手札補充')),
-    so.survival&&h('p',{className:'survival-footnote'},'手札は上限10枚 · 補充後0枚で敗北'),
-    survivalHelp&&so.survival&&h('div',{className:'survival-help',role:'dialog','aria-modal':true,'aria-label':'役と補充の一覧'},h('section',null,h('h2',null,'役と補充'),h(SurvivalRoles),h('p',null,'10を完成させた側が獲得。手札は上限10枚。'),h('p',null,'確認中は試合を一時停止しています。'),h('button',{autoFocus:true,onClick:()=>{setSurvivalHelp(false);if(pausedR.current)togglePause();}},'閉じて再開'))),
     // TOP BAR
     h('div',{className:'gp-top-bar'},
       h('div',{className:'gp-time-box'+(timeLeft<=5?' urgent':'')+(linkMode?' frozen':'')+(rStop?' frozen2':'')},
         h('div',{className:'lbl'},'TIME'),
         h('div',{className:'val'},timeLeft)
       ),
-      !so.charge&&!so.survival&&h('div',{className:'gp-score you'+(ptBurst?' pt-burst':'')},
+      !so.charge&&h('div',{className:'gp-score you'+(ptBurst?' pt-burst':'')},
         h('div',{className:'lbl'},(so.rush||so.charge)?'YOU 得点':'YOU'),
         h('div',{className:'val'},pPt),
         so.rush?h('div',{className:'sub'},'獲得 ',h('b',null,rushMatch.pWins),' / 5 R'):FLOW_CFG.enabled?h('div',{className:'sub'},'pt'):h('div',{className:'sub'},'あと ',h('b',null,Math.max(0,winPt-pPt)),'pt')
@@ -6539,7 +6511,7 @@ function App(){
         h('span',{className:'r'},so.charge?'60秒':'R'+rNum),
         h('span',{className:'lvl'},so.charge?'CHARGE':so.rush?'RUSH':curStage?(curStage.boss?'BOSS':'ST '+curStage.no):(difficulty==='easy'?'EASY':difficulty==='hard'?'HARD':difficulty==='master'?'MASTER':'NORMAL'))
       ),
-      !so.charge&&!so.survival&&h('div',{className:'gp-score dealer'},
+      !so.charge&&h('div',{className:'gp-score dealer'},
         h('div',{className:'lbl'},(so.rush||so.charge)?'相手 得点':rival),
         h('div',{className:'val'},dPt),
         so.rush?h('div',{className:'sub'},'獲得 ',h('b',null,rushMatch.dWins),' / 5 R'):FLOW_CFG.enabled?h('div',{className:'sub'},'pt'):h('div',{className:'sub'},'あと ',h('b',null,Math.max(0,winPt-dPt)),'pt')
@@ -6586,7 +6558,7 @@ function App(){
 
     // DEALER 手札
     h('div',{className:'gp-dealer-area'},
-      h('div',{className:'gp-area-label'},so.survival?'相手　手札 '+(dH.length+(flyR.current?1:0))+'枚':so.charge?'DEALER':(so.rivalName?'✦ ':'💀 ')+rival+' — '+dH.length+'枚'),
+      h('div',{className:'gp-area-label'},so.charge?'DEALER':(so.rivalName?'✦ ':'💀 ')+rival+' — '+dH.length+'枚'),
       h('div',{className:'gp-dealer-cards'+(endFx&&endFx.winner==='player'?' defeated':'')}, // v198/v202 相手の敗北：決着と同時に光に溶ける
         (so.survival?dSlots.filter(id=>id!=null):dSlots).map((id,s)=>{const i=id==null?-1:dIdsR.current.indexOf(id);if(i<0||i>=dH.length)return h('div',{key:'e'+s,className:'gp-dealer-card empty'});const v=dH[i];
           return h('div',{key:'c'+id,'data-card-id':id,className:'gp-dealer-card'+(justStolen.includes(id)?' just-stolen':'')+((hideLeft>0&&dRing[i]!=='orby')||(stageOptsR.current&&stageOptsR.current.blind)?' hidden-card':'')+(dRing[i]?' ringed':'')+(dRing[i]==='morpho'?' mring':'')+(dRing[i]==='setra'?' sring':'')+(dRing[i]==='orby'?' oring':'')+(dCur.id===id?' dsel':'')+(dFrz[id]!=null?' dfrz':'')},h('span',{className:'dv'},v),dFrz[id]!=null&&h('span',{className:'dfrz-sec'},dFrz[id]+'s'),
@@ -6610,7 +6582,7 @@ function App(){
 
       h('div',{className:'gp-field-cards'},
         field.map((v,i)=>h('div',{key:i,className:eraseIdx.includes(i)?'fx-erase':undefined,style:{display:'contents'}},h(FieldCard,{value:mist?'?':v,by:fieldColors[i],decisive:endHit&&i===field.length-1,isComplete:fieldSum===10&&i===field.length-1,isSpecial:!!fieldSp[i],shifted:!!fieldShift[i],ringed:fieldRing[i]||false}))), // v197 霧
-        (so.charge||so.survival)&&Array.from({length:Math.max(0,4-field.length)},(_,i)=>h('div',{key:'slot'+i,className:'charge-field-slot','aria-hidden':true}))
+        so.charge&&Array.from({length:Math.max(0,4-field.length)},(_,i)=>h('div',{key:'slot'+i,className:'charge-field-slot','aria-hidden':true}))
       ),
       // FIELD SUM（場のカードの下・前の配置に戻す＋少し強化）
       h('div',{className:'gp-field-sum gp-field-sum-strong',style:{visibility:fieldSum>0?'visible':'hidden'}},
@@ -6638,7 +6610,7 @@ function App(){
       orbyStat&&denyActive()&&h('div',{className:'orby-stat'}, // v166 調査用。原因が分かったら消す
         '判断'+(orbyStat.call||0)+' / 出した'+(orbyStat.play||0)+' / 見送り'+(orbyStat.skip_gift||0)+' / 列作らず'+(orbyStat.skip_nostart||0)+' / 出せる札なし'+(orbyStat.no_playable||0)),
       hideLeft>0&&h('div',{className:'hide-badge'},'不可観測  あと '+hideLeft+' ラウンド'), // v150 効果が続いている間ずっと出す
-      so.survival?h('div',{className:'survival-hand-header'},h('strong',null,'あなた　手札 '+pH.filter(v=>v!=null).length+' / 10'),h('button',{type:'button',disabled:!canPause(),onClick:()=>{togglePause();if(pausedR.current)setSurvivalHelp(true);}},'役一覧 ⓘ')):so.charge?h('div',{className:'charge-hand-header'},h('div',{className:'gp-area-label'},'YOU'),h(ChargeMeter,{value:charge.player,who:'player'})):h('div',{className:'gp-area-label'},'YOU — '+pH.filter(Boolean).length+'枚'),
+      so.charge?h('div',{className:'charge-hand-header'},h('div',{className:'gp-area-label'},'YOU'),h(ChargeMeter,{value:charge.player,who:'player'})):h('div',{className:'gp-area-label'},'YOU — '+pH.filter(Boolean).length+'枚'),
       h('div',{className:'gp-hand-rows'},
         h('div',{className:'gp-hand-row'},
           pH.slice(0,5).map((v,i)=>v===null?h('div',{key:i,style:{width:'var(--card-w)',height:'calc(var(--card-w) * 1.4)',flexShrink:0}}):(()=>{const dv=confuse[i]!=null?confuse[i]:v;const dk=lantern&&!lantern.lit.includes(i);return h(SlideCard,{key:i+'_'+v,value:dk?'?':dv,dark:dk,onPlay:()=>playCard(i),disabled:chargeEmpty||countNum>=0||!canPlay(dv,fieldSum,field)||rStop||!!pLock[i]||pFrz[i]!=null||(cmdIdx!=null&&cmdIdx!==i),cardState:countNum>=0?null:handCardState(dv,fieldSum,field),frozen:pFrz[i],justFrozen:justFrz.includes(i),pRing:pRing===i,shuffling:shufAll,marked:marked.includes(i),newRefill:so.survival&&survivalReward&&survivalReward.who==='player'&&performance.now()<survivalReward.until&&survivalReward.slots.includes(i),onLocked:()=>fxLockHint(chargeEmpty?'ゲージ回復中':pFrz[i]!=null?'凍結中 あと'+pFrz[i]+'秒':pLock[i]?'星環ロック':(cmdIdx!=null&&cmdIdx!==i)?'指名された札から':lockReason(dv,fieldSum,field)),cardRole:'player',isSpecial:!!pSp[i],linkPick:linkMode&&canPlay(dv,fieldSum,field),rLock:!!pLock[i],rCmd:cmdIdx===i,rWait:cmdIdx!=null&&cmdIdx!==i,confused:confuse[i]!=null});})())

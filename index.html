@@ -3354,7 +3354,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v270'; // v270(2026/09/16): 計測パネルに「計測をコピー」ボタンを追加（集計＋全ログをテキストで書き出す）。ログの表示領域も広げた
+const APP_VER='v271'; // v271(2026/09/16): 役サバイバルのAIを修正。仕上げ札を持っていない場面で場を育てない（相手に10を渡す置き方を強く嫌い、どれを置いても渡すなら待つ）。出す速さも専用に大幅短縮
+// const APP_VER='v270'; // v270(2026/09/16): 計測パネルに「計測をコピー」ボタンを追加（集計＋全ログをテキストで書き出す）。ログの表示領域も広げた
 // const APP_VER='v269'; // v269(2026/09/16): 役サバイバルの補充枚数を1段ずつ増やした（役なし1／ワンペア2／ツーペア3／スリーカード4／ストレート5）。得点はそのまま。AIの見積りとルール表記も合わせて更新
 // const APP_VER='v268'; // v268(2026/09/16): 役サバイバルだけ、相手の手札をほんの少し下げ(62u)、自分の手札マットをほんの少し持ち上げた(下端10u→26u)
 // const APP_VER='v267'; // v267(2026/09/16): v266のディーラー手札下げを取り消し、v265の配置に戻した
@@ -5893,7 +5894,13 @@ function App(){
       const canWin=dHR.current.some(v=>canPlay(v,cs,cf)&&cs+v===10);
       const diff=diffRef.current;
       // 10完成できる時も人間が反応できる程度の「間」を必ず空ける(v40)
-      if(canWin)d=diff==='easy'?900+Math.random()*600:diff==='hard'?300+Math.random()*250:diff==='master'?250+Math.random()*200:450+Math.random()*350;
+      if(isSurvival()){ // v271 役サバイバルはテンポ勝負。通常モードより明確に速くする
+        const sh=diff==='hard';
+        if(canWin)d=sh?170+Math.random()*130:260+Math.random()*180;
+        else if(fl===0)d=sh?120+Math.random()*130:200+Math.random()*180;
+        else d=sh?200+Math.random()*180:320+Math.random()*220;
+      }
+      else if(canWin)d=diff==='easy'?900+Math.random()*600:diff==='hard'?300+Math.random()*250:diff==='master'?250+Math.random()*200:450+Math.random()*350;
       else if(fl===0){if(diff==='easy')d=800+Math.random()*800;else if(diff==='hard')d=150+Math.random()*200;else if(diff==='master')d=120+Math.random()*180;else d=aiFirstFastRef.current?300+Math.random()*300:1200+Math.random()*800;}
       else if(fl===1)d=diff==='easy'?1000+Math.random()*600:diff==='hard'?400+Math.random()*200:diff==='master'?300+Math.random()*180:1000+Math.random()*400;
       else d=diff==='easy'?1200+Math.random()*800:diff==='hard'?600+Math.random()*300:diff==='master'?450+Math.random()*250:1500+Math.random()*500;
@@ -5909,7 +5916,7 @@ function App(){
     if(delay===null&&_canWin10&&so135.winMs)d=Math.max(d,so135.winMs+Math.round(Math.random()*(so135.winJit||0)));
     // v113: 10を完成させる一手だけは、速度倍率のあとでも下限220msを守る（v40の趣旨）
     // ここを消すと人が反応できない速さになる。モルフォを更に強くしたい時もこの行は残す
-    if(delay===null&&_canWin10)d=Math.max(d,stageOptsR.current&&stageOptsR.current.cardSpeed?Math.max(80,Math.round(220*_csK())):220); // v240 調整の cardSpeed がある時は下限もその倍率（最低80ms）
+    if(delay===null&&_canWin10&&!isSurvival())d=Math.max(d,stageOptsR.current&&stageOptsR.current.cardSpeed?Math.max(80,Math.round(220*_csK())):220); // v240 調整の cardSpeed がある時は下限もその倍率（最低80ms）
     if(delay===null&&_canWin10&&so135.winMsAbs)d=Math.max(50,so135.winMsAbs); // v241 決定打の時間を直接指定（調整モード／ステージの winMsAbs）
     aiRef.current=setTimeout(()=>{if(phaseR.current==='playing'&&countNumR.current<0&&!linkR.current)aiPlay(rn);},d);
   }
@@ -6210,19 +6217,30 @@ function App(){
       if(better){survStatR.current&&survStatR.current.dealer.skip++;survLog('dealer','完成を見送り（役なし止まり・在庫'+stock+'枚あるので大きい役を狙う）');}
     }
     if(!safe.length)return wins.length?wins[0]:null;
+    // v271 場を育てるのは「自分で仕上げられる時」だけ。仕上げ札がないのに置くと、相手に10をプレゼントして
+    //      こっちは1枚失うだけになる（計測で相手が11枚出して完成1回だった原因）
+    const mine=v=>dHR.current.includes(10-(cs+v));        // 出したあと自分で10にできる
+    const gift=v=>{const need=10-(cs+v);return need>=1&&need<=5;}; // 相手も1枚で10にできる
+    const okList=safe.filter(v=>mine(v)||!gift(v));
+    if(!okList.length){
+      // どれを置いても相手に渡してしまう。手札に余裕がなければ置かずに待つ
+      if(stock<=8&&Math.random()<(sharp?0.92:0.7)){survLog('dealer','置かずに待つ（どれを出しても相手に10を渡す・在庫'+stock+'枚）');return null;}
+    }
+    const pool=okList.length?okList:safe;
     const score=v=>{
       const nf=[...cf,v],ns=cs+v,need=10-ns;
       let sc=0;
       let bestRole=0;
       for(let k=1;k<=5;k++)if(ns+k===10&&canPlay(k,ns,nf))bestRole=Math.max(bestRole,calcPts([...nf,k]).total);
-      sc+=bestRole*1.6;                                   // このあと作れる役の大きさ
-      if(dHR.current.includes(need))sc+=3.2;              // 自分で仕上げられる
-      if(need>=1&&need<=5)sc-=2.0;                        // 相手にも仕上げられてしまう
+      sc+=bestRole*1.4;                                   // このあと作れる役の大きさ
+      if(mine(v))sc+=6.0;                                 // 自分で仕上げられる（最重要）
+      if(gift(v))sc-=5.5;                                 // 相手にも仕上げられてしまう
+      if(gift(v)&&mine(v))sc+=1.5;                        // 撃ち合いなら先に取れる可能性がある分だけ戻す
       sc-=v*0.12;                                         // 小さい札から出して選択肢を残す
       if(cf.length>=3)sc-=1.2;                            // 4枚目は慎重に
-      return sc+(sharp?0:Math.random()*1.6);              // ふつうは少しブレる
+      return sc+(sharp?0:Math.random()*1.2);              // ふつうは少しブレる
     };
-    const pick=safe.reduce((b,v)=>score(v)>score(b)?v:b,safe[0]);
+    const pick=pool.reduce((b,v)=>score(v)>score(b)?v:b,pool[0]);
     const ns=cs+pick,need=10-ns;let br=0;
     for(let k=1;k<=5;k++)if(ns+k===10&&canPlay(k,ns,[...cf,pick]))br=Math.max(br,calcPts([...cf,pick,k]).total);
     survLog('dealer',pick+'を出す ← 場'+cs+'→'+ns+'／次に最大+'+br+'補充'+(dHR.current.includes(need)?'／自分で仕上げ可':'')+((need>=1&&need<=5)?'／相手も仕上げ可':''));

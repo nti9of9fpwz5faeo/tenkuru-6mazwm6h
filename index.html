@@ -2204,7 +2204,8 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .survival-roles{width:100%;border-collapse:collapse;text-align:left;font-size:16px;color:#243b56;}
 .survival-roles th,.survival-roles td{padding:11px 7px;border-bottom:1px solid #d6e1ea;}
 .survival-roles th{color:#08628e;background:#eaf6fc;}.survival-roles td:not(:first-child){white-space:nowrap;font-weight:700;}
-.gp-screen.survival-playing>.gp-field-area{margin-top:calc(46 * var(--u)) !important;} /* v261 ディーラーの手札と場のあいだに間をとる */
+.gp-screen.survival-playing>.gp-dealer-area{margin-top:calc(150 * var(--u)) !important;} /* v266 ディーラーの手札を下げて、自分の手札との距離を縮める */
+.gp-screen.survival-playing>.gp-field-area{margin-top:calc(34 * var(--u)) !important;} /* v261/v266 ディーラーの手札と場のあいだの間 */
 .gp-screen.survival-playing{position:relative;} /* v262 */
 .gp-screen.survival-playing>.gp-hand-area{position:absolute !important;left:0;right:0;bottom:max(env(safe-area-inset-bottom,0px),calc(10 * var(--u))) !important;margin:0 !important;} /* v262 手札マットを画面の一番下に固定（機種の高さに左右されない） */
 .surv-measure{margin-top:14px;text-align:left;}
@@ -3352,7 +3353,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v265'; // v265(2026/09/16): 役サバイバルに計測モードを追加。対戦画面には出さず、結果画面の「計測を見る」で1手ずつのログ（相手が何を狙って選んだかの理由つき）と集計を確認できる
+const APP_VER='v266'; // v266(2026/09/16): 役サバイバルだけ、ディーラーの手札と場をまとめて下へ移動（自分の手札との視線の距離を縮める）。背景のズレはこのあと調整
+// const APP_VER='v265'; // v265(2026/09/16): 役サバイバルに計測モードを追加。対戦画面には出さず、結果画面の「計測を見る」で1手ずつのログ（相手が何を狙って選んだかの理由つき）と集計を確認できる
 // const APP_VER='v264'; // v264(2026/09/16): 役サバイバル専用のAI思考を追加（補充につながる役を狙う／補充ゼロの完成は手札が少ないうちは見送る／相手に10を渡す置き方を避ける／小さい札から出す）
 // const APP_VER='v263'; // v263(2026/09/16): 役サバイバルに予備カード（手札10枚を超えた補充は予備に無制限ストック→手札が空いたら自動で入る。手札マット右上とディーラー側に枚数表示）と、手札を左→右になぞって発動するシャッフル（何回でも・枚数は変わらず数字だけ入れ替わる）を追加
 // const APP_VER='v262'; // v262(2026/09/16): 役サバイバルの手札マットを画面下端に固定（機種の画面高さに左右されないように）。通常マップは変更なし

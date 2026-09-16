@@ -2207,6 +2207,15 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .gp-screen.survival-playing>.gp-field-area{margin-top:calc(46 * var(--u)) !important;} /* v261 ディーラーの手札と場のあいだに間をとる */
 .gp-screen.survival-playing{position:relative;} /* v262 */
 .gp-screen.survival-playing>.gp-hand-area{position:absolute !important;left:0;right:0;bottom:max(env(safe-area-inset-bottom,0px),calc(10 * var(--u))) !important;margin:0 !important;} /* v262 手札マットを画面の一番下に固定（機種の高さに左右されない） */
+.surv-measure{margin-top:14px;text-align:left;}
+.surv-measure-toggle{width:100%;padding:10px;border-radius:12px;border:1px solid #bcd6e6;background:#f2fafe;color:#18628f;font-weight:700;}
+.surv-measure-note{margin:8px 0;font-size:13px;color:#4a6274;}
+.surv-measure-log{max-height:44vh;overflow-y:auto;margin:8px 0 0;padding-left:0;list-style:none;font-size:12.5px;line-height:1.7;color:#2c4257;}
+.surv-measure-log li{border-bottom:1px solid #e6eef4;padding:3px 2px;}
+.surv-measure-log li.dealer{background:#fff6ee;}
+.surv-measure-log li.player{background:#f2f8ff;}
+.surv-measure-log .tm{display:inline-block;width:44px;color:#89a0b4;}
+.surv-measure-log .wh{display:inline-block;width:34px;font-weight:700;}
 .survival-reserve{position:absolute;right:calc(10 * var(--u));top:calc(-24 * var(--u));display:flex;align-items:center;gap:calc(4 * var(--u));color:#2e6f9e;font-weight:800;font-size:calc(15 * var(--u));z-index:6;} /* v263 予備カード */
 .survival-reserve .ic{font-size:calc(19 * var(--u));line-height:1;}
 .survival-reserve.dealer{color:#c2611c;top:calc(-2 * var(--u));right:calc(14 * var(--u));}
@@ -3343,7 +3352,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v264'; // v264(2026/09/16): 役サバイバル専用のAI思考を追加（補充につながる役を狙う／補充ゼロの完成は手札が少ないうちは見送る／相手に10を渡す置き方を避ける／小さい札から出す）
+const APP_VER='v265'; // v265(2026/09/16): 役サバイバルに計測モードを追加。対戦画面には出さず、結果画面の「計測を見る」で1手ずつのログ（相手が何を狙って選んだかの理由つき）と集計を確認できる
+// const APP_VER='v264'; // v264(2026/09/16): 役サバイバル専用のAI思考を追加（補充につながる役を狙う／補充ゼロの完成は手札が少ないうちは見送る／相手に10を渡す置き方を避ける／小さい札から出す）
 // const APP_VER='v263'; // v263(2026/09/16): 役サバイバルに予備カード（手札10枚を超えた補充は予備に無制限ストック→手札が空いたら自動で入る。手札マット右上とディーラー側に枚数表示）と、手札を左→右になぞって発動するシャッフル（何回でも・枚数は変わらず数字だけ入れ替わる）を追加
 // const APP_VER='v262'; // v262(2026/09/16): 役サバイバルの手札マットを画面下端に固定（機種の画面高さに左右されないように）。通常マップは変更なし
 // const APP_VER='v261'; // v261(2026/09/16): 役サバイバルだけ、ディーラーの手札と場のあいだに間隔(46u)を入れ、手札を下(70u)へ移動。通常マップの配置は変えていない
@@ -3933,7 +3943,23 @@ function SurvivalResult({data,onRetry,onBack}){
  h('p',{className:'rush-lead'},data.survival.reason==='empty'?(data.winner==='player'?'相手の手札が0枚になった！':'自分の手札が0枚になった'):'60秒終了'),
  h('div',{className:'rush-final-score'},h('span',null,'自分 ',h('b',null,data.pPt)),h('span',null,'—'),h('span',null,h('b',null,data.dPt),' 相手')),
  h('p',null,'残り手札　自分 '+data.survival.player+'枚 ／ 相手 '+data.survival.dealer+'枚'),
+ h(SurvivalMeasure,{sv:data.survival}),
  h('button',{className:'rush-primary',onClick:onRetry},'もう一度遊ぶ'),h('button',{className:'rush-secondary',onClick:onBack},'モード選択へ')));
+}
+// v265 計測モード：1試合ぶんの手と、相手の思考のログ。対戦中は出さず、ここでだけ見る
+function SurvivalMeasure({sv}){
+  const[open,setOpen]=useState(false);
+  const st=sv&&sv.stat;if(!st)return null;
+  const row=(name,w,extra)=>h('tr',{key:name},h('td',null,name),h('td',null,w.play),h('td',null,w.ten),h('td',null,w.none),h('td',null,'+'+w.add),h('td',null,extra));
+  return h('div',{className:'surv-measure'},
+    h('button',{type:'button',className:'surv-measure-toggle',onClick:()=>setOpen(!open)},open?'計測を閉じる':'計測を見る'),
+    open&&h('div',null,
+      h('table',{className:'survival-roles'},
+        h('thead',null,h('tr',null,['','出した','完成','役なし','補充','見送り'].map((t,i)=>h('th',{key:i},t)))),
+        h('tbody',null,row('自分',st.player,'-'),row('相手',st.dealer,st.dealer.skip))),
+      h('p',{className:'surv-measure-note'},'場リセット '+st.reset+'回　／　残り予備　自分 '+(sv.pRes||0)+'枚 ・ 相手 '+(sv.dRes||0)+'枚'),
+      h('ol',{className:'surv-measure-log'},(sv.log||[]).map((e,i)=>h('li',{key:i,className:e.who},h('span',{className:'tm'},e.t+'s'),h('span',{className:'wh'},e.who==='player'?'自分':e.who==='dealer'?'相手':'―'),e.text))))
+  );
 }
 
 // ── v254 60秒チャージ ──
@@ -4717,6 +4743,7 @@ function App(){
   // v140 オルビィ: 手札が裏返っている残りラウンド数
   const[hideLeft,setHideLeft]=useState(0);const hideLeftR=useRef(0);
   const[justStolen,setJustStolen]=useState([]); // v141 奪った直後の強調
+  const survLogR=useRef([]),survStatR=useRef(null); // v265 計測モード
   const shufTmR=useRef(null);
   const pResR=useRef([]),dResR=useRef([]);          // v263 役サバイバル：手札に入りきらない分の予備
   const[resv,setResv]=useState({p:0,d:0});          // v263 予備の枚数表示
@@ -5421,7 +5448,7 @@ function App(){
   function goTune(){goMap();setPhase('tune');phaseR.current='tune';} // v239
   function goRush(){goMap();rushClosedR.current=true;setRushBreak(null);setPtFly(null);setPhase('rush');phaseR.current='rush';}
   function goSurvival(){goRush();setSurvivalHelp(false);setSurvivalReward(null);setPhase('survival');phaseR.current='survival';}
-  function startSurvivalBattle(diff){if(phaseR.current==='playing')return;pResR.current=[];dResR.current=[];setResv({p:0,d:0});STAGES.areas[5]={id:'survival',name:'役サバイバル',stages:[survivalStage(diff)]};hitFxR.current=false;startStage(5,0,2);}
+  function startSurvivalBattle(diff){if(phaseR.current==='playing')return;pResR.current=[];dResR.current=[];setResv({p:0,d:0});survLogR.current=[];survStatR.current={player:{play:0,ten:0,none:0,add:0,burst:0},dealer:{play:0,ten:0,none:0,add:0,burst:0,skip:0},reset:0};STAGES.areas[5]={id:'survival',name:'役サバイバル',stages:[survivalStage(diff)]};hitFxR.current=false;startStage(5,0,2);}
   function goCharge(){goRush();setPhase('charge');phaseR.current='charge';}
   function startChargeBattle(diff){if(phaseR.current==='playing')return;STAGES.areas[4]={id:'charge',name:'60秒チャージ',stages:[chargeStage(diff)]};hitFxR.current=false;startStage(4,0,2);}
   function startRushBattle(diff){if(phaseR.current==='playing')return;STAGES.areas[3]={id:'rush',name:'10秒ラッシュ',stages:[rushStage(diff)]};hitFxR.current=false;startStage(3,0,2);}
@@ -5641,6 +5668,8 @@ function App(){
     const f=flyR.current;if(f){refundCharge(f);setDealer([...dHR.current,f.value],[...dRingR.current,f.rf||false],[...dIdsR.current,f.id]);flyR.current=null;setFlyCard(null);}
     lockR.current=true;resolvingR.current=true;
     const tok=roundTokR.current;
+    if(isSurvival()){if(text==='場をリセット'){survStatR.current&&survStatR.current.reset++;survLog('-','手詰まり → 場だけリセット');}
+      else if(text==='バースト'){const w=survStatR.current&&survStatR.current[who==='player'?'dealer':'player'];survLog(who==='player'?'dealer':'player','バーストで相手に+1点');if(survStatR.current){const b=survStatR.current[who==='player'?'dealer':'player'];}}}
     if(pts||((isCharge()||isSurvival())&&text==='場をリセット')){setPtFly({id:Date.now()+Math.random(),text,pts,who,color:who==='player'?'#2e7fe8':'#f5912a'});clearTimeout(rushToastR.current);rushToastR.current=setTimeout(()=>{if(tok===roundTokR.current)setPtFly(null);},850);}
     clearTimeout(rushSettleR.current);
     rushSettleR.current=setTimeout(()=>{
@@ -5706,7 +5735,7 @@ function App(){
     const dealer=dHR.current.length+(flyR.current?1:0);
     lockR.current=true;resolvingR.current=true;cancelCursor();flyR.current=null;setFlyCard(null);setPtFly(null);setSurvivalHelp(false);
     timeLeftR.current=reason==='time'?0:remaining;setTimeLeft(Math.ceil(timeLeftR.current));
-    setGameEndData({pPt:pPtR.current,dPt:dPtR.current,winner:win,diff:diffRef.current,survival:{reason,player:pHR.current.filter(v=>v!=null).length,dealer}});
+    setGameEndData({pPt:pPtR.current,dPt:dPtR.current,winner:win,diff:diffRef.current,survival:{reason,player:pHR.current.filter(v=>v!=null).length,dealer,pRes:pResR.current.length,dRes:dResR.current.length,stat:survStatR.current,log:survLogR.current.slice()}});
     stopBGM();exitLink();setPhase('gameEnd');phaseR.current='gameEnd';
     try{if(win==='player')playWinSE2(false);else if(win==='dealer')playLoseSE();}catch(e){}
   }
@@ -6135,6 +6164,14 @@ function App(){
     return true;
   }
   function denyActive(){const so=stageOptsR.current;return !!(so&&so.deny);}
+  // v265 計測：1手ずつの記録。対戦画面には出さず、結果画面でだけ見る
+  function survLog(who,text){
+    if(!isSurvival())return;
+    const st=survStatR.current;if(!st)return;
+    const t=(60-Math.max(0,(rushDeadlineR.current-performance.now())/1000)).toFixed(1);
+    survLogR.current.push({t,who,text});
+    if(survLogR.current.length>400)survLogR.current.shift();
+  }
   // v264 役サバイバル専用の思考。カードは役を作らないと増えないので「補充につながる10」を狙い、
   // 補充ゼロ（役なし）の完成はできるだけ避け、相手に10を渡す置き方も嫌う
   function survivalPick(playable,cs,cf){
@@ -6148,7 +6185,8 @@ function App(){
       const g=gainOf(best);
       // 補充ゼロの完成は手札を1枚減らすだけ。余裕がないうちは見送って育てる
       const skip=g===0&&safe.length&&stock<=6&&Math.random()<(sharp?0.8:0.5);
-      if(!skip&&(g>0||Math.random()<(sharp?0.97:0.85)))return best;
+      if(!skip&&(g>0||Math.random()<(sharp?0.97:0.85))){survLog('dealer',best+'を出す ← 完成ねらい（補充+'+g+'）');return best;}
+      if(skip){survStatR.current&&survStatR.current.dealer.skip++;survLog('dealer','完成を見送り（役なし＝補充0・在庫'+stock+'枚）');}
     }
     if(!safe.length)return wins.length?wins[0]:null;
     const score=v=>{
@@ -6163,7 +6201,11 @@ function App(){
       if(cf.length>=3)sc-=1.2;                            // 4枚目は慎重に
       return sc+(sharp?0:Math.random()*1.6);              // ふつうは少しブレる
     };
-    return safe.reduce((b,v)=>score(v)>score(b)?v:b,safe[0]);
+    const pick=safe.reduce((b,v)=>score(v)>score(b)?v:b,safe[0]);
+    const ns=cs+pick,need=10-ns;let br=0;
+    for(let k=1;k<=5;k++)if(ns+k===10&&canPlay(k,ns,[...cf,pick]))br=Math.max(br,calcPts([...cf,pick,k]).total-1);
+    survLog('dealer',pick+'を出す ← 場'+cs+'→'+ns+'／次に最大+'+br+'補充'+(dHR.current.includes(need)?'／自分で仕上げ可':'')+((need>=1&&need<=5)?'／相手も仕上げ可':''));
+    return pick;
   }
   function aiPlay(rn){
     if(isTimedMode()&&rushExpired())return;
@@ -6239,6 +6281,7 @@ function App(){
     const gap=5*u,cardW=(fr.width-3*gap)/4,n=fieldR.current.length;
     const x0=cr.left+cr.width/2,y0=cr.top+cr.height/2,x1=fr.left+n*(cardW+gap)+cardW/2,y1=fr.top+fr.height/2;
     const newDH=dHand.filter((_,i)=>i!==idx),newRf=rf.filter((_,i)=>i!==idx),newIds=dIdsR.current.filter((_,i)=>i!==idx);
+    if(isSurvival()&&survStatR.current)survStatR.current.dealer.play++; // v265
     setDealer(newDH,newRf,newIds);
     const _so2=stageOptsR.current||{};
     // v135: 初手だけ降下も速める
@@ -6328,6 +6371,7 @@ function App(){
     const newPH=hand.map((v,i)=>i===idx?null:v);
     const newSp=pSpR.current.map((f,i)=>i===idx?false:f);
     setPH(newPH);pHR.current=newPH;setPSp(newSp);pSpR.current=newSp;
+    if(isSurvival()){survStatR.current&&survStatR.current.player.play++;survLog('player',value+'を出した（手札'+newPH.filter(x=>x!=null).length+'枚）');} // v265
     if(pLockR.current.length)r2CheckUnlock(newPH); // v84
     if(confuseR.current[idx]!=null){const m={...confuseR.current};delete m[idx];setConf(m);} // v112
     const emptied=!newPH.filter(Boolean).length;
@@ -6414,6 +6458,9 @@ function App(){
         const pts=calcPts(nf);
         // Complete the role and refill BEFORE testing last-card defeat.
         const reward=refillSurvival(who,pts.total-1);
+        const _st=survStatR.current;
+        if(_st){const w=_st[who];w.ten++;w.add+=reward.added+Math.max(0,(pts.total-1)-reward.added);if(pts.total===1)w.none++;}
+        survLog(who,'10完成 '+(pts.voice||'役なし')+' +'+pts.total+'点／補充'+(pts.total-1)+'枚（手札'+reward.before+'→'+reward.after+((pts.total-1)-reward.added>0?'＋予備'+((pts.total-1)-reward.added):'')+'）');
         setSurvivalReward({...reward,who,role:pts.voice,pts:pts.total,until:performance.now()+1600});
         playComboSfx(pts.voice||'役なし');finishRushBoard(who,pts.total,pts.voice);checkSurvivalEmpty();return;
       }

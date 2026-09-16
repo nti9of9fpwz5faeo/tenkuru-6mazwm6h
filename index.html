@@ -2209,9 +2209,10 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .gp-screen.survival-playing>.gp-dealer-area{margin-top:calc(62 * var(--u)) !important;} /* v268 相手の手札をほんの少しだけ下げる */
 .gp-screen.survival-playing>.gp-hand-area{position:absolute !important;left:0;right:0;bottom:max(env(safe-area-inset-bottom,0px),calc(26 * var(--u))) !important;margin:0 !important;} /* v262/v268 下固定のまま、ほんの少しだけ持ち上げる */
 .surv-measure{margin-top:14px;text-align:left;}
+.surv-measure-toggle.copy{margin-top:8px;background:#e9f6ff;}
 .surv-measure-toggle{width:100%;padding:10px;border-radius:12px;border:1px solid #bcd6e6;background:#f2fafe;color:#18628f;font-weight:700;}
 .surv-measure-note{margin:8px 0;font-size:13px;color:#4a6274;}
-.surv-measure-log{max-height:44vh;overflow-y:auto;margin:8px 0 0;padding-left:0;list-style:none;font-size:12.5px;line-height:1.7;color:#2c4257;}
+.surv-measure-log{max-height:60vh;overflow-y:auto;margin:8px 0 0;padding-left:0;list-style:none;font-size:12.5px;line-height:1.7;color:#2c4257;}
 .surv-measure-log li{border-bottom:1px solid #e6eef4;padding:3px 2px;}
 .surv-measure-log li.dealer{background:#fff6ee;}
 .surv-measure-log li.player{background:#f2f8ff;}
@@ -3353,7 +3354,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v269'; // v269(2026/09/16): 役サバイバルの補充枚数を1段ずつ増やした（役なし1／ワンペア2／ツーペア3／スリーカード4／ストレート5）。得点はそのまま。AIの見積りとルール表記も合わせて更新
+const APP_VER='v270'; // v270(2026/09/16): 計測パネルに「計測をコピー」ボタンを追加（集計＋全ログをテキストで書き出す）。ログの表示領域も広げた
+// const APP_VER='v269'; // v269(2026/09/16): 役サバイバルの補充枚数を1段ずつ増やした（役なし1／ワンペア2／ツーペア3／スリーカード4／ストレート5）。得点はそのまま。AIの見積りとルール表記も合わせて更新
 // const APP_VER='v268'; // v268(2026/09/16): 役サバイバルだけ、相手の手札をほんの少し下げ(62u)、自分の手札マットをほんの少し持ち上げた(下端10u→26u)
 // const APP_VER='v267'; // v267(2026/09/16): v266のディーラー手札下げを取り消し、v265の配置に戻した
 // const APP_VER='v266'; // v266(2026/09/16): 役サバイバルだけ、ディーラーの手札と場をまとめて下へ移動（自分の手札との視線の距離を縮める）。背景のズレはこのあと調整
@@ -3953,11 +3955,25 @@ function SurvivalResult({data,onRetry,onBack}){
 }
 // v265 計測モード：1試合ぶんの手と、相手の思考のログ。対戦中は出さず、ここでだけ見る
 function SurvivalMeasure({sv}){
-  const[open,setOpen]=useState(false);
+  const[open,setOpen]=useState(false),[copied,setCopied]=useState(false);
   const st=sv&&sv.stat;if(!st)return null;
   const row=(name,w,extra)=>h('tr',{key:name},h('td',null,name),h('td',null,w.play),h('td',null,w.ten),h('td',null,w.none),h('td',null,'+'+w.add),h('td',null,extra));
   return h('div',{className:'surv-measure'},
     h('button',{type:'button',className:'surv-measure-toggle',onClick:()=>setOpen(!open)},open?'計測を閉じる':'計測を見る'),
+    open&&h('button',{type:'button',className:'surv-measure-toggle copy',onClick:()=>{
+      const st2=sv.stat,L=[];
+      L.push('【役サバイバル 計測】');
+      L.push('　　　出した/完成/役なし/補充/見送り');
+      L.push('自分　'+st2.player.play+' / '+st2.player.ten+' / '+st2.player.none+' / +'+st2.player.add+' / -');
+      L.push('相手　'+st2.dealer.play+' / '+st2.dealer.ten+' / '+st2.dealer.none+' / +'+st2.dealer.add+' / '+st2.dealer.skip);
+      L.push('場リセット '+st2.reset+'回　残り予備 自分'+(sv.pRes||0)+'枚 相手'+(sv.dRes||0)+'枚');
+      L.push('');
+      (sv.log||[]).forEach(e=>L.push(e.t+'s '+(e.who==='player'?'自分':e.who==='dealer'?'相手':'―')+' '+e.text));
+      const txt=L.join('\n');
+      const done=()=>{setCopied(true);setTimeout(()=>setCopied(false),1600);};
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(done,()=>{});
+      else{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){}document.body.removeChild(ta);}
+    }},copied?'コピーした！':'計測をコピー'),
     open&&h('div',null,
       h('table',{className:'survival-roles'},
         h('thead',null,h('tr',null,['','出した','完成','役なし','補充','見送り'].map((t,i)=>h('th',{key:i},t)))),

@@ -1,7 +1,9 @@
 {
   "name": "tenkuru-ui-checks",
   "private": true,
-  "scripts": { "test": "node tests/puzzlux-ui.cjs && node tests/rush-mode.cjs && node tests/charge-mode.cjs" },
+  "scripts": {
+    "test": "node tests/puzzlux-ui.cjs && node tests/rush-mode.cjs && node tests/charge-mode.cjs && node tests/survival-mode.cjs"
+  },
   "devDependencies": {
     "css-tree": "2.3.1",
     "jsdom": "24.1.3",

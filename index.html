@@ -2207,6 +2207,10 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .gp-screen.survival-playing>.gp-field-area{margin-top:calc(46 * var(--u)) !important;} /* v261 ディーラーの手札と場のあいだに間をとる */
 .gp-screen.survival-playing{position:relative;} /* v262 */
 .gp-screen.survival-playing>.gp-hand-area{position:absolute !important;left:0;right:0;bottom:max(env(safe-area-inset-bottom,0px),calc(10 * var(--u))) !important;margin:0 !important;} /* v262 手札マットを画面の一番下に固定（機種の高さに左右されない） */
+.survival-reserve{position:absolute;right:calc(10 * var(--u));top:calc(-24 * var(--u));display:flex;align-items:center;gap:calc(4 * var(--u));color:#2e6f9e;font-weight:800;font-size:calc(15 * var(--u));z-index:6;} /* v263 予備カード */
+.survival-reserve .ic{font-size:calc(19 * var(--u));line-height:1;}
+.survival-reserve.dealer{color:#c2611c;top:calc(-2 * var(--u));right:calc(14 * var(--u));}
+.gp-dealer-area{position:relative;}
 .survival-new .card{box-shadow:0 0 calc(9 * var(--u)) #00aeee!important;outline:calc(2 * var(--u)) solid #36c8f0;}
 .survival-new:after{content:'NEW';position:absolute;bottom:calc(-3 * var(--u));left:50%;transform:translateX(-50%);font-size:calc(9 * var(--u));font-weight:800;color:white;background:#078ad0;border-radius:calc(5 * var(--u));padding:calc(1 * var(--u)) calc(5 * var(--u));z-index:8;pointer-events:none;}
 
@@ -3339,7 +3343,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v262'; // v262(2026/09/16): 役サバイバルの手札マットを画面下端に固定（機種の画面高さに左右されないように）。通常マップは変更なし
+const APP_VER='v263'; // v263(2026/09/16): 役サバイバルに予備カード（手札10枚を超えた補充は予備に無制限ストック→手札が空いたら自動で入る。手札マット右上とディーラー側に枚数表示）と、手札を左→右になぞって発動するシャッフル（何回でも・枚数は変わらず数字だけ入れ替わる）を追加
+// const APP_VER='v262'; // v262(2026/09/16): 役サバイバルの手札マットを画面下端に固定（機種の画面高さに左右されないように）。通常マップは変更なし
 // const APP_VER='v261'; // v261(2026/09/16): 役サバイバルだけ、ディーラーの手札と場のあいだに間隔(46u)を入れ、手札を下(70u)へ移動。通常マップの配置は変えていない
 // const APP_VER='v260'; // v260(2026/09/16): 役サバイバルの対戦フィールドを通常マップと同じ見た目に戻した（専用の得点ボックス・補充テロップ・手札ヘッダー・脚注・役一覧ボタン・空き枠・専用レイアウトCSSを撤去し、通常のYOU/DEALER得点表示に統一）
 // const APP_VER='v259'; // v259: 役サバイバル（60秒・役で補充・手札上限10枚）
@@ -4711,6 +4716,10 @@ function App(){
   // v140 オルビィ: 手札が裏返っている残りラウンド数
   const[hideLeft,setHideLeft]=useState(0);const hideLeftR=useRef(0);
   const[justStolen,setJustStolen]=useState([]); // v141 奪った直後の強調
+  const shufTmR=useRef(null);
+  const pResR=useRef([]),dResR=useRef([]);          // v263 役サバイバル：手札に入りきらない分の予備
+  const[resv,setResv]=useState({p:0,d:0});          // v263 予備の枚数表示
+  const swipeR=useRef(null),swipedR=useRef(false);  // v263 手札を左→右になぞってシャッフル
   const[shufAll,setShufAll]=useState(false);    // v164 再観測：全部が同時に回っている状態
   const[spotFx,setSpotFx]=useState(false);      // v164 不可観測：相手の手札を照らす
   // v169: 技の停止と補充は lockR を共有していたため、決着処理などと解除が
@@ -5411,7 +5420,7 @@ function App(){
   function goTune(){goMap();setPhase('tune');phaseR.current='tune';} // v239
   function goRush(){goMap();rushClosedR.current=true;setRushBreak(null);setPtFly(null);setPhase('rush');phaseR.current='rush';}
   function goSurvival(){goRush();setSurvivalHelp(false);setSurvivalReward(null);setPhase('survival');phaseR.current='survival';}
-  function startSurvivalBattle(diff){if(phaseR.current==='playing')return;STAGES.areas[5]={id:'survival',name:'役サバイバル',stages:[survivalStage(diff)]};hitFxR.current=false;startStage(5,0,2);}
+  function startSurvivalBattle(diff){if(phaseR.current==='playing')return;pResR.current=[];dResR.current=[];setResv({p:0,d:0});STAGES.areas[5]={id:'survival',name:'役サバイバル',stages:[survivalStage(diff)]};hitFxR.current=false;startStage(5,0,2);}
   function goCharge(){goRush();setPhase('charge');phaseR.current='charge';}
   function startChargeBattle(diff){if(phaseR.current==='playing')return;STAGES.areas[4]={id:'charge',name:'60秒チャージ',stages:[chargeStage(diff)]};hitFxR.current=false;startStage(4,0,2);}
   function startRushBattle(diff){if(phaseR.current==='playing')return;STAGES.areas[3]={id:'rush',name:'10秒ラッシュ',stages:[rushStage(diff)]};hitFxR.current=false;startStage(3,0,2);}
@@ -5643,8 +5652,12 @@ function App(){
   }
   function refillSurvival(who,n){
     const before=who==='player'?pHR.current.filter(v=>v!=null).length:dHR.current.length;
-    const added=Math.max(0,Math.min(n,10-before-(who==='dealer'&&flyR.current?1:0)));
-    const cards=createDeck().slice(0,added),slots=[];
+    const room=Math.max(0,10-before-(who==='dealer'&&flyR.current?1:0)); // v263 手札に入る分
+    const drawn=createDeck().slice(0,Math.max(0,n));
+    const over=drawn.slice(room);                                        // v263 あふれた分は予備へ（上限なし）
+    if(over.length){(who==='player'?pResR:dResR).current.push(...over);}
+    const added=Math.min(room,drawn.length);
+    const cards=drawn.slice(0,added),slots=[];
     if(who==='player'){
       const hand=Array.from({length:10},(_,i)=>pHR.current[i]??null);let k=0;
       for(let i=0;i<10&&k<added;i++)if(hand[i]==null){hand[i]=cards[k++];slots.push(i);}
@@ -5652,9 +5665,35 @@ function App(){
     }else if(added)setDealer([...dHR.current,...cards],[...dRingR.current,...cards.map(()=>false)],[...dIdsR.current,...cards.map(()=>null)]);
     return {before,after:before+added,added,slots};
   }
+  // v263 手札を左→右になぞるとシャッフル（何回でも）。数字だけ入れ替わり、枚数は変わらない
+  function survivalShuffle(){
+    if(!isSurvival()||phaseR.current!=='playing'||rushClosedR.current)return;
+    if(pausedR.current||lockR.current||resolvingR.current||countNumR.current>=0)return;
+    const d=createDeck();let k=0;
+    const hand=pHR.current.map(v=>v==null?null:d[k++%d.length]);
+    setPH(hand);pHR.current=hand;setCmd(null);
+    setShufAll(true);clearTimeout(shufTmR.current);shufTmR.current=setTimeout(()=>setShufAll(false),420);
+    try{fxAir();}catch(e){}
+  }
+  // v263 手札に空きができたら、予備から自動で入れる
+  function survivalTopUp(){
+    if(!isSurvival()||phaseR.current!=='playing'||rushClosedR.current)return;
+    if(pResR.current.length){
+      const hand=Array.from({length:10},(_,i)=>pHR.current[i]??null);let ch=false;
+      for(let i=0;i<10&&pResR.current.length;i++)if(hand[i]==null){hand[i]=pResR.current.shift();ch=true;}
+      if(ch){setPH(hand);pHR.current=hand;}
+    }
+    if(dResR.current.length){
+      const room=10-dHR.current.length-(flyR.current?1:0);
+      if(room>0){const add=dResR.current.splice(0,room);
+        setDealer([...dHR.current,...add],[...dRingR.current,...add.map(()=>false)],[...dIdsR.current,...add.map(()=>null)]);}
+    }
+    const p=pResR.current.length,d=dResR.current.length;
+    setResv(v=>(v.p===p&&v.d===d)?v:{p,d});
+  }
   function checkSurvivalEmpty(){
     if(!isSurvival()||phaseR.current!=='playing'||rushClosedR.current)return false;
-    const p=pHR.current.some(v=>v!=null),d=dHR.current.length>0||!!flyR.current;
+    const p=pHR.current.some(v=>v!=null)||pResR.current.length>0,d=dHR.current.length>0||!!flyR.current||dResR.current.length>0; // v263 予備が残っていればまだ負けではない
     if(p&&d)return false;
     finishSurvivalMatch('empty',!p&&!d?'draw':p?'player':'dealer');return true;
   }
@@ -5704,6 +5743,7 @@ function App(){
         if(!isTimedMode()||phaseR.current!=='playing'||rushClosedR.current)return;
         const left=Math.max(0,(rushDeadlineR.current-performance.now())/1000);
         timeLeftR.current=left;setTimeLeft(Math.ceil(left));updateCharge();
+        if(isSurvival())survivalTopUp(); // v263 予備から手札へ
         if(left<=0){if(isSurvival())finishSurvivalMatch();else if(isCharge())finishChargeMatch();else finishRushRound(rn);}
         else if(isCharge()||isSurvival())checkChargeStuck();
       };
@@ -6563,6 +6603,7 @@ function App(){
 
     // DEALER 手札
     h('div',{className:'gp-dealer-area'},
+      so.survival&&h('div',{className:'survival-reserve dealer'},h('span',{className:'ic'},'🂠'),h('b',null,resv.d)),
       h('div',{className:'gp-area-label'},so.charge?'DEALER':(so.rivalName?'✦ ':'💀 ')+rival+' — '+dH.length+'枚'),
       h('div',{className:'gp-dealer-cards'+(endFx&&endFx.winner==='player'?' defeated':'')}, // v198/v202 相手の敗北：決着と同時に光に溶ける
         (so.survival?dSlots.filter(id=>id!=null):dSlots).map((id,s)=>{const i=id==null?-1:dIdsR.current.indexOf(id);if(i<0||i>=dH.length)return h('div',{key:'e'+s,className:'gp-dealer-card empty'});const v=dH[i];
@@ -6603,7 +6644,13 @@ function App(){
     h('div',{className:'gp-spacer'}),
 
     // HAND area
-    h('div',{className:'gp-hand-area hand-card-area'},
+    h('div',{className:'gp-hand-area hand-card-area',
+      onTouchStart:so.survival?(e=>{const t=e.touches[0];swipeR.current={x:t.clientX,y:t.clientY};swipedR.current=false;}):undefined,
+      onTouchMove:so.survival?(e=>{const st=swipeR.current;if(!st||swipedR.current)return;const t=e.touches[0];
+        if(t.clientX-st.x>70&&Math.abs(t.clientY-st.y)<55){swipedR.current=true;survivalShuffle();}}):undefined,
+      onTouchEnd:so.survival?(()=>{swipeR.current=null;setTimeout(()=>{swipedR.current=false;},260);}):undefined,
+      onClickCapture:so.survival?(e=>{if(swipedR.current){e.stopPropagation();e.preventDefault();}}):undefined},
+      so.survival&&h('div',{className:'survival-reserve'},h('span',{className:'ic'},'🂠'),h('b',null,resv.p)),
       skipOn&&h('div',{className:'skip-veil',onClick:()=>{const f=skipR.current;if(f){try{resumeAC();}catch(e){}f();}}},h('span',null,'タップでスキップ')), // v183
       !skipOn&&countNum>0&&phase==='playing'&&h('div',{className:'skip-veil light',onClick:()=>{const f=countSkipR.current;if(f){try{resumeAC();}catch(e){}f();}}},h('span',null,'タップで開始')), // v194 カウント中も手札タップで即GO
       r2Banner&&h('div',{className:'hand-hud'},

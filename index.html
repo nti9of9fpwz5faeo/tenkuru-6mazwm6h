@@ -2145,6 +2145,10 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 
 /* v253 10秒ラッシュ */
 
+/* v280 ひとりモード（仮） */
+.solo-screen .gp-dealer-card.solo-first{outline:calc(2.5 * var(--u)) solid #f5912a;outline-offset:calc(3 * var(--u));border-radius:calc(4 * var(--u));margin-right:calc(8 * var(--u));transform:scale(1.12);}
+.solo-screen .gp-dealer-cards{justify-content:flex-start;padding-left:calc(14 * var(--u));}
+.solo-screen .gp-dealer-area{margin-top:calc(20 * var(--u)) !important;}
 /* v276 テンフォール（仮） */
 .fall-screen.fall-play{position:fixed;inset:0;z-index:100;background:linear-gradient(155deg,#edf4fc,#f3eefb);display:flex;flex-direction:column;align-items:center;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;padding-top:max(8px,env(safe-area-inset-top));}
 .fall-top{width:min(100vw,calc(100dvh * 360 / 640));display:flex;align-items:center;justify-content:space-between;padding:6px 14px;color:#263650;}
@@ -3395,7 +3399,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v279'; // v279(2026/09/18): テンフォール：拍刻み（1段ずつドクッ）は気持ち悪いのでやめ、なめらかに落ちる形に戻した。拍の音・光も削除。タイマーなしはそのまま
+const APP_VER='v280'; // v280(2026/09/18): 新モード「ひとりモード（仮）」。相手なし・タイマーなし。場の札に手札を足して10、完成（またはバースト）で右上の「次の札」の先頭が場に出る。次の札は先の先まで7枚見える。数値はSOLO_CFG
+// const APP_VER='v279'; // v279(2026/09/18): テンフォール：拍刻み（1段ずつドクッ）は気持ち悪いのでやめ、なめらかに落ちる形に戻した。拍の音・光も削除。タイマーなしはそのまま
 // const APP_VER='v278'; // v278(2026/09/18): テンフォール：60秒タイマーを廃止（やめるまで続く）。Neon Bladeのように拍（bpm100）ごとに札が1段ドクッと落ちて止まる＋拍の音と光
 // const APP_VER='v277'; // v277(2026/09/18): テンフォール：10は何枚でも完成（いつものルール）。落ち札は消さない。札が確定したレーンの落ち札はその場でフリーズし、場が空いたら再開
 // const APP_VER='v276'; // v276(2026/09/18): 新モード「テンフォール（仮）」を追加。4レーンに札がゆっくり落ちてくる→下の4マスを左から埋めて10。着地で5秒カウント、空白飛ばし着地・カウント切れ・10不可能で💥。落ちてきた札を使うほど加点。手札は左→右なぞりで入れ替え。数値はFALL_CFG
@@ -3928,7 +3933,7 @@ function SkillPanel(){
     )
   );
 }
-function TitleScreen({onPlay,onPuzzlux,onRush,onCharge,onSurvival,onFall,onTune,onTutorial,musicOn,toggleMusic}){
+function TitleScreen({onPlay,onPuzzlux,onRush,onCharge,onSurvival,onFall,onSolo,onTune,onTutorial,musicOn,toggleMusic}){
   const btnBase={borderRadius:14,padding:'15px 0',fontSize:13,fontWeight:800,letterSpacing:2,cursor:'pointer',fontFamily:"'Inter',sans-serif",background:'rgba(255,255,255,.78)',boxShadow:'0 4px 16px rgba(70,100,150,.16), inset 0 1px 0 #fff',width:'100%'};
   return h('div',{style:{height:'100dvh',overflowY:'auto',touchAction:'pan-y',flexDirection:'column',background:"url('img/title-bg.jpg') center/cover no-repeat, #eef2f8",display:'flex',alignItems:'center',justifyContent:'flex-start',padding:16,position:'relative'}},
     h('div',{style:{margin:'auto',flexShrink:0,textAlign:'center',display:'flex',flexDirection:'column',alignItems:'center',gap:18,width:'100%',maxWidth:340,animation:'fadeUp 0.5s ease'}},
@@ -3937,6 +3942,7 @@ function TitleScreen({onPlay,onPuzzlux,onRush,onCharge,onSurvival,onFall,onTune,
       h('div',{style:{display:'flex',flexDirection:'column',gap:12,width:'100%',marginTop:6}},
         h('button',{onClick:onPlay,style:{...btnBase,padding:'17px 0',fontSize:16,letterSpacing:6,border:'1.5px solid rgba(46,127,232,.55)',color:'#2e7fe8',boxShadow:'0 6px 20px rgba(46,127,232,.22), inset 0 1px 0 #fff'}},'遊ぶ'),
         h('button',{onClick:onPuzzlux,style:{...btnBase,padding:'13px 0',fontSize:13,letterSpacing:4,border:'1.5px solid rgba(80,160,230,.5)',color:'#2b7fb8',boxShadow:'0 5px 18px rgba(80,160,230,.2), inset 0 1px 0 #fff'}},'パズルクス'), // v214
+        h('button',{onClick:onSolo,style:{...btnBase,fontSize:16,border:'1.5px solid rgba(46,127,232,.55)',color:'#2e7fe8'}},'ひとりモード',h('span',{style:{display:'block',fontSize:12,marginTop:5}},'お試し · 次に出る札が見える')), // v280
         h('button',{onClick:onFall,style:{...btnBase,fontSize:16,border:'1.5px solid #e08a3a',color:'#b8621a'}},'テンフォール',h('span',{style:{display:'block',fontSize:12,marginTop:5}},'お試し · 落ちてくる札で10を作る')), // v276
         h('button',{onClick:onSurvival,style:{...btnBase,fontSize:16,border:'1.5px solid #2189bc',color:'#096598'}},'役サバイバル',h('span',{style:{display:'block',fontSize:12,marginTop:5}},'お試し · 役を作って手札を補充')),
         h('button',{onClick:onCharge,style:{...btnBase,fontSize:15,border:'1.5px solid #328a89',color:'#236e70'}},'60秒チャージ',h('span',{style:{display:'block',fontSize:11,letterSpacing:1,marginTop:5}},'貯めて、読んで、一気に出す')),
@@ -4831,6 +4837,65 @@ function FallMode({onBack}){
       onTouchEnd:()=>{swipeR.current=null;setTimeout(()=>{swipedR.current=false;},260);}},
       s.hand.map((v,i)=>h('button',{key:'h'+i,className:'fall-hcard'+(s.shake===i&&now<s.shakeUntil?' shake':''),onClick:()=>tap(i)},card(v,'player',{'--card-w':U(56)})))),
     h('div',{className:'fall-hint'},'← 手札を左から右になぞると入れ替え →'));
+}
+// ── v280 ひとりモード（仮）：相手なし。場の札に手札を足して10。完成したら右上の「次の札」が場に出る（先の先まで見えている） ──
+const SOLO_CFG={
+  show:7,           // 右上に見せる「次の札」の枚数
+  burstPenalty:2,   // バーストで減るpt（0未満にはならない）
+  nextMs:1100,      // 完成・バーストのあと、次の札が場に出るまで
+};
+function SoloMode({onBack}){
+  const S=useRef(null);
+  const[,setTick]=useState(0);const re=()=>setTick(t=>t+1);
+  const[combo,setCombo]=useState(null);
+  const tmR=useRef([]);
+  function fill(q){while(q.length<SOLO_CFG.show+2)q.push(...createDeck());return q;}
+  if(!S.current){const q=fill([]);S.current={queue:q,field:[q.shift()],colors:['dealer'],hand:createDeck(),score:0,busy:false,tens:0,cid:0};fill(S.current.queue);}
+  useEffect(()=>()=>tmR.current.forEach(clearTimeout),[]);
+  const later=(fn,ms)=>tmR.current.push(setTimeout(fn,ms));
+  function nextCard(){const s=S.current;s.field=[s.queue.shift()];s.colors=['dealer'];fill(s.queue);s.busy=false;s.cid++;try{playPlaceSE(false);}catch(e){}setCombo(null);re();checkStuck();}
+  function checkStuck(){const s=S.current,sum=s.field.reduce((a,b)=>a+b,0);
+    if(s.hand.every(v=>handCardState(v,sum,s.field)==='locked')){s.busy=true;fxLockHint('出せる札がないので、次の札へ');later(nextCard,900);}}
+  function tap(i){const s=S.current;if(s.busy)return;
+    const v=s.hand[i],sum=s.field.reduce((a,b)=>a+b,0),st=handCardState(v,sum,s.field);
+    if(st==='locked'){fxLockHint(lockReason(v,sum,s.field));return;}
+    s.field=[...s.field,v];s.colors=[...s.colors,'player'];s.hand=[...s.hand];s.hand[i]=Math.floor(Math.random()*5)+1;
+    try{playPlaceSE(true);}catch(e){}
+    const ns=sum+v;
+    if(ns===10){s.busy=true;const p=calcPts(s.field);s.score+=p.total;s.tens++;
+      later(()=>{try{playComboSfx(p.voice);}catch(e){}setCombo({text:p.voice,pts:p.total,color:'#2e7fe8',who:'player'});},250);
+      later(nextCard,SOLO_CFG.nextMs);}
+    else if(ns>10){s.busy=true;s.score=Math.max(0,s.score-SOLO_CFG.burstPenalty);s.burst=true;
+      later(()=>{try{playBurstSE();}catch(e){}setCombo({text:'BURST',pts:-SOLO_CFG.burstPenalty,color:'#ff3b3b',who:'player',burst:true});},250);
+      later(()=>{S.current.burst=false;nextCard();},SOLO_CFG.nextMs);}
+    else checkStuck();
+    re();}
+  const s=S.current,sum=s.field.reduce((a,b)=>a+b,0),fieldCls=sum===10?' complete':sum>10?' over':'';
+  const cardEl=(v,i)=>h(SlideCard,{key:'s'+i+'_'+v+'_'+s.cid,value:v,onPlay:()=>tap(i),disabled:s.busy,cardState:handCardState(v,sum,s.field),onLocked:()=>fxLockHint(lockReason(v,sum,s.field)),cardRole:'player'});
+  const q=s.queue.slice(0,SOLO_CFG.show);
+  return h('div',{className:'gp-screen solo-screen'},
+    combo&&h(CyberComboDisplay,{key:'sc_'+s.tens+'_'+combo.text+s.score,combo}),
+    h('div',{className:'gp-top-bar'},
+      h('div',{className:'gp-score you'},h('div',{className:'lbl'},'YOU'),h('div',{className:'val'},s.score),h('div',{className:'sub'},'10完成 ',h('b',null,s.tens),'回')),
+      h('div',{className:'gp-round-pill'},h('span',{className:'lvl',style:{color:'#2e7fe8',fontWeight:900}},'ひとり')),
+      h('div',{className:'gp-icon-btn',onClick:onBack,title:'ホームに戻る'},h('span',null,'⌂'))),
+    h('div',{className:'gp-dealer-area solo-next'},
+      h('div',{className:'gp-area-label'},'✦ NEXT — 次に場に出る札'),
+      h('div',{className:'gp-dealer-cards'},q.map((v,i)=>h('div',{key:'q'+(s.cid+i),className:'gp-dealer-card'+(i===0?' solo-first':'')},h('span',{className:'dv'},v))))),
+    h('div',{className:'gp-spacer'}),
+    h('div',{className:'gp-field-area field-card-area'+fieldCls,style:{animation:s.burst?'burst 0.5s ease':'none'}},
+      h('div',{className:'field-planet'}),
+      h('div',{className:'gp-field-cards'},s.field.map((v,i)=>h(FieldCard,{key:'f'+s.cid+'_'+i,value:v,by:s.colors[i],isComplete:sum===10&&i===s.field.length-1}))),
+      h('div',{className:'gp-field-sum gp-field-sum-strong'},
+        h('div',{className:'main'},h('span',{className:'num'+fieldCls},sum),h('span',{className:'sep'},'/ 10')),
+        h('div',{className:'ato'},'あと ',h('b',null,Math.max(0,10-sum))))),
+    h('div',{className:'gp-spacer'}),
+    h('div',{className:'gp-hand-area hand-card-area'},
+      h('div',{className:'gp-area-label'},'YOU — 10枚'),
+      h('div',{className:'gp-hand-rows'},
+        h('div',{className:'gp-hand-row'},s.hand.slice(0,5).map((v,i)=>cardEl(v,i))),
+        h('div',{className:'gp-hand-row'},s.hand.slice(5).map((v,i)=>cardEl(v,i+5))))),
+    h('div',{className:'gp-spacer'}));
 }
 function App(){
   const[phase,setPhase]=useState('menu');
@@ -6726,6 +6791,7 @@ function App(){
   function goHome(){if(isSurvival()){goSurvival();return;}if(stageR.current&&stageR.current.ar===4){goCharge();return;}if(stageR.current&&stageR.current.ar===3){goRush();return;}if(stageR.current&&stageR.current.ar===2){goTune();return;}if(stageR.current&&stageR.current.ar===1){goPzxPanel();return;}if(stageR.current){goMap();return;}roundTokR.current++;clearTimers();exitLink();stopBGM();setPhase('menu');}
 
   const curStage=stageCtx?STAGES.areas[stageCtx.ar].stages[stageCtx.st]:null;
+  if(phase==='solo')return h(SoloMode,{onBack:()=>{setPhase('menu');phaseR.current='menu';}}); // v280
   if(phase==='fall')return h(FallMode,{onBack:()=>{setPhase('menu');phaseR.current='menu';}}); // v276
   if(phase==='survival')return h(SurvivalScreen,{onBattle:startSurvivalBattle,onBack:()=>{setPhase('menu');phaseR.current='menu';}});
   if(phase==='charge')return h(ChargeScreen,{onBattle:startChargeBattle,onBack:()=>{setPhase('menu');phaseR.current='menu';}});
@@ -6733,7 +6799,7 @@ function App(){
   if(phase==='tune')return h(TuneScreen,{onBattle:startTuneBattle,onBack:()=>{setPhase('menu');phaseR.current='menu';}}); // v239
   if(phase==='pzx')return h(PzxPanel,{save,onBattle:startPzxStage,onEnter:()=>{setPhase('pzxmap');phaseR.current='pzxmap';},onBack:()=>{setPhase('menu');phaseR.current='menu';},onReset:()=>{updSave(s=>{s.pzx={got:[],boss:false};return s;});}}); // v214/v218 リセットは進行だけ消す（本編の★は無関係）
   if(phase==='pzxmap')return h(PzxWorld,{onPick:startPzxStage,onBack:()=>{setPhase('pzx');phaseR.current='pzx';}}); // v225/v231
-  if(phase==='menu')return h(TitleScreen,{onPlay:()=>{setPhase('map');phaseR.current='map';},onPuzzlux:()=>{setPhase('pzx');phaseR.current='pzx';},onRush:goRush,onCharge:goCharge,onSurvival:goSurvival,onFall:()=>{setPhase('fall');phaseR.current='fall';},onTune:()=>{setPhase('tune');phaseR.current='tune';},onTutorial:()=>openTutorial(null),musicOn:musicEnabled,toggleMusic});
+  if(phase==='menu')return h(TitleScreen,{onPlay:()=>{setPhase('map');phaseR.current='map';},onPuzzlux:()=>{setPhase('pzx');phaseR.current='pzx';},onRush:goRush,onCharge:goCharge,onSurvival:goSurvival,onFall:()=>{setPhase('fall');phaseR.current='fall';},onSolo:()=>{setPhase('solo');phaseR.current='solo';},onTune:()=>{setPhase('tune');phaseR.current='tune';},onTutorial:()=>openTutorial(null),musicOn:musicEnabled,toggleMusic});
   if(phase==='champIntro'&&curStage&&curStage.champion)return h(ChampionIntroScreen,{champ:CHAMPIONS[curStage.champion],stage:curStage,onStart:()=>goIntro(pendingDiff)});
   if(phase==='intro'&&curStage&&curStage.intro)return h(IntroVideoScreen,{src:curStage.intro,onDone:()=>goBrief(pendingDiff)}); // v120
   if(phase==='brief'&&curStage)return h(BriefScreen,{stage:curStage,onStart:()=>startGame(pendingDiff)}); // v119

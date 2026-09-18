@@ -2163,7 +2163,8 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .fall-in.boom{animation:fallBoom .55s ease forwards;}
 @keyframes fallDone{0%{transform:scale(1)}30%{transform:scale(1.12);filter:brightness(1.3)}100%{transform:translateY(-30px) scale(.9);opacity:0}}
 @keyframes fallBoom{0%{transform:none}20%{transform:translateX(-5px) rotate(-4deg)}40%{transform:translateX(5px) rotate(4deg)}100%{transform:scale(.6) rotate(12deg);opacity:0;filter:grayscale(1)}}
-.fall-card{position:absolute;pointer-events:none;}
+.fall-card{position:absolute;pointer-events:none;transition:filter .2s;}
+.fall-card.frz{filter:saturate(.35) brightness(1.05) drop-shadow(0 0 6px rgba(140,190,255,.8));}
 .fall-count{position:absolute;left:50%;top:-30px;transform:translateX(-50%);font:800 18px 'Inter',sans-serif;color:#e0584a;text-align:center;width:100%;}
 .fall-count i{display:block;height:4px;border-radius:2px;background:#e0584a;margin:2px auto 0;transition:none;}
 .fall-flash{position:absolute;left:0;right:0;text-align:center;pointer-events:none;animation:fallFlash .9s ease forwards;}
@@ -3396,7 +3397,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v276'; // v276(2026/09/18): 新モード「テンフォール（仮）」を追加。4レーンに札がゆっくり落ちてくる→下の4マスを左から埋めて10。着地で5秒カウント、空白飛ばし着地・カウント切れ・10不可能で💥。落ちてきた札を使うほど加点。手札は左→右なぞりで入れ替え。数値はFALL_CFG
+const APP_VER='v277'; // v277(2026/09/18): テンフォール：10は何枚でも完成（いつものルール）。落ち札は消さない。札が確定したレーンの落ち札はその場でフリーズし、場が空いたら再開
+// const APP_VER='v276'; // v276(2026/09/18): 新モード「テンフォール（仮）」を追加。4レーンに札がゆっくり落ちてくる→下の4マスを左から埋めて10。着地で5秒カウント、空白飛ばし着地・カウント切れ・10不可能で💥。落ちてきた札を使うほど加点。手札は左→右なぞりで入れ替え。数値はFALL_CFG
 // const APP_VER='v275'; // v275(2026/09/16): 役サバイバルでAIのカーソル移動とカード飛行を短縮（決めてから場に届くまで約0.5秒かかり、毎回プレイヤーに先取りされていた）。待ちログの重複も抑制
 // const APP_VER='v274'; // v274(2026/09/16): 役サバイバルの難易度選択を廃止（常に強い方）。AIが自分から空の場を開けないように変更（開けた側が損なので相手に開けさせる）。完成できる場面の反応も速く
 // const APP_VER='v273'; // v273(2026/09/16): 役サバイバルの手札マットをさらに持ち上げた（下端26u→56u）
@@ -4757,39 +4759,41 @@ function FallMode({onBack}){
   function start(){const best=S.current.best;S.current=fresh();const s=S.current;s.best=best;const now=performance.now();s.phase='play';s.endAt=now+FALL_CFG.time*1000;s.nextSpawn=now+600;try{playGoSE();}catch(e){}setTick(t=>t+1);}
   function flash(kind,text,sub){S.current.flash={kind,text,sub,at:performance.now()};}
   function resolve(kind){const s=S.current,now=performance.now();
-    if(kind==='ten'){const vals=s.row.map(c=>c.v),fell=s.row.filter(c=>c.from==='fall').length,p=calcPts(vals),pts=p.total+fell*FALL_CFG.bonusPerFall;
+    if(kind==='ten'){const used=s.row.filter(Boolean),vals=used.map(c=>c.v),fell=used.filter(c=>c.from==='fall').length,p=calcPts(vals),pts=p.total+fell*FALL_CFG.bonusPerFall;
       s.score+=pts;s.tens++;s.fallUsed+=fell;flash('ten','+'+pts,p.voice+(fell?'　落ち札×'+fell+' +'+fell*FALL_CFG.bonusPerFall:''));try{playComboSfx(p.voice);}catch(e){try{playWinSE(false);}catch(_){}}}
     else{s.score=Math.max(0,s.score-FALL_CFG.boomPenalty);s.booms++;flash('boom','💥','-'+FALL_CFG.boomPenalty);try{playBurstSE();}catch(e){}}
     s.count=null;s.clearUntil=now+FALL_CFG.clearMs;s.resolved=kind;}
   function land(f){const s=S.current,L=f.lane;
-    if(s.row[L]){return;} // 自分の札で先に埋まっていたら消えるだけ
     for(let i=0;i<L;i++)if(!s.row[i]){s.row[L]={v:f.v,from:'fall'};resolve('boom');return;} // 空白を飛ばして着地→💥
+    const vals=s.row.map(c=>c?c.v:null),before=vals.reduce((a,v)=>a+(v||0),0);
     s.row[L]={v:f.v,from:'fall'};try{playPlaceSE(false);}catch(e){}
-    const sum=s.row.reduce((a,c)=>a+(c?c.v:0),0),filled=L+1;
-    if(filled===4){resolve(sum===10?'ten':'boom');return;}
-    if(!fallOk(sum,filled)){resolve('boom');return;}
+    const sum=before+f.v;
+    if(sum===10){resolve('ten');return;}                    // v277 何枚でも10になったら完成
+    if(sum>10||!canPlay(f.v,before,vals)){resolve('boom');return;} // 10を超えた／いつものルールで出せない形
     s.count={until:performance.now()+FALL_CFG.countMs,lane:L};}
   function tap(i){const s=S.current,now=performance.now();
     if(swipedR.current||s.phase!=='play'||now<s.clearUntil)return;
     const k=s.row.findIndex(c=>!c);if(k<0)return;
-    const v=s.hand[i],sum=s.row.reduce((a,c)=>a+(c?c.v:0),0)+v;
-    if(!fallOk(sum,k+1)){s.shake=i;s.shakeUntil=now+320;try{playMissSE();}catch(e){}setTick(t=>t+1);return;}
-    s.row[k]={v,from:'me'};s.falls=s.falls.filter(f=>f.lane!==k);s.count=null;s.hand[i]=fallRand();try{playPlaceSE(true);}catch(e){}
-    if(k===3)resolve('ten');setTick(t=>t+1);}
+    const v=s.hand[i],vals=s.row.map(c=>c?c.v:null),before=vals.reduce((a,x)=>a+(x||0),0),sum=before+v;
+    if(sum>10||!canPlay(v,before,vals)){s.shake=i;s.shakeUntil=now+320;try{playMissSE();}catch(e){}setTick(t=>t+1);return;}
+    s.row[k]={v,from:'me'};s.count=null;s.hand[i]=fallRand();try{playPlaceSE(true);}catch(e){} // v277 落ちてる札は消さない（フリーズするだけ）
+    if(sum===10)resolve('ten');setTick(t=>t+1);}
   function shuffle(){const s=S.current;if(s.phase!=='play')return;s.hand=createDeck();s.shufAt=performance.now();try{fxAir();}catch(e){}setTick(t=>t+1);}
   useEffect(()=>{let raf=0;const loop=()=>{const s=S.current,now=performance.now();
-      if(s.phase==='play'){
+      const dt=Math.min(100,now-(s.last||now));s.last=now;
+      if(s.phase==='play'){ // v277 確定した札があるレーンの落ち札はフリーズ。場が空いたら再スタート
+        s.falls.forEach(f=>{if(!s.row[f.lane])f.p=Math.min(1,f.p+dt/FALL_CFG.fallMs);});
         if(now>=s.endAt){s.phase='end';s.best=Math.max(s.best,s.score);try{playWinSE(false);}catch(e){}}
         else{
           if(s.clearUntil&&now>=s.clearUntil){s.clearUntil=0;s.row=[null,null,null,null];s.resolved=null;}
           if(!s.clearUntil){
             if(now>=s.nextSpawn){const busy=new Set(s.falls.map(f=>f.lane)),free=[0,1,2,3].filter(l=>!s.row[l]&&!busy.has(l));
-              if(s.falls.length<FALL_CFG.maxFalling&&free.length){const lane=free[Math.floor(Math.random()*free.length)];s.falls.push({id:s.id++,lane,v:fallRand(),t0:now});}
+              if(s.falls.length<FALL_CFG.maxFalling&&free.length){const lane=free[Math.floor(Math.random()*free.length)];s.falls.push({id:s.id++,lane,v:fallRand(),p:0});}
               const[a,b]=FALL_CFG.spawnMs;s.nextSpawn=now+a+Math.random()*(b-a);}
-            const landed=s.falls.filter(f=>now-f.t0>=FALL_CFG.fallMs);
-            if(landed.length){s.falls=s.falls.filter(f=>now-f.t0<FALL_CFG.fallMs);landed.sort((x,y)=>x.t0-y.t0).forEach(f=>{if(!S.current.clearUntil)land(f);});}
+            const landed=s.falls.filter(f=>f.p>=1);
+            if(landed.length){s.falls=s.falls.filter(f=>f.p<1);landed.sort((x,y)=>y.p-x.p).forEach(f=>{if(!S.current.clearUntil)land(f);else s.falls.push(f);});}
             if(s.count&&now>=s.count.until)resolve('boom');
-          }else{s.falls.forEach(f=>{if(now-f.t0>FALL_CFG.fallMs-40)f.t0=now-(FALL_CFG.fallMs-40);});} // 片付け中は着地の手前で待たせる
+          }
         }
       }
       setTick(t=>(t+1)%1e6);raf=requestAnimationFrame(loop);};
@@ -4802,7 +4806,7 @@ function FallMode({onBack}){
     return h('main',{className:'rush-screen fall-screen'},h('section',{className:'rush-card'},
       h('p',{className:'rush-eyebrow'},'TEN-KURU · お試し'),h('h1',null,s.phase==='end'?'しゅうりょう':'テンフォール'),
       s.phase==='end'?h('div',{className:'fall-result'},h('b',null,s.score),h('span',null,'pt'),h('p',null,'10完成 '+s.tens+'回　💥 '+s.booms+'回　落ち札 '+s.fallUsed+'枚'),s.best>0&&h('p',null,'ベスト '+s.best+'pt'))
-        :h('ul',{className:'rush-rules'},h('li',null,'4つのレーンに札がゆっくり落ちてくる。'),h('li',null,'下の4マスを左から順に埋めて、合計10を作る。役もいつも通り。'),h('li',null,'着地した札は'+FALL_CFG.countMs/1000+'秒カウント。すぐ右に手札を出せば止まる。'),h('li',null,'空いたマスを飛ばして着地・カウント切れ・10が作れなくなると💥'),h('li',null,'落ちてきた札を使うほど高得点。手札は左→右になぞると入れ替わる。')),
+        :h('ul',{className:'rush-rules'},h('li',null,'4つのレーンに札がゆっくり落ちてくる。'),h('li',null,'下の4マスを左から順に埋めて、合計10を作る（何枚でもOK）。役もいつも通り。'),h('li',null,'着地した札は'+FALL_CFG.countMs/1000+'秒カウント。すぐ右に手札を出せば止まる。'),h('li',null,'空いたマスを飛ばして着地・カウント切れ・10を超えると💥　札が確定したレーンの落ち札は止まる。'),h('li',null,'落ちてきた札を使うほど高得点。手札は左→右になぞると入れ替わる。')),
       h('button',{className:'rush-primary',onClick:start},s.phase==='end'?'もう一度':'はじめる'),h('button',{className:'rush-secondary',onClick:onBack},'ホームへ')));
   }
   const left=Math.max(0,Math.ceil((s.endAt-now)/1000)),sum=s.row.reduce((a,c)=>a+(c?c.v:0),0);
@@ -4820,8 +4824,8 @@ function FallMode({onBack}){
           c&&h('div',{key:'c'+l,className:'fall-in'+(cl?(s.resolved==='boom'?' boom':' done'):'')},card(c.v,c.from==='fall'?'dealer':'player')),
           cnt&&h('div',{className:'fall-count'},Math.max(0,Math.ceil((cnt.until-now)/1000)),
             h('i',{style:{width:(Math.max(0,cnt.until-now)/FALL_CFG.countMs*100)+'%'}})));}),
-      s.falls.map(f=>{const p=Math.min(1,(now-f.t0)/FALL_CFG.fallMs),y=-cardH+(laneH+cardH)*p;
-        return h('div',{key:'f'+f.id,className:'fall-card',style:{left:U(f.lane*laneW+(laneW-cardW)/2),top:U(y)}},card(f.v,'dealer'));}),
+      s.falls.map(f=>{const p=f.p,y=-cardH+(laneH+cardH)*p;
+        return h('div',{key:'f'+f.id,className:'fall-card'+(s.row[f.lane]?' frz':''),style:{left:U(f.lane*laneW+(laneW-cardW)/2),top:U(y)}},card(f.v,'dealer'));}),
       fl&&h('div',{key:'fl'+fl.at,className:'fall-flash '+fl.kind,style:{top:U(laneH-70)}},h('b',null,fl.text),fl.sub&&h('span',null,fl.sub))),
     h('div',{className:'fall-sum'},'合計 ',h('b',{className:sum>0?'on':''},sum),' / 10'),
     h('div',{className:'fall-hand'+(s.shufAt&&now-s.shufAt<400?' shuf':''),

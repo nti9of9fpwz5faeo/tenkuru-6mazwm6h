@@ -2144,6 +2144,48 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 @keyframes skipPulse{0%,100%{opacity:.75}50%{opacity:1}}
 
 /* v253 10秒ラッシュ */
+
+/* v276 テンフォール（仮） */
+.fall-screen.fall-play{position:fixed;inset:0;z-index:100;background:linear-gradient(155deg,#edf4fc,#f3eefb);display:flex;flex-direction:column;align-items:center;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;padding-top:max(8px,env(safe-area-inset-top));}
+.fall-top{width:min(100vw,calc(100dvh * 360 / 640));display:flex;align-items:center;justify-content:space-between;padding:6px 14px;color:#263650;}
+.fall-back{width:34px;height:34px;border-radius:17px;border:1.5px solid rgba(120,150,190,.4);background:rgba(255,255,255,.75);color:#5a80ab;font-size:14px;}
+.fall-time{font:800 28px 'Inter',sans-serif;color:#2e7fe8;min-width:60px;text-align:center;}
+.fall-time.low{color:#e0584a;}
+.fall-score{font:700 13px 'Inter',sans-serif;color:#5a6f90;min-width:60px;text-align:right;}
+.fall-score b{font-size:22px;color:#263650;margin-right:2px;}
+.fall-lanes{position:relative;flex-shrink:0;overflow:hidden;}
+.fall-lane{position:absolute;top:0;bottom:0;border-left:1px dashed rgba(120,150,190,.25);}
+.fall-lane:first-child{border-left:none;}
+.fall-slot{position:absolute;border-radius:8px;border:2px dashed rgba(120,150,190,.35);box-sizing:border-box;}
+.fall-slot.next{border-color:rgba(46,127,232,.7);background:rgba(46,127,232,.07);}
+.fall-slot>.fall-in{position:absolute;inset:-2px;}
+.fall-in.done{animation:fallDone .55s ease forwards;}
+.fall-in.boom{animation:fallBoom .55s ease forwards;}
+@keyframes fallDone{0%{transform:scale(1)}30%{transform:scale(1.12);filter:brightness(1.3)}100%{transform:translateY(-30px) scale(.9);opacity:0}}
+@keyframes fallBoom{0%{transform:none}20%{transform:translateX(-5px) rotate(-4deg)}40%{transform:translateX(5px) rotate(4deg)}100%{transform:scale(.6) rotate(12deg);opacity:0;filter:grayscale(1)}}
+.fall-card{position:absolute;pointer-events:none;}
+.fall-count{position:absolute;left:50%;top:-30px;transform:translateX(-50%);font:800 18px 'Inter',sans-serif;color:#e0584a;text-align:center;width:100%;}
+.fall-count i{display:block;height:4px;border-radius:2px;background:#e0584a;margin:2px auto 0;transition:none;}
+.fall-flash{position:absolute;left:0;right:0;text-align:center;pointer-events:none;animation:fallFlash .9s ease forwards;}
+.fall-flash b{display:block;font:900 40px 'Inter',sans-serif;color:#2e7fe8;text-shadow:0 2px 10px rgba(255,255,255,.9);}
+.fall-flash.boom b{color:#e0584a;}
+.fall-flash span{font-size:13px;font-weight:800;color:#3c5a80;background:rgba(255,255,255,.85);border-radius:10px;padding:2px 10px;}
+@keyframes fallFlash{0%{opacity:0;transform:scale(.7)}15%{opacity:1;transform:scale(1.05)}70%{opacity:1}100%{opacity:0;transform:translateY(-20px)}}
+.fall-sum{font:700 14px 'Inter',sans-serif;color:#7a90ae;margin:4px 0 6px;}
+.fall-sum b{font-size:22px;color:#9aaccc;margin:0 2px;}
+.fall-sum b.on{color:#263650;}
+.fall-hand{display:grid;grid-template-columns:repeat(5,auto);gap:6px 8px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.6);box-shadow:0 4px 16px rgba(70,100,150,.12);}
+.fall-hand.shuf .fall-hcard{animation:fallShuf .4s ease;}
+@keyframes fallShuf{0%{transform:translateX(-8px);opacity:.3}100%{transform:none;opacity:1}}
+.fall-hcard{background:none;border:none;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.fall-hcard:active{transform:scale(.94);}
+.fall-hcard.shake{animation:fallShake .32s ease;}
+@keyframes fallShake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.fall-hint{font-size:11px;color:#8aa0be;margin-top:6px;letter-spacing:1px;}
+.fall-result{text-align:center;margin:14px 0;}
+.fall-result b{font:900 48px 'Inter',sans-serif;color:#2e7fe8;}
+.fall-result span{font-weight:800;margin-left:4px;color:#5a6f90;}
+.fall-result p{font-size:13px;color:#5a6f90;margin:6px 0;}
 .rush-screen{position:fixed;inset:0;z-index:100;overflow-y:auto;touch-action:pan-y;background:linear-gradient(155deg,#edf4fc,#f3eefb);color:#263650;padding:max(24px,env(safe-area-inset-top)) 18px max(24px,env(safe-area-inset-bottom));}
 .rush-card{width:min(100%,440px);margin:0 auto;background:#ffffffed;border:1px solid #d7dff0;border-radius:22px;padding:24px;box-shadow:0 12px 40px #35467413;text-align:center;}
 .rush-card h1{font-size:30px;margin:8px 0 12px;color:#534181;}.rush-eyebrow{font-size:12px;letter-spacing:3px;color:#6b7290;margin:0;}.rush-lead{font-size:16px;line-height:1.6;}
@@ -3354,7 +3396,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v275'; // v275(2026/09/16): 役サバイバルでAIのカーソル移動とカード飛行を短縮（決めてから場に届くまで約0.5秒かかり、毎回プレイヤーに先取りされていた）。待ちログの重複も抑制
+const APP_VER='v276'; // v276(2026/09/18): 新モード「テンフォール（仮）」を追加。4レーンに札がゆっくり落ちてくる→下の4マスを左から埋めて10。着地で5秒カウント、空白飛ばし着地・カウント切れ・10不可能で💥。落ちてきた札を使うほど加点。手札は左→右なぞりで入れ替え。数値はFALL_CFG
+// const APP_VER='v275'; // v275(2026/09/16): 役サバイバルでAIのカーソル移動とカード飛行を短縮（決めてから場に届くまで約0.5秒かかり、毎回プレイヤーに先取りされていた）。待ちログの重複も抑制
 // const APP_VER='v274'; // v274(2026/09/16): 役サバイバルの難易度選択を廃止（常に強い方）。AIが自分から空の場を開けないように変更（開けた側が損なので相手に開けさせる）。完成できる場面の反応も速く
 // const APP_VER='v273'; // v273(2026/09/16): 役サバイバルの手札マットをさらに持ち上げた（下端26u→56u）
 // const APP_VER='v272'; // v272(2026/09/16): 役サバイバルのステージ設定から smart:true と winMsAbs を外した。これらが残っていたため v271 の専用AI・専用の速さが一度も使われていなかった
@@ -3883,7 +3926,7 @@ function SkillPanel(){
     )
   );
 }
-function TitleScreen({onPlay,onPuzzlux,onRush,onCharge,onSurvival,onTune,onTutorial,musicOn,toggleMusic}){
+function TitleScreen({onPlay,onPuzzlux,onRush,onCharge,onSurvival,onFall,onTune,onTutorial,musicOn,toggleMusic}){
   const btnBase={borderRadius:14,padding:'15px 0',fontSize:13,fontWeight:800,letterSpacing:2,cursor:'pointer',fontFamily:"'Inter',sans-serif",background:'rgba(255,255,255,.78)',boxShadow:'0 4px 16px rgba(70,100,150,.16), inset 0 1px 0 #fff',width:'100%'};
   return h('div',{style:{height:'100dvh',overflowY:'auto',touchAction:'pan-y',flexDirection:'column',background:"url('img/title-bg.jpg') center/cover no-repeat, #eef2f8",display:'flex',alignItems:'center',justifyContent:'flex-start',padding:16,position:'relative'}},
     h('div',{style:{margin:'auto',flexShrink:0,textAlign:'center',display:'flex',flexDirection:'column',alignItems:'center',gap:18,width:'100%',maxWidth:340,animation:'fadeUp 0.5s ease'}},
@@ -3892,6 +3935,7 @@ function TitleScreen({onPlay,onPuzzlux,onRush,onCharge,onSurvival,onTune,onTutor
       h('div',{style:{display:'flex',flexDirection:'column',gap:12,width:'100%',marginTop:6}},
         h('button',{onClick:onPlay,style:{...btnBase,padding:'17px 0',fontSize:16,letterSpacing:6,border:'1.5px solid rgba(46,127,232,.55)',color:'#2e7fe8',boxShadow:'0 6px 20px rgba(46,127,232,.22), inset 0 1px 0 #fff'}},'遊ぶ'),
         h('button',{onClick:onPuzzlux,style:{...btnBase,padding:'13px 0',fontSize:13,letterSpacing:4,border:'1.5px solid rgba(80,160,230,.5)',color:'#2b7fb8',boxShadow:'0 5px 18px rgba(80,160,230,.2), inset 0 1px 0 #fff'}},'パズルクス'), // v214
+        h('button',{onClick:onFall,style:{...btnBase,fontSize:16,border:'1.5px solid #e08a3a',color:'#b8621a'}},'テンフォール',h('span',{style:{display:'block',fontSize:12,marginTop:5}},'お試し · 落ちてくる札で10を作る')), // v276
         h('button',{onClick:onSurvival,style:{...btnBase,fontSize:16,border:'1.5px solid #2189bc',color:'#096598'}},'役サバイバル',h('span',{style:{display:'block',fontSize:12,marginTop:5}},'お試し · 役を作って手札を補充')),
         h('button',{onClick:onCharge,style:{...btnBase,fontSize:15,border:'1.5px solid #328a89',color:'#236e70'}},'60秒チャージ',h('span',{style:{display:'block',fontSize:11,letterSpacing:1,marginTop:5}},'貯めて、読んで、一気に出す')),
         h('button',{onClick:onRush,style:{...btnBase,fontSize:15,border:'1.5px solid #b29ade',color:'#60499a'}},'10秒ラッシュ',h('span',{style:{display:'block',fontSize:11,letterSpacing:1,marginTop:5}},'10秒間、何度でも取り返せる')),
@@ -4690,6 +4734,103 @@ const DEFAULT_LAYOUT={handW:53,handY:0,fieldW:64,sumSize:30,sumX:1,sumY:-8,gapDF
 // 参考: 4枚+隙間の合計 = fieldW*4+15u、画面幅は360u
 
 // ── App ──
+// ── v276 テンフォール（仮）：4レーンに札がゆっくり落ちてくる。落ちてきた札と手札で下の4マスを左から埋めて10を作る ──
+// 数字の調整はここだけ
+const FALL_CFG={
+  time:60,          // 1プレイの秒数
+  fallMs:6000,      // 札が上から着地するまでの時間（ゆっくり）
+  spawnMs:[1600,2800], // 次の札が落ち始めるまでの間隔（最小〜最大）
+  maxFalling:2,     // 同時に落ちている札の最大数
+  countMs:5000,     // 着地してからのカウントダウン（隣に出せば止まる）
+  bonusPerFall:2,   // 落ちてきた札を1枚使うごとの上乗せpt
+  boomPenalty:3,    // 💥のときに減るpt（0未満にはならない）
+  clearMs:550,      // 10完成・💥のあと場が空くまで
+};
+function fallRand(){return Math.floor(Math.random()*5)+1;}
+function fallOk(sum,filled){const r=4-filled,need=10-sum;return need>=r&&need<=r*5;} // 残りのマスで10ちょうどにできるか
+function FallMode({onBack}){
+  const S=useRef(null);
+  const[,setTick]=useState(0);
+  const swipeR=useRef(null),swipedR=useRef(false);
+  function fresh(){return{phase:'ready',row:[null,null,null,null],falls:[],hand:createDeck(),score:0,endAt:0,nextSpawn:0,count:null,clearUntil:0,flash:null,shake:-1,shakeUntil:0,id:1,best:0,tens:0,booms:0,fallUsed:0};}
+  if(!S.current)S.current=fresh();
+  function start(){const best=S.current.best;S.current=fresh();const s=S.current;s.best=best;const now=performance.now();s.phase='play';s.endAt=now+FALL_CFG.time*1000;s.nextSpawn=now+600;try{playGoSE();}catch(e){}setTick(t=>t+1);}
+  function flash(kind,text,sub){S.current.flash={kind,text,sub,at:performance.now()};}
+  function resolve(kind){const s=S.current,now=performance.now();
+    if(kind==='ten'){const vals=s.row.map(c=>c.v),fell=s.row.filter(c=>c.from==='fall').length,p=calcPts(vals),pts=p.total+fell*FALL_CFG.bonusPerFall;
+      s.score+=pts;s.tens++;s.fallUsed+=fell;flash('ten','+'+pts,p.voice+(fell?'　落ち札×'+fell+' +'+fell*FALL_CFG.bonusPerFall:''));try{playComboSfx(p.voice);}catch(e){try{playWinSE(false);}catch(_){}}}
+    else{s.score=Math.max(0,s.score-FALL_CFG.boomPenalty);s.booms++;flash('boom','💥','-'+FALL_CFG.boomPenalty);try{playBurstSE();}catch(e){}}
+    s.count=null;s.clearUntil=now+FALL_CFG.clearMs;s.resolved=kind;}
+  function land(f){const s=S.current,L=f.lane;
+    if(s.row[L]){return;} // 自分の札で先に埋まっていたら消えるだけ
+    for(let i=0;i<L;i++)if(!s.row[i]){s.row[L]={v:f.v,from:'fall'};resolve('boom');return;} // 空白を飛ばして着地→💥
+    s.row[L]={v:f.v,from:'fall'};try{playPlaceSE(false);}catch(e){}
+    const sum=s.row.reduce((a,c)=>a+(c?c.v:0),0),filled=L+1;
+    if(filled===4){resolve(sum===10?'ten':'boom');return;}
+    if(!fallOk(sum,filled)){resolve('boom');return;}
+    s.count={until:performance.now()+FALL_CFG.countMs,lane:L};}
+  function tap(i){const s=S.current,now=performance.now();
+    if(swipedR.current||s.phase!=='play'||now<s.clearUntil)return;
+    const k=s.row.findIndex(c=>!c);if(k<0)return;
+    const v=s.hand[i],sum=s.row.reduce((a,c)=>a+(c?c.v:0),0)+v;
+    if(!fallOk(sum,k+1)){s.shake=i;s.shakeUntil=now+320;try{playMissSE();}catch(e){}setTick(t=>t+1);return;}
+    s.row[k]={v,from:'me'};s.falls=s.falls.filter(f=>f.lane!==k);s.count=null;s.hand[i]=fallRand();try{playPlaceSE(true);}catch(e){}
+    if(k===3)resolve('ten');setTick(t=>t+1);}
+  function shuffle(){const s=S.current;if(s.phase!=='play')return;s.hand=createDeck();s.shufAt=performance.now();try{fxAir();}catch(e){}setTick(t=>t+1);}
+  useEffect(()=>{let raf=0;const loop=()=>{const s=S.current,now=performance.now();
+      if(s.phase==='play'){
+        if(now>=s.endAt){s.phase='end';s.best=Math.max(s.best,s.score);try{playWinSE(false);}catch(e){}}
+        else{
+          if(s.clearUntil&&now>=s.clearUntil){s.clearUntil=0;s.row=[null,null,null,null];s.resolved=null;}
+          if(!s.clearUntil){
+            if(now>=s.nextSpawn){const busy=new Set(s.falls.map(f=>f.lane)),free=[0,1,2,3].filter(l=>!s.row[l]&&!busy.has(l));
+              if(s.falls.length<FALL_CFG.maxFalling&&free.length){const lane=free[Math.floor(Math.random()*free.length)];s.falls.push({id:s.id++,lane,v:fallRand(),t0:now});}
+              const[a,b]=FALL_CFG.spawnMs;s.nextSpawn=now+a+Math.random()*(b-a);}
+            const landed=s.falls.filter(f=>now-f.t0>=FALL_CFG.fallMs);
+            if(landed.length){s.falls=s.falls.filter(f=>now-f.t0<FALL_CFG.fallMs);landed.sort((x,y)=>x.t0-y.t0).forEach(f=>{if(!S.current.clearUntil)land(f);});}
+            if(s.count&&now>=s.count.until)resolve('boom');
+          }else{s.falls.forEach(f=>{if(now-f.t0>FALL_CFG.fallMs-40)f.t0=now-(FALL_CFG.fallMs-40);});} // 片付け中は着地の手前で待たせる
+        }
+      }
+      setTick(t=>(t+1)%1e6);raf=requestAnimationFrame(loop);};
+    raf=requestAnimationFrame(loop);return()=>cancelAnimationFrame(raf);},[]);
+  const s=S.current,now=performance.now();
+  const u='min(calc(100vw / 360),calc(100dvh / 640))',U=n=>'calc('+u+' * '+n+')';
+  const laneW=80,cardW=60,laneH=300,cardH=cardW*7/5;
+  const card=(v,by,extra)=>h('div',{style:{'--card-w':U(cardW),...(extra||{})}},h(FieldCard,{value:v,by}));
+  if(s.phase==='ready'||s.phase==='end'){
+    return h('main',{className:'rush-screen fall-screen'},h('section',{className:'rush-card'},
+      h('p',{className:'rush-eyebrow'},'TEN-KURU · お試し'),h('h1',null,s.phase==='end'?'しゅうりょう':'テンフォール'),
+      s.phase==='end'?h('div',{className:'fall-result'},h('b',null,s.score),h('span',null,'pt'),h('p',null,'10完成 '+s.tens+'回　💥 '+s.booms+'回　落ち札 '+s.fallUsed+'枚'),s.best>0&&h('p',null,'ベスト '+s.best+'pt'))
+        :h('ul',{className:'rush-rules'},h('li',null,'4つのレーンに札がゆっくり落ちてくる。'),h('li',null,'下の4マスを左から順に埋めて、合計10を作る。役もいつも通り。'),h('li',null,'着地した札は'+FALL_CFG.countMs/1000+'秒カウント。すぐ右に手札を出せば止まる。'),h('li',null,'空いたマスを飛ばして着地・カウント切れ・10が作れなくなると💥'),h('li',null,'落ちてきた札を使うほど高得点。手札は左→右になぞると入れ替わる。')),
+      h('button',{className:'rush-primary',onClick:start},s.phase==='end'?'もう一度':'はじめる'),h('button',{className:'rush-secondary',onClick:onBack},'ホームへ')));
+  }
+  const left=Math.max(0,Math.ceil((s.endAt-now)/1000)),sum=s.row.reduce((a,c)=>a+(c?c.v:0),0);
+  const next=s.row.findIndex(c=>!c);
+  const fl=s.flash&&now-s.flash.at<900?s.flash:null;
+  return h('main',{className:'fall-screen fall-play'},
+    h('div',{className:'fall-top'},
+      h('button',{className:'fall-back',onClick:()=>{S.current.phase='ready';onBack();}},'✕'),
+      h('div',{className:'fall-time'+(left<=10?' low':'')},left),
+      h('div',{className:'fall-score'},h('b',null,s.score),'pt')),
+    h('div',{className:'fall-lanes',style:{width:U(laneW*4),height:U(laneH+cardH+8)}},
+      [0,1,2,3].map(l=>h('div',{key:'ln'+l,className:'fall-lane',style:{left:U(laneW*l),width:U(laneW)}})),
+      [0,1,2,3].map(l=>{const c=s.row[l],cnt=s.count&&s.count.lane===l?s.count:null,cl=!!s.clearUntil;
+        return h('div',{key:'sl'+l,className:'fall-slot'+(l===next&&!cl?' next':''),style:{left:U(laneW*l+(laneW-cardW)/2),top:U(laneH),width:U(cardW),height:U(cardH)}},
+          c&&h('div',{key:'c'+l,className:'fall-in'+(cl?(s.resolved==='boom'?' boom':' done'):'')},card(c.v,c.from==='fall'?'dealer':'player')),
+          cnt&&h('div',{className:'fall-count'},Math.max(0,Math.ceil((cnt.until-now)/1000)),
+            h('i',{style:{width:(Math.max(0,cnt.until-now)/FALL_CFG.countMs*100)+'%'}})));}),
+      s.falls.map(f=>{const p=Math.min(1,(now-f.t0)/FALL_CFG.fallMs),y=-cardH+(laneH+cardH)*p;
+        return h('div',{key:'f'+f.id,className:'fall-card',style:{left:U(f.lane*laneW+(laneW-cardW)/2),top:U(y)}},card(f.v,'dealer'));}),
+      fl&&h('div',{key:'fl'+fl.at,className:'fall-flash '+fl.kind,style:{top:U(laneH-70)}},h('b',null,fl.text),fl.sub&&h('span',null,fl.sub))),
+    h('div',{className:'fall-sum'},'合計 ',h('b',{className:sum>0?'on':''},sum),' / 10'),
+    h('div',{className:'fall-hand'+(s.shufAt&&now-s.shufAt<400?' shuf':''),
+      onTouchStart:e=>{const t=e.touches[0];swipeR.current={x:t.clientX,y:t.clientY};swipedR.current=false;},
+      onTouchMove:e=>{const st=swipeR.current;if(!st||swipedR.current)return;const t=e.touches[0];if(t.clientX-st.x>70&&Math.abs(t.clientY-st.y)<55){swipedR.current=true;shuffle();}},
+      onTouchEnd:()=>{swipeR.current=null;setTimeout(()=>{swipedR.current=false;},260);}},
+      s.hand.map((v,i)=>h('button',{key:'h'+i,className:'fall-hcard'+(s.shake===i&&now<s.shakeUntil?' shake':''),onClick:()=>tap(i)},card(v,'player',{'--card-w':U(56)})))),
+    h('div',{className:'fall-hint'},'← 手札を左から右になぞると入れ替え →'));
+}
 function App(){
   const[phase,setPhase]=useState('menu');
   const[demoMode,setDemoMode]=useState(false);
@@ -6584,13 +6725,14 @@ function App(){
   function goHome(){if(isSurvival()){goSurvival();return;}if(stageR.current&&stageR.current.ar===4){goCharge();return;}if(stageR.current&&stageR.current.ar===3){goRush();return;}if(stageR.current&&stageR.current.ar===2){goTune();return;}if(stageR.current&&stageR.current.ar===1){goPzxPanel();return;}if(stageR.current){goMap();return;}roundTokR.current++;clearTimers();exitLink();stopBGM();setPhase('menu');}
 
   const curStage=stageCtx?STAGES.areas[stageCtx.ar].stages[stageCtx.st]:null;
+  if(phase==='fall')return h(FallMode,{onBack:()=>{setPhase('menu');phaseR.current='menu';}}); // v276
   if(phase==='survival')return h(SurvivalScreen,{onBattle:startSurvivalBattle,onBack:()=>{setPhase('menu');phaseR.current='menu';}});
   if(phase==='charge')return h(ChargeScreen,{onBattle:startChargeBattle,onBack:()=>{setPhase('menu');phaseR.current='menu';}});
   if(phase==='rush')return h(RushScreen,{onBattle:startRushBattle,onBack:()=>{setPhase('menu');phaseR.current='menu';}});
   if(phase==='tune')return h(TuneScreen,{onBattle:startTuneBattle,onBack:()=>{setPhase('menu');phaseR.current='menu';}}); // v239
   if(phase==='pzx')return h(PzxPanel,{save,onBattle:startPzxStage,onEnter:()=>{setPhase('pzxmap');phaseR.current='pzxmap';},onBack:()=>{setPhase('menu');phaseR.current='menu';},onReset:()=>{updSave(s=>{s.pzx={got:[],boss:false};return s;});}}); // v214/v218 リセットは進行だけ消す（本編の★は無関係）
   if(phase==='pzxmap')return h(PzxWorld,{onPick:startPzxStage,onBack:()=>{setPhase('pzx');phaseR.current='pzx';}}); // v225/v231
-  if(phase==='menu')return h(TitleScreen,{onPlay:()=>{setPhase('map');phaseR.current='map';},onPuzzlux:()=>{setPhase('pzx');phaseR.current='pzx';},onRush:goRush,onCharge:goCharge,onSurvival:goSurvival,onTune:()=>{setPhase('tune');phaseR.current='tune';},onTutorial:()=>openTutorial(null),musicOn:musicEnabled,toggleMusic});
+  if(phase==='menu')return h(TitleScreen,{onPlay:()=>{setPhase('map');phaseR.current='map';},onPuzzlux:()=>{setPhase('pzx');phaseR.current='pzx';},onRush:goRush,onCharge:goCharge,onSurvival:goSurvival,onFall:()=>{setPhase('fall');phaseR.current='fall';},onTune:()=>{setPhase('tune');phaseR.current='tune';},onTutorial:()=>openTutorial(null),musicOn:musicEnabled,toggleMusic});
   if(phase==='champIntro'&&curStage&&curStage.champion)return h(ChampionIntroScreen,{champ:CHAMPIONS[curStage.champion],stage:curStage,onStart:()=>goIntro(pendingDiff)});
   if(phase==='intro'&&curStage&&curStage.intro)return h(IntroVideoScreen,{src:curStage.intro,onDone:()=>goBrief(pendingDiff)}); // v120
   if(phase==='brief'&&curStage)return h(BriefScreen,{stage:curStage,onStart:()=>startGame(pendingDiff)}); // v119

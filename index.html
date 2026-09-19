@@ -2270,6 +2270,60 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .survival-new .card{box-shadow:0 0 calc(9 * var(--u)) #00aeee!important;outline:calc(2 * var(--u)) solid #36c8f0;}
 .survival-new:after{content:'NEW';position:absolute;bottom:calc(-3 * var(--u));left:50%;transform:translateX(-50%);font-size:calc(9 * var(--u));font-weight:800;color:white;background:#078ad0;border-radius:calc(5 * var(--u));padding:calc(1 * var(--u)) calc(5 * var(--u));z-index:8;pointer-events:none;}
 
+/* v281: fixed card slots and thumb controls. Scope excludes solo/fall/tutorial. */
+.gp-screen.cursor-playing{
+  --u:min(calc(100vw / 360),calc((100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)) / 680));
+  display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:calc(60 * var(--u)) calc(132 * var(--u)) minmax(calc(108 * var(--u)),1fr) calc(177 * var(--u)) calc(132 * var(--u));gap:calc(6 * var(--u));
+  padding:calc(env(safe-area-inset-top,0px) + 10 * var(--u)) max(calc(12 * var(--u)),calc((100vw - 336 * var(--u))/2)) calc(env(safe-area-inset-bottom,0px) + 10 * var(--u))!important;
+}
+.gp-screen.cursor-playing>.gp-spacer{display:none;}
+.gp-screen.cursor-playing>.ability-pill{position:absolute;top:calc(204 * var(--u));left:50%;transform:translateX(-50%);margin:0;z-index:8;}
+.gp-screen.cursor-playing>.gp-top-bar{grid-row:1;display:flex;align-items:center;gap:calc(6 * var(--u));padding:0!important;filter:none!important;}
+.cursor-playing .gp-top-bar .gp-score{position:static;width:calc(54 * var(--u));padding:calc(4 * var(--u));background:#ffffff80;border-color:#ffffffb0;}
+.cursor-playing .gp-top-bar .gp-score .lbl{max-width:calc(66 * var(--u));overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cursor-playing .gp-top-bar .gp-score .val{font-size:calc(22 * var(--u));}
+.cursor-playing .gp-top-bar .gp-score .sub{font-size:calc(8 * var(--u))!important;}
+.cursor-playing .gp-top-bar .gp-icon-btn{display:none;}
+.cursor-playing .gp-top-bar .gp-track-btn{margin-left:auto;width:calc(38 * var(--u));height:calc(38 * var(--u));}
+.cursor-playing .control-pause{width:calc(42 * var(--u));height:calc(42 * var(--u));border-radius:calc(12 * var(--u));border:1px solid #fff;background:#ffffff99;color:#294b70;font-size:calc(22 * var(--u));font-weight:900;cursor:pointer;}
+.cursor-playing .control-pause:disabled{opacity:.4;}
+.gp-screen.cursor-playing>.gp-dealer-area{grid-row:2;position:relative;margin:0!important;padding:0!important;align-self:center;}
+.gp-screen.cursor-playing .gp-dealer-cards{display:grid;grid-template-columns:repeat(5,calc(37 * var(--u)));gap:calc(6 * var(--u)) calc(10 * var(--u))!important;justify-content:center;}
+.gp-screen.cursor-playing .gp-dealer-card{width:calc(37 * var(--u))!important;height:calc(50 * var(--u));transform:none;}
+.gp-screen.cursor-playing .gp-dealer-card .dv{font-size:calc(24 * var(--u))!important;}
+.gp-screen.cursor-playing .gp-dealer-card.empty{visibility:visible;border:1px dashed #9aaec055!important;background:#ffffff15!important;}
+.gp-screen.cursor-playing .gp-dealer-card.dsel{outline:calc(2 * var(--u)) solid #f58b25;outline-offset:calc(2 * var(--u));border-radius:calc(5 * var(--u));}
+.gp-screen.cursor-playing .gp-area-label{font-size:calc(10 * var(--u))!important;margin:0 0 calc(6 * var(--u))!important;padding:0;justify-content:center;}
+.gp-screen.cursor-playing>.gp-field-area{grid-row:3;--card-w:calc(48 * var(--u));min-height:0!important;height:100%;width:100%;padding:0!important;margin:0!important;gap:calc(3 * var(--u));overflow:visible;}
+.cursor-playing .gp-field-sum{transform:none;margin:calc(3 * var(--u)) 0 0;}
+.cursor-playing .gp-field-sum .num{font-size:calc(25 * var(--u))!important;}
+.cursor-playing .gp-field-sum .ato{display:none;}
+.gp-screen.cursor-playing>.gp-hand-area{grid-row:4;--card-w:calc(51 * var(--u));position:relative!important;left:auto;right:auto;bottom:auto!important;margin:0!important;padding:0;align-self:center;}
+.gp-screen.cursor-playing .gp-hand-rows{margin:0;padding:calc(7 * var(--u)) calc(10 * var(--u));gap:calc(7 * var(--u));}
+.gp-screen.cursor-playing .gp-hand-row{gap:calc(9 * var(--u));}
+.player-hand-slot{position:relative;width:var(--card-w);height:calc(var(--card-w) * 1.4);flex-shrink:0;border-radius:calc(6 * var(--u));}
+.player-hand-slot.empty{border:1px dashed #9aaec066;background:#ffffff20;}
+.player-hand-slot>.card-stage{pointer-events:none;}
+.player-hand-slot.selected:after{content:'';position:absolute;inset:calc(-3 * var(--u));border:calc(2.5 * var(--u)) solid #00baff;border-radius:calc(8 * var(--u));box-shadow:0 0 calc(8 * var(--u)) #00baff70;pointer-events:none;z-index:10;}
+.player-hand-slot.selected:before{content:'';position:absolute;top:calc(-9 * var(--u));left:50%;transform:translateX(-50%);border-left:calc(5 * var(--u)) solid transparent;border-right:calc(5 * var(--u)) solid transparent;border-top:calc(6 * var(--u)) solid #009be8;z-index:11;}
+.hand-controls{grid-row:5;display:flex;align-items:center;justify-content:space-between;padding:0 calc(12 * var(--u));touch-action:none;user-select:none;}
+.hand-controls.dpad-right{flex-direction:row-reverse;}
+.hand-dpad{display:grid;grid-template:repeat(3,calc(44 * var(--u)))/repeat(3,calc(44 * var(--u)));filter:drop-shadow(0 calc(3 * var(--u)) calc(4 * var(--u)) #44648940);}
+.dpad-key,.dpad-center{border:0;background:linear-gradient(135deg,#fff,#d9eaf5);color:#244c7d;display:flex;align-items:center;justify-content:center;}
+.dpad-key{font-size:calc(22 * var(--u));cursor:pointer;touch-action:none;-webkit-tap-highlight-color:transparent;box-shadow:inset 0 0 0 1px #ffffffa0;}
+.dpad-key.up{grid-area:1/2;border-radius:calc(12 * var(--u)) calc(12 * var(--u)) 0 0;}.dpad-key.left{grid-area:2/1;border-radius:calc(12 * var(--u)) 0 0 calc(12 * var(--u));}.dpad-key.right{grid-area:2/3;border-radius:0 calc(12 * var(--u)) calc(12 * var(--u)) 0;}.dpad-key.down{grid-area:3/2;border-radius:0 0 calc(12 * var(--u)) calc(12 * var(--u));}.dpad-center{grid-area:2/2;}
+.dpad-center:after{content:'';width:50%;height:50%;border-radius:50%;background:#cbdfed80;}
+.dpad-key:active{background:#afd9f4;}.dpad-key:disabled{color:#819aaf;}
+.hand-confirm{width:calc(110 * var(--u));height:calc(110 * var(--u));border-radius:50%;border:calc(3 * var(--u)) solid #fff;outline:calc(2 * var(--u)) solid #76d5f4;background:linear-gradient(145deg,#38d3fa,#008ee6);color:white;box-shadow:0 calc(4 * var(--u)) calc(12 * var(--u)) #078dc74d,inset 0 0 0 calc(4 * var(--u)) #ffffff33;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:calc(21 * var(--u));font-weight:800;cursor:pointer;touch-action:manipulation;}
+.hand-confirm svg{width:calc(40 * var(--u));height:calc(40 * var(--u));}.hand-confirm:disabled{filter:saturate(.3);opacity:.55;}.hand-confirm:active:not(:disabled){transform:scale(.96);}
+.hand-controls button:focus-visible,.control-pause:focus-visible{outline:3px solid #164c89;outline-offset:4px;}
+.control-settings{border:0;color:#24405f;margin:18px 0;text-align:left;}.control-settings legend{font-size:16px;font-weight:800;}
+.control-side-options{display:flex;gap:12px;margin-top:10px;}.control-side-options label{flex:1;padding:12px;border:2px solid #d6e2ed;border-radius:14px;background:#f7fbff;cursor:pointer;}.control-side-options label.selected{border-color:#119ce0;background:#e9f8ff;}.control-side-options input{margin-right:8px;accent-color:#098fda;}.control-side-options small{display:block;font-size:16px;text-align:center;margin-top:10px;}
+.cursor-pause-card{background:#f6faff;color:#274463;padding:24px;border-radius:22px;width:min(340px,90vw);max-height:90dvh;overflow:auto;text-align:center;touch-action:pan-y;}.cursor-pause-card h2{font-size:24px;}.cursor-pause-card>button{width:100%;padding:12px;border-radius:12px;border:1px solid #b3c9df;margin-top:10px;background:#fff;color:#274463;font-size:16px;font-weight:700;}.cursor-pause-card>button:first-of-type{background:#128fd1;color:#fff;}
+.cursor-playing .charge-hand-header{height:calc(20 * var(--u));margin-bottom:calc(2 * var(--u));}.cursor-playing .charge-meter{width:calc(160 * var(--u));}.cursor-playing .charge-meter.dealer{margin-top:calc(5 * var(--u));}.cursor-playing .charge-cell{height:calc(9 * var(--u));}.cursor-playing .charge-bolt{height:calc(18 * var(--u));}
+.gp-screen.cursor-playing.charge-playing>.victory-meter{top:42%;right:calc(9 * var(--u));height:calc(115 * var(--u));}
+.cursor-playing .survival-reserve{top:calc(-6 * var(--u));right:calc(5 * var(--u));font-size:calc(12 * var(--u));}
+
 </style>
 </head>
 <body>
@@ -3399,7 +3453,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v280'; // v280(2026/09/18): 新モード「ひとりモード（仮）」。相手なし・タイマーなし。場の札に手札を足して10、完成（またはバースト）で右上の「次の札」の先頭が場に出る。次の札は先の先まで7枚見える。数値はSOLO_CFG
+const APP_VER='v281'; // 2段の固定手札・十字キー選択・左右配置設定
+// v280(2026/09/18): 新モード「ひとりモード（仮）」。相手なし・タイマーなし。場の札に手札を足して10、完成（またはバースト）で右上の「次の札」の先頭が場に出る。次の札は先の先まで7枚見える。数値はSOLO_CFG
 // const APP_VER='v279'; // v279(2026/09/18): テンフォール：拍刻み（1段ずつドクッ）は気持ち悪いのでやめ、なめらかに落ちる形に戻した。拍の音・光も削除。タイマーなしはそのまま
 // const APP_VER='v278'; // v278(2026/09/18): テンフォール：60秒タイマーを廃止（やめるまで続く）。Neon Bladeのように拍（bpm100）ごとに札が1段ドクッと落ちて止まる＋拍の音と光
 // const APP_VER='v277'; // v277(2026/09/18): テンフォール：10は何枚でも完成（いつものルール）。落ち札は消さない。札が確定したレーンの落ち札はその場でフリーズし、場が空いたら再開
@@ -3933,7 +3988,7 @@ function SkillPanel(){
     )
   );
 }
-function TitleScreen({onPlay,onPuzzlux,onRush,onCharge,onSurvival,onFall,onSolo,onTune,onTutorial,musicOn,toggleMusic}){
+function TitleScreen({onPlay,onPuzzlux,onRush,onCharge,onSurvival,onFall,onSolo,onTune,onTutorial,onSettings,musicOn,toggleMusic}){
   const btnBase={borderRadius:14,padding:'15px 0',fontSize:13,fontWeight:800,letterSpacing:2,cursor:'pointer',fontFamily:"'Inter',sans-serif",background:'rgba(255,255,255,.78)',boxShadow:'0 4px 16px rgba(70,100,150,.16), inset 0 1px 0 #fff',width:'100%'};
   return h('div',{style:{height:'100dvh',overflowY:'auto',touchAction:'pan-y',flexDirection:'column',background:"url('img/title-bg.jpg') center/cover no-repeat, #eef2f8",display:'flex',alignItems:'center',justifyContent:'flex-start',padding:16,position:'relative'}},
     h('div',{style:{margin:'auto',flexShrink:0,textAlign:'center',display:'flex',flexDirection:'column',alignItems:'center',gap:18,width:'100%',maxWidth:340,animation:'fadeUp 0.5s ease'}},
@@ -3948,6 +4003,7 @@ function TitleScreen({onPlay,onPuzzlux,onRush,onCharge,onSurvival,onFall,onSolo,
         h('button',{onClick:onCharge,style:{...btnBase,fontSize:15,border:'1.5px solid #328a89',color:'#236e70'}},'60秒チャージ',h('span',{style:{display:'block',fontSize:11,letterSpacing:1,marginTop:5}},'貯めて、読んで、一気に出す')),
         h('button',{onClick:onRush,style:{...btnBase,fontSize:15,border:'1.5px solid #b29ade',color:'#60499a'}},'10秒ラッシュ',h('span',{style:{display:'block',fontSize:11,letterSpacing:1,marginTop:5}},'10秒間、何度でも取り返せる')),
         h('button',{onClick:onTune,style:{...btnBase,padding:'11px 0',fontSize:12,letterSpacing:4,border:'1.5px solid rgba(120,120,140,.4)',color:'#6a6a80',boxShadow:'inset 0 1px 0 #fff'}},'調整'), // v239
+        h('button',{onClick:onSettings,style:{...btnBase,border:'1.5px solid #aac7db',color:'#31628b'}},'操作設定'),
         h('button',{onClick:onTutorial,style:{...btnBase,padding:'10px 0',fontSize:11,fontWeight:700,background:'rgba(255,255,255,.55)',border:'1.5px solid rgba(120,150,190,.35)',color:'#5a80ab',boxShadow:'0 3px 10px rgba(70,100,150,.12)'}},'✦ あそびかた')
       ),
       // h(SkillPanel), // v197 クロノリンク廃止に伴い非表示
@@ -3968,6 +4024,7 @@ function rushRoundResult(match,pp,dp,rn){
 }
 function rushStage(diff){return {no:1,name:'10秒ラッシュ',rivalName:'DEALER',rush:true,diff:diff==='hard'?'hard':'normal',noBoost:true,winPt:RUSH_CFG.target,timeLimit:RUSH_CFG.roundSec,smart:true,firstMs:400,firstJit:150,winMsAbs:diff==='hard'?400:650,flyMs:300,curStep:70,curArr:80,curHold:80};}
 function RushScreen({onBattle,onBack}){
+  const[diff,setDiff]=useState('normal');
    return h('main',{className:'rush-screen'},h('section',{className:'rush-card'},
     h('p',{className:'rush-eyebrow'},'TEN-KURU'),h('h1',null,'10秒ラッシュ'),
     h('p',{className:'rush-lead'},'取られても、すぐ取り返せる。'),
@@ -4897,7 +4954,90 @@ function SoloMode({onBack}){
         h('div',{className:'gp-hand-row'},s.hand.slice(5).map((v,i)=>cardEl(v,i+5))))),
     h('div',{className:'gp-spacer'}));
 }
+// v281: both players navigate the same fixed 5 x 2 hand at the same step speed.
+const HAND_NAV={cols:5,slots:10,stepMs:160,start:2};
+const CONTROL_SIDE_KEY='tenkuru.controlSide.v1';
+function loadControlSide(){try{return localStorage.getItem(CONTROL_SIDE_KEY)==='right'?'right':'left';}catch(e){return 'left';}}
+function handNeighbor(slot,dir){
+  const row=Math.floor(slot/HAND_NAV.cols),col=slot%HAND_NAV.cols;
+  if(dir==='left'&&col>0)return slot-1;
+  if(dir==='right'&&col<4)return slot+1;
+  if(dir==='up'&&row>0)return slot-5;
+  if(dir==='down'&&row<1)return slot+5;
+  return slot;
+}
+function handPath(from,to){
+  const path=[];let slot=from;
+  while(slot%5!==to%5){slot=handNeighbor(slot,slot%5<to%5?'right':'left');path.push(slot);}
+  if(slot!==to)path.push(handNeighbor(slot,slot<to?'down':'up'));
+  return path;
+}
+function ControlSettings({side,onChange}){
+  return h('fieldset',{className:'control-settings'},h('legend',null,'十字キーの位置'),
+    h('div',{className:'control-side-options'},['left','right'].map(value=>h('label',{key:value,className:side===value?'selected':''},
+      h('input',{type:'radio',name:'control-side',value,checked:side===value,onChange:()=>onChange(value)}),
+      h('span',null,value==='left'?'左':'右'),h('small',null,value==='left'?'✛　　出す':'出す　　✛')))));
+}
+function HandControls({side,onMove,onPlay,canMove,canPlay,playLabel='出す'}){
+  const latest=useRef(null),held=useRef(null),repeat=useRef(null);
+  latest.current={onMove,onPlay,canMove,canPlay};
+  const stop=()=>{clearInterval(repeat.current);repeat.current=null;held.current=null;};
+  function begin(dir,source){
+    if(!latest.current.canMove||held.current)return;
+    held.current=source;latest.current.onMove(dir);
+    repeat.current=setInterval(()=>{if(!latest.current.canMove){stop();return;}latest.current.onMove(dir);},HAND_NAV.stepMs+8);
+  }
+  useEffect(()=>{if(!canMove)stop();},[canMove]);
+  useEffect(()=>{
+    const dirs={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'};
+    const editing=e=>e.target&&/INPUT|TEXTAREA|SELECT/.test(e.target.tagName);
+    const down=e=>{
+      if(editing(e)||e.altKey||e.ctrlKey||e.metaKey)return;
+      if(dirs[e.key]){e.preventDefault();if(!e.repeat)begin(dirs[e.key],e.key);}
+      else if((e.key==='Enter'||e.key===' ')&&e.target.tagName!=='BUTTON'){
+        e.preventDefault();if(!e.repeat&&latest.current.canPlay)latest.current.onPlay();
+      }
+    };
+    const up=e=>{if(held.current===e.key)stop();};
+    const visibility=()=>{if(document.hidden)stop();};
+    window.addEventListener('keydown',down);window.addEventListener('keyup',up);
+    window.addEventListener('blur',stop);document.addEventListener('visibilitychange',visibility);
+    return()=>{stop();window.removeEventListener('keydown',down);window.removeEventListener('keyup',up);window.removeEventListener('blur',stop);document.removeEventListener('visibilitychange',visibility);};
+  },[]);
+  const arrow=(dir,label,symbol)=>h('button',{key:dir,type:'button',className:'dpad-key '+dir,'aria-label':label,disabled:!canMove,
+    onPointerDown:e=>{if(e.button!==0)return;e.preventDefault();e.currentTarget.setPointerCapture(e.pointerId);begin(dir,e.pointerId);},
+    onPointerUp:e=>{if(held.current===e.pointerId)stop();},onPointerCancel:stop,onLostPointerCapture:stop,
+    onClick:e=>{if(e.detail===0&&latest.current.canMove)latest.current.onMove(dir);}},h('span',{'aria-hidden':true},symbol));
+  return h('div',{className:'hand-controls'+(side==='right'?' dpad-right':'')},
+    h('div',{className:'hand-dpad',role:'group','aria-label':'カードを選択'},
+      arrow('up','上のカードへ','▲'),arrow('left','左のカードへ','◀'),h('span',{className:'dpad-center','aria-hidden':true}),arrow('right','右のカードへ','▶'),arrow('down','下のカードへ','▼')),
+    h('button',{type:'button',className:'hand-confirm',disabled:!canPlay,onClick:()=>latest.current.canPlay&&latest.current.onPlay(),'aria-label':playLabel==='出す'?'選択中のカードを出す':playLabel},
+      h('svg',{viewBox:'0 0 48 48','aria-hidden':true},h('rect',{x:12,y:5,width:24,height:37,rx:4,fill:'none',stroke:'currentColor',strokeWidth:3}),h('path',{d:'M24 33V15m-7 7 7-7 7 7',fill:'none',stroke:'currentColor',strokeWidth:3,strokeLinecap:'round',strokeLinejoin:'round'})),h('span',null,playLabel)));
+}
+
 function App(){
+  const[controlSide,setControlSide]=useState(loadControlSide);
+  const[pCursor,setPCursor]=useState(HAND_NAV.start),pCursorR=useRef(HAND_NAV.start);
+  const[pMoving,setPMoving]=useState(false),pMoveUntilR=useRef(0),pMoveTimerR=useRef(null);
+  const[dCursorSlot,setDCursorSlot]=useState(HAND_NAV.start),dCursorSlotR=useRef(HAND_NAV.start),dMoveUntilR=useRef(0);
+  function changeControlSide(side){if(side!=='left'&&side!=='right')return;setControlSide(side);try{localStorage.setItem(CONTROL_SIDE_KEY,side);}catch(e){}}
+  function playerCanNavigate(){return phaseR.current==='playing'&&countNumR.current<0&&!pausedR.current&&!rStopR.current&&!sceneOnR.current&&!resolvingR.current&&!lockR.current&&!fxLockR.current&&!eraseBusyR.current;}
+  function movePlayerCursor(dir){
+    if(!playerCanNavigate()||performance.now()<pMoveUntilR.current)return false;
+    const next=handNeighbor(pCursorR.current,dir);if(next===pCursorR.current)return false;
+    pCursorR.current=next;setPCursor(next);pMoveUntilR.current=performance.now()+HAND_NAV.stepMs;setPMoving(true);
+    clearTimeout(pMoveTimerR.current);pMoveTimerR.current=setTimeout(()=>setPMoving(false),HAND_NAV.stepMs);
+    return true;
+  }
+  function playSelectedCard(){
+    if(pausedR.current||phaseR.current!=='playing')return;
+    if(countNumR.current>0){countSkipR.current&&countSkipR.current();return;}
+    if(skipR.current&&resolvingR.current){skipR.current();return;}
+    if(!playerCanNavigate()||performance.now()<pMoveUntilR.current)return;
+    playCard(pCursorR.current);
+  }
+  useEffect(()=>()=>clearTimeout(pMoveTimerR.current),[]);
+
   const[phase,setPhase]=useState('menu');
   const[demoMode,setDemoMode]=useState(false);
   const[pH,setPH]=useState([]);
@@ -5012,7 +5152,7 @@ function App(){
     }
     if(!canPause())return;
     if(isTimedMode()){if(rushExpired())return;updateCharge();timeLeftR.current=Math.max(0,(rushDeadlineR.current-performance.now())/1000);}
-    pausedR.current=true;setPaused(true);
+    pausedR.current=true;setPaused(true);cancelCursor();
     clearInterval(timerRef.current);clearTimeout(aiRef.current);
     try{if(bgmAudio)bgmAudio.pause();}catch(e){}
   }
@@ -5247,31 +5387,25 @@ function App(){
   const flyR=useRef(null);const[flyCard,setFlyCard]=useState(null); // v107 降りてくる相手の札
   // v109 選択カーソル：常に相手の手札のどこかにいて、出す札まで1枚ずつ移動→タップ→降下
   const[dCur,setDCur]=useState({id:null,tap:false});const dCurR=useRef(null);const curBusyR=useRef(false);const curT=useRef([]);const curTokR=useRef(0);
-  // v113: カーソルの速さはステージ側で指定できる（未指定なら従来通り）
-  const _so=stageOptsR.current||{};
-  // v135: 初手（場が0枚）だけカーソルも降下も速める。人のタップ速度を上回らせるため
-  const _first=()=>fieldR.current.length===0&&!!_so.firstMs;
-  // v240 cardSpeed（調整モード／ステージの cardSpeed:[1枚目,2枚目,3枚目,4枚目]）は考える時間だけでなく、カーソルの移動・タップ・降下の速さにも同じ倍率を掛ける
+  // cardSpeed still scales thinking/flight, but both cursors use HAND_NAV.stepMs.
   const _csK=()=>{const so=stageOptsR.current||{};if(!so.cardSpeed)return 1;const k=so.cardSpeed[Math.min(fieldR.current.length,3)];return (k!=null&&k>0)?k:1;};
-  const CUR_STEP=()=>Math.max(12,Math.round((_first()?(_so.curStepFirst||_so.curStep||55):(_so.curStep||(_so.speed<1?55:110)))*_csK()));
-  const CUR_HOLD=()=>Math.max(30,Math.round((_first()?(_so.curHoldFirst||_so.curHold||120):(_so.curHold||(_so.speed<1?120:230)))*_csK()));
-  const CUR_ARR =()=>Math.max(30,Math.round((_first()?(_so.curArrFirst||_so.curArr||120):(_so.curArr||120))*_csK()));
-  function cursorToCard(targetId,onArrive,check,onCancel){ // v121: 手札番号ではなくカード固有IDを追う
+  function cursorToCard(targetId,onArrive,check,onCancel){
     if(curBusyR.current||targetId==null)return false;
-    const order=dSlotsR.current.filter(id=>id!=null&&dIdsR.current.includes(id));
-    const tgt=order.indexOf(targetId);if(tgt<0)return false;
+    const target=dSlotsR.current.indexOf(targetId);if(target<0)return false;
+    const steps=handPath(dCursorSlotR.current,target);
     curT.current.forEach(clearTimeout);curT.current=[];curBusyR.current=true;
     const tok=++curTokR.current;
-    let cur=order.indexOf(dCurR.current);if(cur<0)cur=0;
-    const steps=[];while(cur!==tgt){cur+=cur<tgt?1:-1;steps.push(order[cur]);}
-    const valid=()=>tok===curTokR.current&&dIdsR.current.includes(targetId)&&(!check||check());
-    let cancelled=false;
-    const abort=()=>{if(tok!==curTokR.current)return;curTokR.current++;curT.current.forEach(clearTimeout);curT.current=[];curBusyR.current=false;setDCur(c=>({id:c.id,tap:false}));if(!cancelled){cancelled=true;onCancel&&onCancel();}};
-    const at=(ms,f)=>curT.current.push(setTimeout(()=>{if(!valid()){abort();return;}f();},ms));
-    steps.forEach((id,k)=>at((k+1)*CUR_STEP(),()=>{dCurR.current=id;setDCur({id,tap:false});try{fxTone({f:1500,type:'sine',v:0.012,a:0.002,d:0.03,rev:0.1});}catch(e){}}));
-    const arrive=(steps.length+1)*CUR_STEP()+CUR_ARR();
-    at(arrive,()=>{dCurR.current=targetId;setDCur({id:targetId,tap:true});try{fxTone({f:2200,f2:1200,type:'sine',v:0.05,a:0.002,d:0.12,rev:0.3});}catch(e){}});
-    at(arrive+CUR_HOLD(),()=>{curBusyR.current=false;setDCur({id:targetId,tap:false});onArrive&&onArrive();});
+    const valid=()=>tok===curTokR.current&&phaseR.current==='playing'&&!pausedR.current&&!pStopR.current&&!sceneOnR.current&&!resolvingR.current&&dSlotsR.current[target]===targetId&&dIdsR.current.includes(targetId)&&(!check||check());
+    const abort=()=>{if(tok!==curTokR.current)return;cancelCursor();onCancel&&onCancel();};
+    const at=(ms,fn)=>curT.current.push(setTimeout(()=>{if(!valid()){abort();return;}fn();},ms));
+    const wait=Math.max(0,dMoveUntilR.current-performance.now());
+    steps.forEach((slot,k)=>at(wait+k*HAND_NAV.stepMs,()=>{
+      dCursorSlotR.current=slot;setDCursorSlot(slot);dMoveUntilR.current=performance.now()+HAND_NAV.stepMs;
+      dCurR.current=dSlotsR.current[slot]??null;setDCur({id:dCurR.current,tap:false});
+    }));
+    const arrive=wait+steps.length*HAND_NAV.stepMs;
+    at(arrive,()=>{dCurR.current=targetId;setDCur({id:targetId,tap:true});});
+    at(arrive+80,()=>{curBusyR.current=false;setDCur({id:targetId,tap:false});onArrive&&onArrive();});
     return true;
   }
   function cursorTo(target,onArrive,check){const id=dIdsR.current[target];return cursorToCard(id,onArrive,check);}
@@ -5393,7 +5527,7 @@ function App(){
     while(slots.length>10&&slots[slots.length-1]==null)slots.pop();
     dIdsR.current=ids;dSlotsR.current=slots;setDSlots(slots);
     setDH(hand);dHR.current=hand;const r=ring||hand.map(()=>false);setDRing(r);dRingR.current=r;
-    if(!ids.includes(dCurR.current)){dCurR.current=ids[0]||null;setDCur({id:dCurR.current,tap:false});}
+    dCurR.current=slots[dCursorSlotR.current]??null;setDCur({id:dCurR.current,tap:false});
   }
   function ringSum(){return dHR.current.reduce((s,v,i)=>s+(dRingR.current[i]&&!isTapped(dRingR.current[i])?v:0),0);}
   function isTapped(f){return typeof f==='string'&&f.indexOf('tapped-')===0;}
@@ -5611,7 +5745,7 @@ function App(){
       return next;
     });
   }
-  function clearTimers(){clearTimeout(aiRef.current);clearInterval(timerRef.current);clearTimeout(countRef.current);clearTimeout(rushNextR.current);clearTimeout(rushSettleR.current);clearTimeout(rushToastR.current);}
+  function clearTimers(){cancelCursor();clearTimeout(aiRef.current);clearInterval(timerRef.current);clearTimeout(countRef.current);clearTimeout(rushNextR.current);clearTimeout(rushSettleR.current);clearTimeout(rushToastR.current);}
   // v54: プレイヤー手札を配る（特殊フラグも同時に付与）
   // プレイヤーへ手札10枚を配る。何周目かを数え、appearOnDeal 周目からクロノリンクを1枚付ける
   function dealPlayer(hand){
@@ -5762,6 +5896,7 @@ function App(){
     if(diff){setDifficulty(diff);diffRef.current=diff;}
     matchStatsR.current={bursts:0,tens:[],dtens:[],nines:0,timeups:0,start:Date.now()}; // v217/v243/v246/v247 nines=自分の手で場を9にした回数、dtens=相手が作った10、timeups=タイムアップ回数
     clearTimers();lockR.current=false;
+    clearTimeout(pMoveTimerR.current);pCursorR.current=HAND_NAV.start;setPCursor(HAND_NAV.start);pMoveUntilR.current=0;setPMoving(false);dCursorSlotR.current=HAND_NAV.start;setDCursorSlot(HAND_NAV.start);dMoveUntilR.current=0;
     setSurvivalReward(null);setSurvivalHelp(false);
     const p=createDeck(),d=createDeck();
     const opts=stageR.current?(stageOptsR.current||{}):{};
@@ -6511,6 +6646,9 @@ function App(){
     if(idx<0)idx=dHand.findIndex((v,i)=>eligible(i)&&v===chosen&&(rf[i]==='morpho'||rf[i]==='setra'||rf[i]==='orby'||isGk(rf[i]))); // v117/v127/v197: 同じ数字なら環付きを優先して出す
     if(idx<0)idx=dHand.findIndex((v,i)=>eligible(i)&&v===chosen&&!rf[i]);
     if(idx<0){scheduleAi(rn);return;}
+    const tier=i=>isTapped(rf[i])?0:(rf[i]==='morpho'||rf[i]==='setra'||rf[i]==='orby'||isGk(rf[i]))?1:2;
+    const distance=i=>handPath(dCursorSlotR.current,dSlotsR.current.indexOf(dIdsR.current[i])).length;
+    dHand.forEach((v,i)=>{if(v===chosen&&eligible(i)&&tier(i)===tier(idx)&&distance(i)<distance(idx))idx=i;});
     const cardId=dIdsR.current[idx];if(cardId==null){scheduleAi(rn);return;}
     // v121: この時点で選んだ固有IDを、カーソル→タップ→飛行→着地まで選び直さない。
     const ok=cursorToCard(cardId,()=>commitDealerPlay({id:cardId,value:chosen},rn),()=>{
@@ -6791,6 +6929,7 @@ function App(){
   function goHome(){if(isSurvival()){goSurvival();return;}if(stageR.current&&stageR.current.ar===4){goCharge();return;}if(stageR.current&&stageR.current.ar===3){goRush();return;}if(stageR.current&&stageR.current.ar===2){goTune();return;}if(stageR.current&&stageR.current.ar===1){goPzxPanel();return;}if(stageR.current){goMap();return;}roundTokR.current++;clearTimers();exitLink();stopBGM();setPhase('menu');}
 
   const curStage=stageCtx?STAGES.areas[stageCtx.ar].stages[stageCtx.st]:null;
+  if(phase==='controlSettings')return h('main',{className:'rush-screen'},h('section',{className:'rush-card'},h('h1',null,'操作設定'),h(ControlSettings,{side:controlSide,onChange:changeControlSide}),h('p',{className:'rush-lead'},'十字キーで選んで、出すボタンで1枚出します。'),h('button',{className:'rush-secondary',onClick:()=>{setPhase('menu');phaseR.current='menu';}},'ホームへ')));
   if(phase==='solo')return h(SoloMode,{onBack:()=>{setPhase('menu');phaseR.current='menu';}}); // v280
   if(phase==='fall')return h(FallMode,{onBack:()=>{setPhase('menu');phaseR.current='menu';}}); // v276
   if(phase==='survival')return h(SurvivalScreen,{onBattle:startSurvivalBattle,onBack:()=>{setPhase('menu');phaseR.current='menu';}});
@@ -6799,7 +6938,7 @@ function App(){
   if(phase==='tune')return h(TuneScreen,{onBattle:startTuneBattle,onBack:()=>{setPhase('menu');phaseR.current='menu';}}); // v239
   if(phase==='pzx')return h(PzxPanel,{save,onBattle:startPzxStage,onEnter:()=>{setPhase('pzxmap');phaseR.current='pzxmap';},onBack:()=>{setPhase('menu');phaseR.current='menu';},onReset:()=>{updSave(s=>{s.pzx={got:[],boss:false};return s;});}}); // v214/v218 リセットは進行だけ消す（本編の★は無関係）
   if(phase==='pzxmap')return h(PzxWorld,{onPick:startPzxStage,onBack:()=>{setPhase('pzx');phaseR.current='pzx';}}); // v225/v231
-  if(phase==='menu')return h(TitleScreen,{onPlay:()=>{setPhase('map');phaseR.current='map';},onPuzzlux:()=>{setPhase('pzx');phaseR.current='pzx';},onRush:goRush,onCharge:goCharge,onSurvival:goSurvival,onFall:()=>{setPhase('fall');phaseR.current='fall';},onSolo:()=>{setPhase('solo');phaseR.current='solo';},onTune:()=>{setPhase('tune');phaseR.current='tune';},onTutorial:()=>openTutorial(null),musicOn:musicEnabled,toggleMusic});
+  if(phase==='menu')return h(TitleScreen,{onPlay:()=>{setPhase('map');phaseR.current='map';},onPuzzlux:()=>{setPhase('pzx');phaseR.current='pzx';},onRush:goRush,onCharge:goCharge,onSurvival:goSurvival,onFall:()=>{setPhase('fall');phaseR.current='fall';},onSolo:()=>{setPhase('solo');phaseR.current='solo';},onTune:()=>{setPhase('tune');phaseR.current='tune';},onTutorial:()=>openTutorial(null),onSettings:()=>{setPhase('controlSettings');phaseR.current='controlSettings';},musicOn:musicEnabled,toggleMusic});
   if(phase==='champIntro'&&curStage&&curStage.champion)return h(ChampionIntroScreen,{champ:CHAMPIONS[curStage.champion],stage:curStage,onStart:()=>goIntro(pendingDiff)});
   if(phase==='intro'&&curStage&&curStage.intro)return h(IntroVideoScreen,{src:curStage.intro,onDone:()=>goBrief(pendingDiff)}); // v120
   if(phase==='brief'&&curStage)return h(BriefScreen,{stage:curStage,onStart:()=>startGame(pendingDiff)}); // v119
@@ -6828,9 +6967,11 @@ function App(){
 
   const so=stageOptsR.current||{};
   const chargeEmpty=so.charge&&charge.player+1e-9<1;
+  const selectedValue=confuse[pCursor]!=null?confuse[pCursor]:pH[pCursor];
+  const selectedPlayable=selectedValue!=null&&!chargeEmpty&&canPlay(selectedValue,fieldSum,field)&&!pLock[pCursor]&&pFrz[pCursor]==null&&(cmdIdx==null||cmdIdx===pCursor);
   const rival=(form2&&so.form2Name)||so.rivalName||'DEALER';
   // v62: 第7は「ルナ」／v70: 第2形態は「レイピア」
-  return h('div',{className:'gp-screen'+(so.charge?' charge-playing':'')+(so.survival?' survival-playing':'')+(so.rush?' rush-playing':'')+(endHold?' end-hold':'')+(so.challenge?' ch7':'')+(so.ch8?' ch8':'')+(so.ch9?' ch9':'')+(so.ch10?' ch10':'')+(form2?' f2':'')+(screenPop?' form2-pop':'')+(lkFx?' lk-on':'')},
+  return h('div',{className:'gp-screen cursor-playing'+(so.charge?' charge-playing':'')+(so.survival?' survival-playing':'')+(so.rush?' rush-playing':'')+(endHold?' end-hold':'')+(so.challenge?' ch7':'')+(so.ch8?' ch8':'')+(so.ch9?' ch9':'')+(so.ch10?' ch10':'')+(form2?' f2':'')+(screenPop?' form2-pop':'')+(lkFx?' lk-on':'')},
     h(ChampionLayer,{champ:stageOptsR.current&&stageOptsR.current.champion?CHAMPIONS[stageOptsR.current.champion]:null}), // v61 チャンピオン戦は立ち絵
     so.challenge&&h('div',{className:'champ-layer'},
       form2
@@ -6902,7 +7043,8 @@ function App(){
       h('div',{className:'gp-icon-btn',onClick:goHome,title:'ホームに戻る'},h('span',null,'⌂')),
       h('div',{className:'gp-track-btn',onClick:toggleMusic,title:'曲を変更（1→2→ミュート）'},
         h('span',{className:'num'},trackNum===0?'OFF':String(trackNum).padStart(2,'0'))
-      )
+      ),
+      h('button',{className:'control-pause',type:'button',onClick:togglePause,disabled:!paused&&!canPause(),'aria-label':'一時停止'},'Ⅱ')
     ),
 
 
@@ -6934,8 +7076,7 @@ function App(){
     ),
     flyCard&&h('div',{key:flyCard.k,className:'fly-card'+(flyCard.back?' back':'')+(flyCard.face?' face-'+flyCard.face:''),style:{'--fw':flyCard.w+'px','--x0':flyCard.x0+'px','--y0':flyCard.y0+'px','--x1':flyCard.x1+'px','--y1':flyCard.y1+'px','--d':flyCard.d+'ms'}},flyCard.value),
     // v91: 一時停止
-    h('div',{className:'gp-pause-btn'+((paused||canPause())?'':' off'),onClick:togglePause,title:'一時停止'},h('i'),h('i')),
-    paused&&!survivalHelp&&h('div',{className:'pause-veil',onClick:togglePause},h('div',{className:'t'},'PAUSE'),h('div',{className:'s'},'タップで再開'),h('div',{className:'go'},'再開')),
+    paused&&!survivalHelp&&h('div',{className:'pause-veil'},h('section',{className:'cursor-pause-card',role:'dialog','aria-modal':true,'aria-label':'一時停止'},h('h2',null,'一時停止'),h(ControlSettings,{side:controlSide,onChange:changeControlSide}),h('button',{onClick:togglePause,autoFocus:true},'再開'),h('button',{onClick:goHome},'対戦を終了'))),
 
     rStop&&h('div',{className:'rs-veil'}),
 
@@ -6944,8 +7085,8 @@ function App(){
       so.survival&&h('div',{className:'survival-reserve dealer'},h('span',{className:'ic'},'🂠'),h('b',null,resv.d)),
       h('div',{className:'gp-area-label'},so.charge?'DEALER':(so.rivalName?'✦ ':'💀 ')+rival+' — '+dH.length+'枚'),
       h('div',{className:'gp-dealer-cards'+(endFx&&endFx.winner==='player'?' defeated':'')}, // v198/v202 相手の敗北：決着と同時に光に溶ける
-        (so.survival?dSlots.filter(id=>id!=null):dSlots).map((id,s)=>{const i=id==null?-1:dIdsR.current.indexOf(id);if(i<0||i>=dH.length)return h('div',{key:'e'+s,className:'gp-dealer-card empty'});const v=dH[i];
-          return h('div',{key:'c'+id,'data-card-id':id,className:'gp-dealer-card'+(justStolen.includes(id)?' just-stolen':'')+((hideLeft>0&&dRing[i]!=='orby')||(stageOptsR.current&&stageOptsR.current.blind)?' hidden-card':'')+(dRing[i]?' ringed':'')+(dRing[i]==='morpho'?' mring':'')+(dRing[i]==='setra'?' sring':'')+(dRing[i]==='orby'?' oring':'')+(dCur.id===id?' dsel':'')+(dFrz[id]!=null?' dfrz':'')},h('span',{className:'dv'},v),dFrz[id]!=null&&h('span',{className:'dfrz-sec'},dFrz[id]+'s'),
+        dSlots.map((id,s)=>{const i=id==null?-1:dIdsR.current.indexOf(id);if(i<0||i>=dH.length)return h('div',{key:'e'+s,'data-slot':s,className:'gp-dealer-card empty'+(dCursorSlot===s?' dsel':'')});const v=dH[i];
+          return h('div',{key:'c'+id,'data-card-id':id,'data-slot':s,className:'gp-dealer-card'+(justStolen.includes(id)?' just-stolen':'')+((hideLeft>0&&dRing[i]!=='orby')||(stageOptsR.current&&stageOptsR.current.blind)?' hidden-card':'')+(dRing[i]?' ringed':'')+(dRing[i]==='morpho'?' mring':'')+(dRing[i]==='setra'?' sring':'')+(dRing[i]==='orby'?' oring':'')+(dCur.id===id?' dsel':'')+(dFrz[id]!=null?' dfrz':'')},h('span',{className:'dv'},v),dFrz[id]!=null&&h('span',{className:'dfrz-sec'},dFrz[id]+'s'),
           dCur.id===id&&h('div',{className:'dcur'+(dCur.tap?' tap':'')}),dCur.id===id&&dCur.tap&&h('div',{className:'dcur-ripple'}),(dRing[i]&&dRing[i]!=='morpho'&&dRing[i]!=='setra'&&dRing[i]!=='orby'&&!(typeof dRing[i]==='string'&&dRing[i].indexOf('tapped-')===0))&&h('div',{className:'star-ring'+(typeof dRing[i]==='string'?' t-'+(isGk(dRing[i])?REIPIA_RINGS[GIMMICKS[dRing[i].slice(3)].ring]?dRing[i].slice(3):'':dRing[i]):'')+(tapCardId===id?' tap':''),'data-ring-color':typeof dRing[i]==='string'?(isGk(dRing[i])?REIPIA_RINGS[GIMMICKS[dRing[i].slice(3)].ring].ringColor:REIPIA_RINGS[dRing[i]].ringColor):undefined}));})
       ),
       so.charge&&h(ChargeMeter,{value:charge.dealer,who:'dealer'})
@@ -7001,15 +7142,14 @@ function App(){
         '判断'+(orbyStat.call||0)+' / 出した'+(orbyStat.play||0)+' / 見送り'+(orbyStat.skip_gift||0)+' / 列作らず'+(orbyStat.skip_nostart||0)+' / 出せる札なし'+(orbyStat.no_playable||0)),
       hideLeft>0&&h('div',{className:'hide-badge'},'不可観測  あと '+hideLeft+' ラウンド'), // v150 効果が続いている間ずっと出す
       so.charge?h('div',{className:'charge-hand-header'},h('div',{className:'gp-area-label'},'YOU'),h(ChargeMeter,{value:charge.player,who:'player'})):h('div',{className:'gp-area-label'},'YOU — '+pH.filter(Boolean).length+'枚'),
-      h('div',{className:'gp-hand-rows'},
-        h('div',{className:'gp-hand-row'},
-          pH.slice(0,5).map((v,i)=>v===null?h('div',{key:i,style:{width:'var(--card-w)',height:'calc(var(--card-w) * 1.4)',flexShrink:0}}):(()=>{const dv=confuse[i]!=null?confuse[i]:v;const dk=lantern&&!lantern.lit.includes(i);return h(SlideCard,{key:i+'_'+v,value:dk?'?':dv,dark:dk,onPlay:()=>playCard(i),disabled:chargeEmpty||countNum>=0||!canPlay(dv,fieldSum,field)||rStop||!!pLock[i]||pFrz[i]!=null||(cmdIdx!=null&&cmdIdx!==i),cardState:countNum>=0?null:handCardState(dv,fieldSum,field),frozen:pFrz[i],justFrozen:justFrz.includes(i),pRing:pRing===i,shuffling:shufAll,marked:marked.includes(i),newRefill:so.survival&&survivalReward&&survivalReward.who==='player'&&performance.now()<survivalReward.until&&survivalReward.slots.includes(i),onLocked:()=>fxLockHint(chargeEmpty?'ゲージ回復中':pFrz[i]!=null?'凍結中 あと'+pFrz[i]+'秒':pLock[i]?'星環ロック':(cmdIdx!=null&&cmdIdx!==i)?'指名された札から':lockReason(dv,fieldSum,field)),cardRole:'player',isSpecial:!!pSp[i],linkPick:linkMode&&canPlay(dv,fieldSum,field),rLock:!!pLock[i],rCmd:cmdIdx===i,rWait:cmdIdx!=null&&cmdIdx!==i,confused:confuse[i]!=null});})())
-        ),
-        h('div',{className:'gp-hand-row'},
-          pH.slice(5).map((v,i)=>v===null?h('div',{key:i+5,style:{width:'var(--card-w)',height:'calc(var(--card-w) * 1.4)',flexShrink:0}}):(()=>{const j=i+5,dv=confuse[j]!=null?confuse[j]:v;const dk=lantern&&!lantern.lit.includes(j);return h(SlideCard,{key:j+'_'+v,value:dk?'?':dv,dark:dk,onPlay:()=>playCard(j),disabled:chargeEmpty||countNum>=0||!canPlay(dv,fieldSum,field)||rStop||!!pLock[j]||pFrz[j]!=null||(cmdIdx!=null&&cmdIdx!==j),cardState:countNum>=0?null:handCardState(dv,fieldSum,field),frozen:pFrz[j],justFrozen:justFrz.includes(j),pRing:pRing===j,shuffling:shufAll,marked:marked.includes(j),newRefill:so.survival&&survivalReward&&survivalReward.who==='player'&&performance.now()<survivalReward.until&&survivalReward.slots.includes(j),onLocked:()=>fxLockHint(chargeEmpty?'ゲージ回復中':pFrz[j]!=null?'凍結中 あと'+pFrz[j]+'秒':pLock[j]?'星環ロック':(cmdIdx!=null&&cmdIdx!==j)?'指名された札から':lockReason(dv,fieldSum,field)),cardRole:'player',isSpecial:!!pSp[j],linkPick:linkMode&&canPlay(dv,fieldSum,field),rLock:!!pLock[j],rCmd:cmdIdx===j,rWait:cmdIdx!=null&&cmdIdx!==j,confused:confuse[j]!=null});})())
-        )
-      )
+      h('div',{className:'gp-hand-rows'},[0,1].map(row=>h('div',{key:row,className:'gp-hand-row'},
+        Array.from({length:5},(_,col)=>{
+          const i=row*5+col,v=pH[i]??null,dv=confuse[i]!=null?confuse[i]:v,dk=lantern&&!lantern.lit.includes(i);
+          return h('div',{key:i,className:'player-hand-slot'+(v==null?' empty':'')+(pCursor===i?' selected':''),'data-slot':i,'aria-label':v==null?'空き枠':(dk?'裏向き':dv)+'のカード','aria-current':pCursor===i?'true':undefined},
+            v!=null&&h(SlideCard,{value:dk?'?':dv,dark:dk,onPlay:()=>{},disabled:chargeEmpty||countNum>=0||!canPlay(dv,fieldSum,field)||rStop||!!pLock[i]||pFrz[i]!=null||(cmdIdx!=null&&cmdIdx!==i),cardState:countNum>=0?null:handCardState(dv,fieldSum,field),frozen:pFrz[i],justFrozen:justFrz.includes(i),pRing:pRing===i,shuffling:shufAll,marked:marked.includes(i),newRefill:so.survival&&survivalReward&&survivalReward.who==='player'&&performance.now()<survivalReward.until&&survivalReward.slots.includes(i),cardRole:'player',isSpecial:!!pSp[i],linkPick:linkMode&&canPlay(dv,fieldSum,field),rLock:!!pLock[i],rCmd:cmdIdx===i,rWait:cmdIdx!=null&&cmdIdx!==i,confused:confuse[i]!=null}));
+        }))))
     ),
+    h(HandControls,{side:controlSide,onMove:movePlayerCursor,onPlay:playSelectedCard,canMove:playerCanNavigate(),canPlay:!paused&&(countNum>0||skipOn||(!pMoving&&playerCanNavigate()&&selectedPlayable)),playLabel:countNum>0?'開始':skipOn?'次へ':'出す'}),
 
     // SPACER (below hand)
     h('div',{className:'gp-spacer'})

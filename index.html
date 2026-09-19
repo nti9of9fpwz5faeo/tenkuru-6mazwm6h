@@ -2325,6 +2325,7 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .cursor-playing .survival-reserve{top:calc(-6 * var(--u));right:calc(5 * var(--u));font-size:calc(12 * var(--u));}
 
 </style>
+<link rel="stylesheet" href="shared-board.css">
 </head>
 <body>
 <svg style="position:absolute;width:0;height:0;" aria-hidden="true">
@@ -2336,6 +2337,7 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 </defs>
 </svg>
 <div id="root"></div>
+<script src="shared-board.js"></script>
 <script>
 const h=React.createElement;
 const{useState,useEffect,useRef,useCallback,useMemo}=React;
@@ -3453,7 +3455,7 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v281'; // 2段の固定手札・十字キー選択・左右配置設定
+const APP_VER='v282'; // 4×4共有盤面・二人のカーソル・空き枠補充
 // v280(2026/09/18): 新モード「ひとりモード（仮）」。相手なし・タイマーなし。場の札に手札を足して10、完成（またはバースト）で右上の「次の札」の先頭が場に出る。次の札は先の先まで7枚見える。数値はSOLO_CFG
 // const APP_VER='v279'; // v279(2026/09/18): テンフォール：拍刻み（1段ずつドクッ）は気持ち悪いのでやめ、なめらかに落ちる形に戻した。拍の音・光も削除。タイマーなしはそのまま
 // const APP_VER='v278'; // v278(2026/09/18): テンフォール：60秒タイマーを廃止（やめるまで続く）。Neon Bladeのように拍（bpm100）ごとに札が1段ドクッと落ちて止まる＋拍の音と光
@@ -3988,13 +3990,14 @@ function SkillPanel(){
     )
   );
 }
-function TitleScreen({onPlay,onPuzzlux,onRush,onCharge,onSurvival,onFall,onSolo,onTune,onTutorial,onSettings,musicOn,toggleMusic}){
+function TitleScreen({onShared,onPlay,onPuzzlux,onRush,onCharge,onSurvival,onFall,onSolo,onTune,onTutorial,onSettings,musicOn,toggleMusic}){
   const btnBase={borderRadius:14,padding:'15px 0',fontSize:13,fontWeight:800,letterSpacing:2,cursor:'pointer',fontFamily:"'Inter',sans-serif",background:'rgba(255,255,255,.78)',boxShadow:'0 4px 16px rgba(70,100,150,.16), inset 0 1px 0 #fff',width:'100%'};
   return h('div',{style:{height:'100dvh',overflowY:'auto',touchAction:'pan-y',flexDirection:'column',background:"url('img/title-bg.jpg') center/cover no-repeat, #eef2f8",display:'flex',alignItems:'center',justifyContent:'flex-start',padding:16,position:'relative'}},
     h('div',{style:{margin:'auto',flexShrink:0,textAlign:'center',display:'flex',flexDirection:'column',alignItems:'center',gap:18,width:'100%',maxWidth:340,animation:'fadeUp 0.5s ease'}},
       h('div',{style:{fontSize:10,letterSpacing:8,color:'#5a80ab',fontWeight:700,fontFamily:"'Inter',sans-serif"}},'✦ CARD GAME ✦'),
       h('img',{src:'img/logo.webp',alt:'テンクル',style:{width:'100%',maxWidth:330,height:'auto',filter:'drop-shadow(0 8px 22px rgba(80,110,160,.28))',animation:'float 3.5s ease-in-out infinite'}}),
       h('div',{style:{display:'flex',flexDirection:'column',gap:12,width:'100%',marginTop:6}},
+        h('button',{onClick:onShared,style:{...btnBase,padding:'17px 0',fontSize:17,border:'1.5px solid #19a9cb',background:'linear-gradient(135deg,#fff,#d8f3fa)',color:'#076e9c'}},'4×4対戦',h('span',{style:{display:'block',fontSize:12,marginTop:5,letterSpacing:1}},'お試し · 同じ16枚を取り合う')),
         h('button',{onClick:onPlay,style:{...btnBase,padding:'17px 0',fontSize:16,letterSpacing:6,border:'1.5px solid rgba(46,127,232,.55)',color:'#2e7fe8',boxShadow:'0 6px 20px rgba(46,127,232,.22), inset 0 1px 0 #fff'}},'遊ぶ'),
         h('button',{onClick:onPuzzlux,style:{...btnBase,padding:'13px 0',fontSize:13,letterSpacing:4,border:'1.5px solid rgba(80,160,230,.5)',color:'#2b7fb8',boxShadow:'0 5px 18px rgba(80,160,230,.2), inset 0 1px 0 #fff'}},'パズルクス'), // v214
         h('button',{onClick:onSolo,style:{...btnBase,fontSize:16,border:'1.5px solid rgba(46,127,232,.55)',color:'#2e7fe8'}},'ひとりモード',h('span',{style:{display:'block',fontSize:12,marginTop:5}},'お試し · 次に出る札が見える')), // v280
@@ -6929,6 +6932,7 @@ function App(){
   function goHome(){if(isSurvival()){goSurvival();return;}if(stageR.current&&stageR.current.ar===4){goCharge();return;}if(stageR.current&&stageR.current.ar===3){goRush();return;}if(stageR.current&&stageR.current.ar===2){goTune();return;}if(stageR.current&&stageR.current.ar===1){goPzxPanel();return;}if(stageR.current){goMap();return;}roundTokR.current++;clearTimers();exitLink();stopBGM();setPhase('menu');}
 
   const curStage=stageCtx?STAGES.areas[stageCtx.ar].stages[stageCtx.st]:null;
+  if(phase==='shared')return h(SharedBoardMode,{side:controlSide,onSideChange:changeControlSide,onBack:()=>{setPhase('menu');phaseR.current='menu';}});
   if(phase==='controlSettings')return h('main',{className:'rush-screen'},h('section',{className:'rush-card'},h('h1',null,'操作設定'),h(ControlSettings,{side:controlSide,onChange:changeControlSide}),h('p',{className:'rush-lead'},'十字キーで選んで、出すボタンで1枚出します。'),h('button',{className:'rush-secondary',onClick:()=>{setPhase('menu');phaseR.current='menu';}},'ホームへ')));
   if(phase==='solo')return h(SoloMode,{onBack:()=>{setPhase('menu');phaseR.current='menu';}}); // v280
   if(phase==='fall')return h(FallMode,{onBack:()=>{setPhase('menu');phaseR.current='menu';}}); // v276
@@ -6938,7 +6942,7 @@ function App(){
   if(phase==='tune')return h(TuneScreen,{onBattle:startTuneBattle,onBack:()=>{setPhase('menu');phaseR.current='menu';}}); // v239
   if(phase==='pzx')return h(PzxPanel,{save,onBattle:startPzxStage,onEnter:()=>{setPhase('pzxmap');phaseR.current='pzxmap';},onBack:()=>{setPhase('menu');phaseR.current='menu';},onReset:()=>{updSave(s=>{s.pzx={got:[],boss:false};return s;});}}); // v214/v218 リセットは進行だけ消す（本編の★は無関係）
   if(phase==='pzxmap')return h(PzxWorld,{onPick:startPzxStage,onBack:()=>{setPhase('pzx');phaseR.current='pzx';}}); // v225/v231
-  if(phase==='menu')return h(TitleScreen,{onPlay:()=>{setPhase('map');phaseR.current='map';},onPuzzlux:()=>{setPhase('pzx');phaseR.current='pzx';},onRush:goRush,onCharge:goCharge,onSurvival:goSurvival,onFall:()=>{setPhase('fall');phaseR.current='fall';},onSolo:()=>{setPhase('solo');phaseR.current='solo';},onTune:()=>{setPhase('tune');phaseR.current='tune';},onTutorial:()=>openTutorial(null),onSettings:()=>{setPhase('controlSettings');phaseR.current='controlSettings';},musicOn:musicEnabled,toggleMusic});
+  if(phase==='menu')return h(TitleScreen,{onShared:()=>{setPhase('shared');phaseR.current='shared';},onPlay:()=>{setPhase('map');phaseR.current='map';},onPuzzlux:()=>{setPhase('pzx');phaseR.current='pzx';},onRush:goRush,onCharge:goCharge,onSurvival:goSurvival,onFall:()=>{setPhase('fall');phaseR.current='fall';},onSolo:()=>{setPhase('solo');phaseR.current='solo';},onTune:()=>{setPhase('tune');phaseR.current='tune';},onTutorial:()=>openTutorial(null),onSettings:()=>{setPhase('controlSettings');phaseR.current='controlSettings';},musicOn:musicEnabled,toggleMusic});
   if(phase==='champIntro'&&curStage&&curStage.champion)return h(ChampionIntroScreen,{champ:CHAMPIONS[curStage.champion],stage:curStage,onStart:()=>goIntro(pendingDiff)});
   if(phase==='intro'&&curStage&&curStage.intro)return h(IntroVideoScreen,{src:curStage.intro,onDone:()=>goBrief(pendingDiff)}); // v120
   if(phase==='brief'&&curStage)return h(BriefScreen,{stage:curStage,onStart:()=>startGame(pendingDiff)}); // v119

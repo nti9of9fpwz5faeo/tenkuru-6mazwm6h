@@ -3484,7 +3484,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v283'; // サイコロ試作モード追加（既存モードは変更なし）
+const APP_VER='v284'; // サイコロ：AIを超弱体化（考える間隔 2.6〜4.2秒、賢い手は30%だけ・残りはでたらめ。数値は DICE_CFG の aiMinMs/aiJitterMs/aiSmartRate）
+// const APP_VER='v283'; // サイコロ試作モード追加（既存モードは変更なし）
 // v280(2026/09/18): 新モード「ひとりモード（仮）」。相手なし・タイマーなし。場の札に手札を足して10、完成（またはバースト）で右上の「次の札」の先頭が場に出る。次の札は先の先まで7枚見える。数値はSOLO_CFG
 // const APP_VER='v279'; // v279(2026/09/18): テンフォール：拍刻み（1段ずつドクッ）は気持ち悪いのでやめ、なめらかに落ちる形に戻した。拍の音・光も削除。タイマーなしはそのまま
 // const APP_VER='v278'; // v278(2026/09/18): テンフォール：60秒タイマーを廃止（やめるまで続く）。Neon Bladeのように拍（bpm100）ごとに札が1段ドクッと落ちて止まる＋拍の音と光
@@ -5049,7 +5050,7 @@ function HandControls({side,onMove,onPlay,canMove,canPlay,playLabel='出す'}){
 }
 
 // ── DICE MODE v283: isolated prototype; every gameplay timing lives here. ──
-const DICE_CFG={matchMs:60000,rollMs:280,dropMs:720,dropStaggerMs:65,pointMs:700,aiMinMs:650,aiJitterMs:450,swipePx:20,axisRatio:1.15,frameMs:16,points:1};
+const DICE_CFG={matchMs:60000,rollMs:280,dropMs:720,dropStaggerMs:65,pointMs:700,aiMinMs:2600,aiJitterMs:1600,aiSmartRate:0.3,swipePx:20,axisRatio:1.15,frameMs:16,points:1};
 const DICE_DIRS=['up','down','left','right'];
 // Local x=right, y=screen-down, z=top (toward the viewer). Opposites: 1/blank, 2/5, 3/4.
 const DICE_FACES=[{value:1,n:[0,0,1],css:'translateZ(var(--dice-half))'},{value:0,n:[0,0,-1],css:'rotateY(180deg) translateZ(var(--dice-half))'},
@@ -5080,6 +5081,7 @@ function diceFinish(s){s.phase='ended';s.left=0;s.winner=s.score.player===s.scor
 function diceChoices(poses,indices){const out=[];for(const index of indices)for(const dir of DICE_DIRS){const pose=diceRotate(poses[index],dir),sum=poses.reduce((n,p,j)=>n+diceTop(j===index?pose:p),0);out.push({index,dir,pose,sum});}return out;}
 function diceAiChoice(s,random=Math.random){
  const poses=s.dice.map(d=>d.pose),choices=diceChoices(poses,[0,1]);let best=null,bestScore=-Infinity;
+ if(random()>=DICE_CFG.aiSmartRate)return choices[Math.floor(random()*choices.length)];
  for(const c of choices){
   const next=poses.map((p,i)=>i===c.index?c.pose:p);
   const follow=diceChoices(next,[0,1]),threats=diceChoices(next,[2,3]).filter(v=>v.sum===10).length;

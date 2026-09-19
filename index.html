@@ -3484,7 +3484,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v284'; // サイコロ：AIを超弱体化（考える間隔 2.6〜4.2秒、賢い手は30%だけ・残りはでたらめ。数値は DICE_CFG の aiMinMs/aiJitterMs/aiSmartRate）
+const APP_VER='v285'; // サイコロ：将棋のようなターン制（自分→相手で1手ずつ交代、1手の制限時間なし。10を取られた側が次の先手）。DICE_CFG.turnBased:false で元のリアルタイムに戻る
+// const APP_VER='v284'; // サイコロ：AIを超弱体化（考える間隔 2.6〜4.2秒、賢い手は30%だけ・残りはでたらめ。数値は DICE_CFG の aiMinMs/aiJitterMs/aiSmartRate）
 // const APP_VER='v283'; // サイコロ試作モード追加（既存モードは変更なし）
 // v280(2026/09/18): 新モード「ひとりモード（仮）」。相手なし・タイマーなし。場の札に手札を足して10、完成（またはバースト）で右上の「次の札」の先頭が場に出る。次の札は先の先まで7枚見える。数値はSOLO_CFG
 // const APP_VER='v279'; // v279(2026/09/18): テンフォール：拍刻み（1段ずつドクッ）は気持ち悪いのでやめ、なめらかに落ちる形に戻した。拍の音・光も削除。タイマーなしはそのまま
@@ -5050,7 +5051,7 @@ function HandControls({side,onMove,onPlay,canMove,canPlay,playLabel='出す'}){
 }
 
 // ── DICE MODE v283: isolated prototype; every gameplay timing lives here. ──
-const DICE_CFG={matchMs:60000,rollMs:280,dropMs:720,dropStaggerMs:65,pointMs:700,aiMinMs:2600,aiJitterMs:1600,aiSmartRate:0.3,swipePx:20,axisRatio:1.15,frameMs:16,points:1};
+const DICE_CFG={matchMs:60000,rollMs:280,dropMs:720,dropStaggerMs:65,pointMs:700,aiMinMs:2600,aiJitterMs:1600,aiSmartRate:0.3,turnBased:true,aiTurnMs:900,swipePx:20,axisRatio:1.15,frameMs:16,points:1};
 const DICE_DIRS=['up','down','left','right'];
 // Local x=right, y=screen-down, z=top (toward the viewer). Opposites: 1/blank, 2/5, 3/4.
 const DICE_FACES=[{value:1,n:[0,0,1],css:'translateZ(var(--dice-half))'},{value:0,n:[0,0,-1],css:'rotateY(180deg) translateZ(var(--dice-half))'},
@@ -5070,11 +5071,12 @@ function diceNewDice(random=Math.random){
  if(dice.reduce((sum,d)=>sum+diceTop(d.pose),0)===10)dice[0].pose=diceRotate(dice[0].pose,'right');
  return dice;
 }
-function diceCreate(random=Math.random){return {dice:diceNewDice(random),phase:'ready',paused:false,now:0,left:DICE_CFG.matchMs,score:{player:0,dealer:0},round:0,epoch:0,serial:0,aiAt:0,scorer:null,winner:null,event:0};}
+function diceCreate(random=Math.random){return {dice:diceNewDice(random),phase:'ready',paused:false,now:0,left:DICE_CFG.matchMs,score:{player:0,dealer:0},round:0,epoch:0,serial:0,aiAt:0,turn:'player',scorer:null,winner:null,event:0};}
 function diceSum(s){return s.dice.reduce((sum,d)=>sum+diceTop(d.pose),0);}
-function diceThrow(s,random=Math.random){s.dice=diceNewDice(random);s.phase='dropping';s.round++;s.epoch++;s.dropEnd=s.now+DICE_CFG.dropMs+3*DICE_CFG.dropStaggerMs;s.scorer=null;}
+function diceThrow(s,random=Math.random){s.turn=s.scorer==='player'?'dealer':'player';s.dice=diceNewDice(random);s.phase='dropping';s.round++;s.epoch++;s.dropEnd=s.now+DICE_CFG.dropMs+3*DICE_CFG.dropStaggerMs;s.scorer=null;}
 function diceRoll(s,index,dir,epoch=s.epoch){
  if(s.phase!=='active'||s.paused||epoch!==s.epoch||!DICE_DIRS.includes(dir)||!Number.isInteger(index)||index<0||index>3||s.dice[index].motion||s.left<=DICE_CFG.rollMs)return false;
+ if(DICE_CFG.turnBased&&((index<2?'dealer':'player')!==s.turn||s.dice.some(d=>d.motion)))return false;
  const die=s.dice[index];die.motion={dir,to:diceRotate(die.pose,dir),at:s.now+DICE_CFG.rollMs,id:++s.serial,epoch:s.epoch};return true;
 }
 function diceFinish(s){s.phase='ended';s.left=0;s.winner=s.score.player===s.score.dealer?'draw':s.score.player>s.score.dealer?'player':'dealer';s.dice.forEach(d=>d.motion=null);s.epoch++;}
@@ -5102,7 +5104,7 @@ function diceAdvance(s,ms,random=Math.random,withAi=true){
   const next=Math.min(until,deadline,phaseEnd,landing),elapsed=next-s.now;
   if(timed)s.left=Math.max(0,s.left-elapsed);s.now=next;
   if(timed&&s.left<=0){diceFinish(s);break;}
-  if(s.phase==='dropping'&&s.now>=s.dropEnd){s.phase='active';s.aiAt=s.now+DICE_CFG.aiMinMs+random()*DICE_CFG.aiJitterMs;continue;}
+  if(s.phase==='dropping'&&s.now>=s.dropEnd){s.phase='active';s.aiAt=s.now+(DICE_CFG.turnBased?DICE_CFG.aiTurnMs:DICE_CFG.aiMinMs+random()*DICE_CFG.aiJitterMs);continue;}
   if(s.phase==='point'&&s.now>=s.pointEnd){diceThrow(s,random);continue;}
   if(s.phase==='active'){
    const landed=s.dice.map((d,index)=>({d,index})).filter(x=>x.d.motion&&x.d.motion.at<=s.now).sort((a,b)=>a.d.motion.at-b.d.motion.at||a.d.motion.id-b.d.motion.id);
@@ -5113,10 +5115,11 @@ function diceAdvance(s,ms,random=Math.random,withAi=true){
      // Later in-flight rolls belong to the completed round and cannot score again.
      s.dice.forEach(die=>die.motion=null);break;
     }
+    if(DICE_CFG.turnBased){s.turn=index<2?'player':'dealer';if(s.turn==='dealer')s.aiAt=s.now+DICE_CFG.aiTurnMs;}
    }
   }
  }
- if(withAi&&s.phase==='active'&&s.now>=s.aiAt&&!s.dice[0].motion&&!s.dice[1].motion){
+ if(withAi&&s.phase==='active'&&s.now>=s.aiAt&&!s.dice[0].motion&&!s.dice[1].motion&&(!DICE_CFG.turnBased||(s.turn==='dealer'&&!s.dice.some(d=>d.motion)))){
   const choice=diceAiChoice(s,random);if(choice)diceRoll(s,choice.index,choice.dir);
   s.aiAt=s.now+DICE_CFG.aiMinMs+random()*DICE_CFG.aiJitterMs;
  }
@@ -5165,7 +5168,7 @@ function DiceMode({onBack}){
   window.addEventListener('blur',blur);document.addEventListener('visibilitychange',hidden);window.addEventListener('keydown',key);
   return()=>{clearInterval(timer);window.removeEventListener('blur',blur);document.removeEventListener('visibilitychange',hidden);window.removeEventListener('keydown',key);};
  },[]);
- const modal=s.paused||s.phase==='ready'||s.phase==='ended',active=s.phase==='active'&&!s.paused;
+ const modal=s.paused||s.phase==='ready'||s.phase==='ended',active=s.phase==='active'&&!s.paused&&(!DICE_CFG.turnBased||(s.turn==='player'&&!s.dice.some(d=>d.motion)));
  useEffect(()=>{if(modal&&dialog.current)dialog.current.querySelector('button')?.focus();},[modal,s.phase]);
  function trap(e){if(e.key!=='Tab')return;const els=[...e.currentTarget.querySelectorAll('button')],first=els[0],end=els[els.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();end.focus();}else if(!e.shiftKey&&document.activeElement===end){e.preventDefault();first.focus();}}
  return h('main',{className:'dc-screen'+(s.paused?' dc-paused':''),style:{'--dc-roll-ms':DICE_CFG.rollMs+'ms','--dc-drop-ms':DICE_CFG.dropMs+'ms'}},
@@ -5180,7 +5183,7 @@ function DiceMode({onBack}){
    h('div',{className:'dc-pads'},h(DicePad,{index:2,enabled:active&&!s.dice[2].motion,onRoll:roll}),h(DicePad,{index:3,enabled:active&&!s.dice[3].motion,onRoll:roll}))),
   modal&&h('div',{className:'dc-overlay'},h('section',{className:'dc-dialog',role:'dialog','aria-modal':true,'aria-labelledby':'dc-dialog-title',ref:dialog,onKeyDown:trap},
    h('p',{className:'dc-eyebrow'},'TEN-KURU · PROTOTYPE'),h('h1',{id:'dc-dialog-title'},s.paused?'一時停止':s.phase==='ended'?(s.winner==='draw'?'引き分け':s.winner==='player'?'勝利！':'次は取り返そう'):'サイコロ'),
-   s.phase==='ready'&&h(React.Fragment,null,h('p',{className:'dc-lead'},'4つの上の面で、10をつくる。'),h('p',null,'左パッドで青の左、右パッドで青の右を上下左右にスワイプ。最後に転がして10にした側が得点。'),h('p',{className:'dc-note'},DICE_CFG.matchMs/1000+'秒勝負 · 10で振り直し · 空白は0'),h('small',null,'PC：左はWASD、右は矢印キー')),
+   s.phase==='ready'&&h(React.Fragment,null,h('p',{className:'dc-lead'},'4つの上の面で、10をつくる。'),h('p',null,(DICE_CFG.turnBased?'自分と相手で1手ずつ交代。':'')+'左パッドで青の左、右パッドで青の右を上下左右にスワイプ。最後に転がして10にした側が得点。'),h('p',{className:'dc-note'},DICE_CFG.matchMs/1000+'秒勝負 · 10で振り直し · 空白は0'),h('small',null,'PC：左はWASD、右は矢印キー')),
    s.phase==='ended'&&h('p',{className:'dc-result'},'YOU '+s.score.player+' — '+s.score.dealer+' CPU'),
    h('button',{className:'dc-primary',onClick:s.paused?resume:start},s.paused?'再開':s.phase==='ended'?'もう一度':'はじめる'),h('button',{className:'dc-secondary',onClick:onBack},'ホームへ'))));
 }

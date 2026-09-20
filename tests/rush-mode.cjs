@@ -15,7 +15,7 @@ function makeClock(){
  return {now:()=>now,setTimeout:(fn,ms)=>add(fn,ms,0),setInterval:(fn,ms)=>add(fn,ms,ms),clear:key=>jobs.delete(key),reset:()=>jobs.clear(),
  jump:ms=>{now+=ms;},advance(ms){const to=now+ms;let n=0;while(true){const next=[...jobs].filter(([,j])=>j.at<=to).sort((a,b)=>a[1].at-b[1].at)[0];if(!next)break;if(++n>20000)throw Error('Timer loop');const[key,j]=next;now=j.at;if(j.interval)j.at+=j.interval;else jobs.delete(key);j.fn();}now=to;}};
 }
-function engine({ai=false}={}){
+function engine({ai=false,energy=false}={}){
  const clock=makeClock();const dom=new JSDOM('<body><div id="root"></div></body>',{url:'https://example.test/'});
  const soundNode=()=>({connect(){},gain:{value:0}});
  dom.window.AudioContext=class{constructor(){this.sampleRate=10;this.state='running';}createConvolver(){return soundNode();}createGain(){return soundNode();}createBuffer(ch,n){return{getChannelData:()=>new Float32Array(n)}}};
@@ -29,7 +29,7 @@ function engine({ai=false}={}){
   phaseR,stageR,stageOptsR,rushMatchR,rushClosedR,rushDeadlineR,timeLeftR,pPtR,dPtR,rnR,roundTokR,pHR,dHR,dIdsR,fieldR,fieldSumR,flyR,lockR,resolvingR,countNumR,saveR,
   silenceAi:()=>{scheduleAi=()=>{};},openRound:()=>{countNumR.current=-1;lockR.current=false;resolvingR.current=false;startTimer(rnR.current);},
   state:()=>({phase:phaseR.current,p:pPtR.current,d:dPtR.current,wins:rushMatchR.current,closed:rushClosedR.current,field:[...fieldR.current],rn:rnR.current})};\n`;
- const code=source.replace('  const curStage=stageCtx?',capture+'  const curStage=stageCtx?');
+ const code=source.replace('  const curStage=stageCtx?',capture+'  const curStage=stageCtx?').replace('const ENERGY_CFG={enabled:false,',energy?'const ENERGY_CFG={enabled:true,':'const ENERGY_CFG={enabled:false,'); // v296 energy system is off in the game; its test turns it on
  vm.runInContext(code+`\n[${['resumeAC','stopBGM','startBGM','stopChronoHum','duckBGM','playGoSE','playPlaceSE','playComboSfx','playBurstSE','playWinSE2','playLoseSE','fxBell','fxAir'].map(n=>JSON.stringify(n)).join(',')}].forEach(n=>{this[n]=()=>{};});\nthis.testApi={ENERGY_CFG,energyAdvance,EnergyMeter,calcPts,HAND_NAV,handNeighbor,handPath,loadControlSide,ControlSettings,HandControls,SurvivalScreen,SurvivalResult,SurvivalRoles,survivalStage,SlideCard,VictoryMeter,ChargeScreen,ChargeResult,ChargeMeter,CHARGE_CFG,chargeStage,chargeAdvance,App,RUSH_CFG,rushRoundResult,rushStage,TitleScreen,RushScreen,RushResult};`,context);
  clock.reset();context.__capture=true;const app=context.testApi.App();if(!ai)app.silenceAi();
  return {clock,app,api:context.testApi,context,dom,render:()=>{cursor=0;context.__capture=false;return context.testApi.App();}};

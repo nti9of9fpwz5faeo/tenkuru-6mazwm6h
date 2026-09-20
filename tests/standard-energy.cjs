@@ -4,7 +4,7 @@ const {engine}=require('./rush-mode.cjs');
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-7,`${a} != ${b}`);
 const walk=(x,out=[])=>{if(x&&typeof x==='object'){out.push(x);(x.children||[]).flat(Infinity).forEach(y=>walk(y,out));}return out;};
 const hasClass=(n,c)=>(n.props.className||'').split(' ').includes(c);
-function start(options){const e=engine(options);e.app.startGame('normal');while(e.app.countNumR.current>=0)e.clock.advance(1);return e;}
+function start(options){const e=engine({...(options||{}),energy:true});e.app.startGame('normal');while(e.app.countNumR.current>=0)e.clock.advance(1);return e;}
 function pool(e,p,d=p){e.app.energyR.current={player:p,dealer:d,at:e.clock.now()};e.app.updateEnergy();}
 
 // Cost is the face value, invalid/empty/locked taps do not consume, caps discard overflow.
@@ -42,7 +42,7 @@ for(const [cards,gain,points] of [[[5,5],0,1],[[1,1,3,5],2,2],[[2,2,3,3],4,3],[[
 }
 // Countdown and results grant nothing. A new round carries energy; a new match resets.
 {
- const e=engine();e.app.startGame('normal');pool(e,4);e.clock.advance(1000);near(e.app.energyR.current.player,4);
+ const e=engine({energy:true});e.app.startGame('normal');pool(e,4);e.clock.advance(1000);near(e.app.energyR.current.player,4);
  while(e.app.countNumR.current>=0)e.clock.advance(1);
  e.app.completeTen([5,5],'player',1);e.clock.advance(4000);assert.equal(e.app.rnR.current,2);near(e.app.energyR.current.player,4);
  while(e.app.countNumR.current>=0)e.clock.advance(1);

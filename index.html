@@ -2304,6 +2304,8 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .player-hand-slot{position:relative;width:var(--card-w);height:calc(var(--card-w) * 1.4);flex-shrink:0;border-radius:calc(6 * var(--u));}
 .player-hand-slot.empty{border:1px dashed #9aaec066;background:#ffffff20;}
 .player-hand-slot>.card-stage{pointer-events:none;}
+.player-hand-slot.legacy-tap>.card-stage{pointer-events:auto;} /* v296 通常・チャレンジは札を直接タップ */
+.player-hand-slot.legacy-tap.empty{border:0;background:none;}
 .player-hand-slot.selected:after{content:'';position:absolute;inset:calc(-3 * var(--u));border:calc(2.5 * var(--u)) solid #00baff;border-radius:calc(8 * var(--u));box-shadow:0 0 calc(8 * var(--u)) #00baff70;pointer-events:none;z-index:10;}
 .player-hand-slot.selected:before{content:'';position:absolute;top:calc(-9 * var(--u));left:50%;transform:translateX(-50%);border-left:calc(5 * var(--u)) solid transparent;border-right:calc(5 * var(--u)) solid transparent;border-top:calc(6 * var(--u)) solid #009be8;z-index:11;}
 .hand-controls{grid-row:5;display:flex;align-items:center;justify-content:space-between;padding:0 calc(12 * var(--u));touch-action:none;user-select:none;}
@@ -2489,7 +2491,7 @@ function calcPts(cards){
 }
 
 // v286: normal battles only. Card value is its cost; points remain unchanged.
-const ENERGY_CFG={max:10,initial:10,refillMs:1000,rewards:{'役なし':0,'ワンペア':2,'ツーペア':4,'スリーカード':6,'ストレート':8}};
+const ENERGY_CFG={enabled:false,max:10,initial:10,refillMs:1000,rewards:{'役なし':0,'ワンペア':2,'ツーペア':4,'スリーカード':6,'ストレート':8}};
 function energyAdvance(pool,now){
   const gain=Math.max(0,now-pool.at)/ENERGY_CFG.refillMs;
   return {player:Math.min(ENERGY_CFG.max,pool.player+gain),dealer:Math.min(ENERGY_CFG.max,pool.dealer+gain),at:now};
@@ -3585,7 +3587,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v295'; // 10秒ラッシュ・通常ステージの対戦画面を v281 以前の見た目に戻した（cursor-playing の固定グリッドを外す）。チャージ・サバイバル・チャレンジはそのまま
+const APP_VER='v296'; // 通常ステージ・チャレンジを十字キー前の元の対戦に戻した：元のラウンド制（点数先取・バーストあり）、札を直接タップ、元の画面レイアウト。エネルギーゲージ（v286/v287）は停止（ENERGY_CFG.enabled）。ラッシュのバーストなし・チャージ/サバイバルの十字キーはそのまま
+// const APP_VER='v295'; // 10秒ラッシュ・通常ステージの対戦画面を v281 以前の見た目に戻した（cursor-playing の固定グリッドを外す）。チャージ・サバイバル・チャレンジはそのまま
 // const APP_VER='v294'; // 通常ステージ（エリア1、チャレンジ以外）も10秒ラッシュの遊び方に：10秒×5ラウンド先取、手札は直接タップ、バーストなし（10こえははじき返す）。相手の強さはステージのまま
 // const APP_VER='v293'; // 10秒ラッシュ：カーソル（十字キー）をやめて手札を直接タップに戻した。バーストを削除し、10をこえる札ははじき返す（相手も10こえは出さない）。他のモードは変更なし
 // const APP_VER='v292'; // エナジー：押した札が手札から場へ移る（手札のその場所は空く）。10完成で空いた所に補充。10をこえたら場の札は手札に戻る。場の札を押しても手札に戻る
@@ -5416,7 +5419,7 @@ function App(){
   function isCharge(){return !!(stageOptsR.current&&stageOptsR.current.charge);}
   function isSurvival(){return !!(stageOptsR.current&&stageOptsR.current.survival);}
   function isTimedMode(){return isRush()||isCharge()||isSurvival();}
-  function isStandardEnergy(){return !isTimedMode();}
+  function isStandardEnergy(){return ENERGY_CFG.enabled&&!isTimedMode();} // v296 通常・チャレンジはエネルギーなしの元のルールに戻す
   const energyR=useRef({player:ENERGY_CFG.initial,dealer:ENERGY_CFG.initial,at:0});
   const[energy,setEnergy]=useState(energyR.current);
   const energyTimerR=useRef(null),energyRunningR=useRef(false),energyAwardRoundR=useRef(-1);
@@ -6249,9 +6252,7 @@ function App(){
     if(!st||st.comingSoon){goMap();return;} // v54: 準備中は開始しない
     if(phaseR.current==='playing')return;      // v54: 二重開始防止
     stageR.current={ar:arIdx,st:stIdx};setStageCtx({ar:arIdx,st:stIdx});
-    const rushify=arIdx===0&&!st.challenge&&!st.survival&&!st.charge&&!st.rush; // v294 通常ステージも10秒ラッシュの遊び方（10秒×5ラウンド先取・直接タップ・バーストなし）。チャレンジは対象外
-    const stWin=rushify?RUSH_CFG.target:(st.winPt||WIN_PT);
-    winPtR.current=stWin;setWinPt(stWin);
+    winPtR.current=st.winPt||WIN_PT;setWinPt(st.winPt||WIN_PT); // v296 通常ステージのラッシュ化（v294）は取り消し。元のラウンド制
     const hook=RULE_HOOKS[st.rule];if(hook&&typeof hook.onStart==='function')hook.onStart(st); // ギミック差し込み口（未実装）
     // v56: ステージ固有オプション
     const firstChrono=ar.stages.find(x=>x.chrono);
@@ -6260,7 +6261,7 @@ function App(){
       if(CHRONO_CONFIG.guaranteeFirstUnlock&&firstChrono&&st.no===firstChrono.no&&!saveR.current.chronoIntro){chrono=true;updSave(s=>{s.chronoIntro=true;return s;});}
       else chrono=Math.random()<CHRONO_CONFIG.appearRate;
     }
-    stageOptsR.current={chrono,survival:!!st.survival,rush:!!st.rush||rushify,charge:!!st.charge,noBoost:!!st.noBoost,cardSpeed:st.cardSpeed||null,winMsAbs:st.winMsAbs||null,nineStop:!!st.nineStop,frzBoth:st.frzBoth||null,blind:!!st.blind,firstMs:st.firstMs||null,firstJit:st.firstJit||0,curStepFirst:st.curStepFirst||null,curArrFirst:st.curArrFirst||null,curHoldFirst:st.curHoldFirst||null,flyMsFirst:st.flyMsFirst||null,winMs:st.winMs||null,winJit:st.winJit||0,timeLimit:st.timeLimit||10,ability:st.ability||null,champion:st.champion||null,challenge:!!st.challenge,ch8:!!st.ch8,ch9:!!st.ch9,ch10:!!st.ch10,smart:!!st.smart,deny:!!st.deny,playerRing:!!st.playerRing,speed:st.speed||1,curStep:st.curStep||null,curArr:st.curArr||null,curHold:st.curHold||null,flyMs:st.flyMs||null,rivalName:st.rivalName||null,form2Name:st.form2Name||null,shiftPt:st.shiftPt||null,bgm:st.bgm||null};
+    stageOptsR.current={chrono,survival:!!st.survival,rush:!!st.rush,charge:!!st.charge,noBoost:!!st.noBoost,cardSpeed:st.cardSpeed||null,winMsAbs:st.winMsAbs||null,nineStop:!!st.nineStop,frzBoth:st.frzBoth||null,blind:!!st.blind,firstMs:st.firstMs||null,firstJit:st.firstJit||0,curStepFirst:st.curStepFirst||null,curArrFirst:st.curArrFirst||null,curHoldFirst:st.curHoldFirst||null,flyMsFirst:st.flyMsFirst||null,winMs:st.winMs||null,winJit:st.winJit||0,timeLimit:st.timeLimit||10,ability:st.ability||null,champion:st.champion||null,challenge:!!st.challenge,ch8:!!st.ch8,ch9:!!st.ch9,ch10:!!st.ch10,smart:!!st.smart,deny:!!st.deny,playerRing:!!st.playerRing,speed:st.speed||1,curStep:st.curStep||null,curArr:st.curArr||null,curHold:st.curHold||null,flyMs:st.flyMs||null,rivalName:st.rivalName||null,form2Name:st.form2Name||null,shiftPt:st.shiftPt||null,bgm:st.bgm||null};
     if(st.challenge&&typeof SHIFT_VIDEO!=='undefined'){try{[SHIFT_VIDEO.v1,SHIFT_VIDEO.v2].forEach(u=>fetch(u,{mode:'no-cors',cache:'force-cache'}).catch(()=>{}));}catch(e){}} // v78: 変身動画を先読み
     if(quick===2){clearTimers();roundTokR.current++;setPendingDiff(st.diff||null);startGame(st.diff);return;} // v234 パズルクス：説明も飛ばして即開始
     if(quick){goBrief(st.diff);return;} // v195 パズルモードはチャレンジの登場ムービーも飛ばす（テンポ優先）
@@ -7395,7 +7396,7 @@ function App(){
   const selectedPlayable=selectedValue!=null&&!chargeEmpty&&canPlay(selectedValue,fieldSum,field)&&!pLock[pCursor]&&pFrz[pCursor]==null&&(cmdIdx==null||cmdIdx===pCursor);
   const rival=(form2&&so.form2Name)||so.rivalName||'DEALER';
   // v62: 第7は「ルナ」／v70: 第2形態は「レイピア」
-  return h('div',{className:'gp-screen'+(so.rush?'':' cursor-playing')+(standardEnergy?' energy-playing':'')+(so.charge?' charge-playing':'')+(so.survival?' survival-playing':'')+(so.rush?' rush-playing':'')+(endHold?' end-hold':'')+(so.challenge?' ch7':'')+(so.ch8?' ch8':'')+(so.ch9?' ch9':'')+(so.ch10?' ch10':'')+(form2?' f2':'')+(screenPop?' form2-pop':'')+(lkFx?' lk-on':'')},
+  return h('div',{className:'gp-screen'+((so.charge||so.survival)?' cursor-playing':'')+(standardEnergy?' energy-playing':'')+(so.charge?' charge-playing':'')+(so.survival?' survival-playing':'')+(so.rush?' rush-playing':'')+(endHold?' end-hold':'')+(so.challenge?' ch7':'')+(so.ch8?' ch8':'')+(so.ch9?' ch9':'')+(so.ch10?' ch10':'')+(form2?' f2':'')+(screenPop?' form2-pop':'')+(lkFx?' lk-on':'')},
     h(ChampionLayer,{champ:stageOptsR.current&&stageOptsR.current.champion?CHAMPIONS[stageOptsR.current.champion]:null}), // v61 チャンピオン戦は立ち絵
     so.challenge&&h('div',{className:'champ-layer'},
       form2
@@ -7457,7 +7458,7 @@ function App(){
       ),
       !so.survival&&h('div',{className:'gp-round-pill '+difficulty},
         h('span',{className:'r'},so.charge?'60秒':'R'+rNum),
-        h('span',{className:'lvl'},so.charge?'CHARGE':so.rush&&(!stageCtx||stageCtx.ar!==0)?'RUSH':curStage?(curStage.boss?'BOSS':'ST '+curStage.no):(difficulty==='easy'?'EASY':difficulty==='hard'?'HARD':difficulty==='master'?'MASTER':'NORMAL'))
+        h('span',{className:'lvl'},so.charge?'CHARGE':so.rush?'RUSH':curStage?(curStage.boss?'BOSS':'ST '+curStage.no):(difficulty==='easy'?'EASY':difficulty==='hard'?'HARD':difficulty==='master'?'MASTER':'NORMAL'))
       ),
       !so.charge&&h('div',{className:'gp-score dealer'},
         h('div',{className:'lbl'},(so.rush||so.charge)?'相手 得点':rival),
@@ -7573,11 +7574,12 @@ function App(){
           const i=row*5+col,v=pH[i]??null,dv=confuse[i]!=null?confuse[i]:v,dk=lantern&&!lantern.lit.includes(i);
           const unavailable=v==null||chargeEmpty||(standardEnergy&&energy.player+1e-9<dv)||countNum>=0||!canPlay(dv,fieldSum,field)||rStop||!!pLock[i]||pFrz[i]!=null||(cmdIdx!=null&&cmdIdx!==i);
           const directTap=standardEnergy||so.rush; // v293 ラッシュはカーソルをやめて直接タップ
-          return h(directTap?'button':'div',{key:i,type:directTap?'button':undefined,onClick:standardEnergy?()=>playCard(i):so.rush?()=>{if(countNumR.current>0){countSkipR.current&&countSkipR.current();return;}if(skipR.current&&resolvingR.current){skipR.current();return;}playCard(i);}:undefined,disabled:standardEnergy?(unavailable||paused||resolvingR.current||lockR.current):so.rush?(v==null||paused):undefined,className:'player-hand-slot'+(v==null?' empty':'')+(!directTap&&pCursor===i?' selected':'')+(so.rush&&rushBounce&&rushBounce.i===i?' rush-bounce':''),'data-slot':i,'aria-label':v==null?'空き枠':(dk?'裏向き':dv)+'のカード','aria-current':!directTap&&pCursor===i?'true':undefined},
-            v!=null&&h(SlideCard,{value:dk?'?':dv,dark:dk,onPlay:()=>{},disabled:unavailable,cardState:countNum>=0?null:handCardState(dv,fieldSum,field),frozen:pFrz[i],justFrozen:justFrz.includes(i),pRing:pRing===i,shuffling:shufAll,marked:marked.includes(i),newRefill:so.survival&&survivalReward&&survivalReward.who==='player'&&performance.now()<survivalReward.until&&survivalReward.slots.includes(i),cardRole:'player',isSpecial:!!pSp[i],linkPick:linkMode&&canPlay(dv,fieldSum,field),rLock:!!pLock[i],rCmd:cmdIdx===i,rWait:cmdIdx!=null&&cmdIdx!==i,confused:confuse[i]!=null}));
+          const legacyTap=!directTap&&!so.charge&&!so.survival; // v296 通常・チャレンジは十字キー前と同じく札そのものをタップ
+          return h(directTap?'button':'div',{key:i,type:directTap?'button':undefined,onClick:standardEnergy?()=>playCard(i):so.rush?()=>{if(countNumR.current>0){countSkipR.current&&countSkipR.current();return;}if(skipR.current&&resolvingR.current){skipR.current();return;}playCard(i);}:undefined,disabled:standardEnergy?(unavailable||paused||resolvingR.current||lockR.current):so.rush?(v==null||paused):undefined,className:'player-hand-slot'+(legacyTap?' legacy-tap':'')+(v==null?' empty':'')+(!directTap&&!legacyTap&&pCursor===i?' selected':'')+(so.rush&&rushBounce&&rushBounce.i===i?' rush-bounce':''),'data-slot':i,'aria-label':v==null?'空き枠':(dk?'裏向き':dv)+'のカード','aria-current':!directTap&&!legacyTap&&pCursor===i?'true':undefined},
+            v!=null&&h(SlideCard,{value:dk?'?':dv,dark:dk,onPlay:legacyTap?()=>playCard(i):()=>{},disabled:unavailable,cardState:countNum>=0?null:handCardState(dv,fieldSum,field),frozen:pFrz[i],justFrozen:justFrz.includes(i),pRing:pRing===i,shuffling:shufAll,marked:marked.includes(i),newRefill:so.survival&&survivalReward&&survivalReward.who==='player'&&performance.now()<survivalReward.until&&survivalReward.slots.includes(i),cardRole:'player',isSpecial:!!pSp[i],linkPick:linkMode&&canPlay(dv,fieldSum,field),rLock:!!pLock[i],rCmd:cmdIdx===i,rWait:cmdIdx!=null&&cmdIdx!==i,confused:confuse[i]!=null}));
         }))))
     ),
-    standardEnergy?h(EnergyMeter,{value:energy.player,reward:energyReward}):so.rush?null:h(HandControls,{side:controlSide,onMove:movePlayerCursor,onPlay:playSelectedCard,canMove:playerCanNavigate(),canPlay:!paused&&(countNum>0||skipOn||(!pMoving&&playerCanNavigate()&&selectedPlayable)),playLabel:countNum>0?'開始':skipOn?'次へ':'出す'}),
+    standardEnergy?h(EnergyMeter,{value:energy.player,reward:energyReward}):!(so.charge||so.survival)?null:h(HandControls,{side:controlSide,onMove:movePlayerCursor,onPlay:playSelectedCard,canMove:playerCanNavigate(),canPlay:!paused&&(countNum>0||skipOn||(!pMoving&&playerCanNavigate()&&selectedPlayable)),playLabel:countNum>0?'開始':skipOn?'次へ':'出す'}),
 
     // SPACER (below hand)
     h('div',{className:'gp-spacer'})

@@ -3746,7 +3746,7 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v309'; // ビリヤード：2〜4球の10完成・バースト廃止・結合不可は反発
+const APP_VER='v310'; // ビリヤード：白玉2回接触で分解・1回目は銅色の輪郭
 // const APP_VER='v299'; // テンフォール：新デザイン素材（背景・盤面・札・マス・ボタン・合計/点数の枠・10完成/💥の演出・説明パネル）を組み込み。ルールは変更なし
 // const APP_VER='v298'; // テンフォール：手札10枚をやめて1〜5の数字ボタン5つに（何回でも押せる・押した数字が下のマスの左から入る）。入れ替えスワイプと案内文は削除。落ち札・💥・点数はそのまま
 // const APP_VER='v297'; // セパレート（試作）：場を2人で分ける。自分の札は自分の場だけ、ぴったり10で役の点、10こえははじき返す、相手が10を作ると自分の場はリセット（札は捨て）、先に15点で勝ち。出せる札がなければその場をリセット。数値は SEP_CFG
@@ -5754,10 +5754,10 @@ function tapFieldPlaces(field,places=[]){
  const used=new Set();return field.map((_,i)=>{let slot=places[i];if(!Number.isInteger(slot)||slot<0||slot>3||used.has(slot))slot=[0,1,2,3].find(n=>!used.has(n));used.add(slot);return slot;});
 }
 
-// ── BILLIARDS ENGINE v309 ──
+// ── BILLIARDS ENGINE v310 ──
 // Shared, pocketless compound-ball billiards. Fixed 120 Hz; rendering and AI use the same engine.
 const BB_CFG={w:440,h:706,r:20,target:15,initialBalls:12,step:1/120,friction:125,maxSpeed:1120,levels:{easy:{label:'やさしい',samples:18,error:.075},normal:{label:'ふつう',samples:60,error:.012},hard:{label:'つよい',samples:130,error:.001}}};
-function bbBody(id,x,y,parts){const b={id,x,y,vx:0,vy:0,a:0,w:0,parts:parts.map(p=>({...p})),sum:parts.reduce((s,p)=>s+p.n,0)};b.mass=parts.length;b.inertia=parts.reduce((s,p)=>s+p.x*p.x+p.y*p.y+BB_CFG.r**2/2,0);return b;}
+function bbBody(id,x,y,parts){const b={id,x,y,vx:0,vy:0,a:0,w:0,cueHits:0,cueTouching:false,parts:parts.map(p=>({...p})),sum:parts.reduce((s,p)=>s+p.n,0)};b.mass=parts.length;b.inertia=parts.reduce((s,p)=>s+p.x*p.x+p.y*p.y+BB_CFG.r**2/2,0);return b;}
 function bbPoints(b){const c=Math.cos(b.a),s=Math.sin(b.a);return b.parts.map(p=>({x:b.x+p.x*c-p.y*s,y:b.y+p.x*s+p.y*c,n:p.n}));}
 function bbRole(values){const r=calcPts(values);return{points:r.total,label:r.voice};}
 function bbCreate(level='normal',rng=Math.random){
@@ -5784,6 +5784,7 @@ function bbJoin(s,a,b){
  const outcome=bbOutcome(a.sum+b.sum,a.parts.length+b.parts.length);if(outcome==='bounce')return null;
  const ps=[...bbPoints(a),...bbPoints(b)],mass=a.mass+b.mass,x=(a.x*a.mass+b.x*b.mass)/mass,y=(a.y*a.mass+b.y*b.mass)/mass;
  const c=bbBody(s.nextId++,x,y,ps.map(p=>({x:p.x-x,y:p.y-y,n:p.n})));
+ c.cueHits=Math.max(a.cueHits||0,b.cueHits||0);c.cueTouching=!!(a.cueTouching||b.cueTouching);
  c.vx=(a.vx*a.mass+b.vx*b.mass)/mass;c.vy=(a.vy*a.mass+b.vy*b.mass)/mass;
  c.w=(a.w*a.inertia+b.w*b.inertia+(a.x-x)*a.mass*a.vy-(a.y-y)*a.mass*a.vx+(b.x-x)*b.mass*b.vy-(b.y-y)*b.mass*b.vx)/c.inertia;
  s.bodies=s.bodies.filter(o=>o!==a&&o!==b);s.merged++;
@@ -5805,15 +5806,22 @@ function bbPhysics(s,dt){
    depth=0;if(p.y<R){ny=-1;depth=R-p.y;}else if(p.y>s.h-R){ny=1;depth=p.y-(s.h-R);}if(depth){b.y-=ny*depth;const v=bbImpulse(b,null,{x:p.x,y:p.y+ny*R},0,ny,.82);if(v>35)bbEvent(s,'rail',{power:v/700});}
   }
  }
+ // Rearm only after the cue has separated from every component of this cluster.
+ const cue=s.bodies.find(b=>b.sum===0);
+ if(cue)for(const b of s.bodies)if(b.cueTouching&&bbPoints(b).every(p=>Math.hypot(p.x-cue.x,p.y-cue.y)>2*R+3))b.cueTouching=false;
  for(let i=0;i<s.bodies.length;i++)for(let j=i+1;j<s.bodies.length;j++){
   const a=s.bodies[i],b=s.bodies[j];let contact=null;
   for(const p of bbPoints(a)){for(const q of bbPoints(b)){const dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy);if(d<2*R){contact={p,q,d,nx:d>1e-8?dx/d:1,ny:d>1e-8?dy/d:0};break;}}if(contact)break;}
   if(!contact)continue;const {p,q,d,nx,ny}=contact,pt={x:(p.x+q.x)/2,y:(p.y+q.y)/2};
   const rvx=(b.vx-b.w*(pt.y-b.y))-(a.vx-a.w*(pt.y-a.y)),rvy=(b.vy+b.w*(pt.x-b.x))-(a.vy+a.w*(pt.x-a.x));
   const white=a.sum===0?a:b.sum===0?b:null,cluster=white===a?b:a;
-  if(white&&cluster.parts.length>1){
-   const pieces=bbBreak(s,cluster),target=pieces.reduce((best,c)=>Math.hypot(c.x-white.x,c.y-white.y)<Math.hypot(best.x-white.x,best.y-white.y)?c:best,pieces[0]);
-   const dx=target.x-white.x,dy=target.y-white.y,distance=Math.hypot(dx,dy)||1;bbImpulse(white,target,{x:(white.x+target.x)/2,y:(white.y+target.y)/2},dx/distance,dy/distance,.9);return;
+  if(white&&cluster.parts.length>1&&!cluster.cueTouching){
+   cluster.cueTouching=true;cluster.cueHits=(cluster.cueHits||0)+1;
+   if(cluster.cueHits>=2){
+    const pieces=bbBreak(s,cluster),target=pieces.reduce((best,c)=>Math.hypot(c.x-white.x,c.y-white.y)<Math.hypot(best.x-white.x,best.y-white.y)?c:best,pieces[0]);
+    const dx=target.x-white.x,dy=target.y-white.y,distance=Math.hypot(dx,dy)||1;bbImpulse(white,target,{x:(white.x+target.x)/2,y:(white.y+target.y)/2},dx/distance,dy/distance,.9);return;
+   }
+   bbEvent(s,'weaken',{x:cluster.x,y:cluster.y,points:bbPoints(cluster)});
   }
   const siblings=a.splitId&&a.splitId===b.splitId&&s.now<Math.max(a.splitUntil||0,b.splitUntil||0);
   if(!siblings&&a.sum>0&&b.sum>0&&bbOutcome(a.sum+b.sum,a.parts.length+b.parts.length)!=='bounce'&&rvx*nx+rvy*ny<-.3){bbJoin(s,a,b);return;}
@@ -5892,6 +5900,7 @@ function bbAudio(){let enabled=true,disposed=false;const nodes=new Set(),last={}
    notes.forEach((f,i)=>{tone(f,.40+rank*.045,.06,i*.055);tone(f*2,.20,.009,i*.055);});
    if(rank>=4){tone(523.25,.72,.04,.19);tone(783.99,.72,.032,.19);}
   }
+  else if(kind==='weaken'){tone(520,.10,.025,0,'sine',340);}
   else if(kind==='break'){click(.14,1800);tone(820,.10,.035,0,'sine',410);tone(570,.12,.025,.035,'sine',285);}
   else if(kind==='place'){click(.085,1200);tone(420,.07,.035,0,'sine',230);}
   else if(kind==='bonus'){tone(659.25,.16,.035);tone(1046.5,.27,.045,.09);}
@@ -5913,12 +5922,12 @@ function bbDraw(ctx,s,aim,width,height,reduced=false){
  }
  for(const b of s.bodies){const pts=bbPoints(b);
   ctx.save();ctx.fillStyle='rgba(0,0,0,.22)';ctx.shadowColor='rgba(0,0,0,.32)';ctx.shadowBlur=7;ctx.shadowOffsetY=6;for(const p of pts){ctx.beginPath();ctx.arc(p.x,p.y+2,R,0,Math.PI*2);ctx.fill();}ctx.restore();
-  if(pts.length>1){ctx.save();ctx.fillStyle='#f5dfa0';ctx.shadowColor='#f4c970';ctx.shadowBlur=9;ctx.beginPath();for(const p of pts){ctx.moveTo(p.x+R+1.8,p.y);ctx.arc(p.x,p.y,R+1.8,0,Math.PI*2);}ctx.fill();ctx.restore();}
+  if(pts.length>1){const worn=b.cueHits>0,rim=worn?2.5:1.8;ctx.save();ctx.fillStyle=worn?'#d58a72':'#f5dfa0';ctx.shadowColor=worn?'#bf654f':'#f4c970';ctx.shadowBlur=9;ctx.beginPath();for(const p of pts){ctx.moveTo(p.x+R+rim,p.y);ctx.arc(p.x,p.y,R+rim,0,Math.PI*2);}ctx.fill();ctx.restore();}
   for(const p of pts){const g=ctx.createRadialGradient(p.x-7,p.y-10,1,p.x-2,p.y-3,R+10);g.addColorStop(0,p.n?'#fffdf0':'#fffef6');g.addColorStop(.50,p.n?'#eee9d4':'#e9e7dc');g.addColorStop(.8,'#c4bda5');g.addColorStop(1,'#898777');ctx.fillStyle=g;ctx.beginPath();ctx.arc(p.x,p.y,R,0,Math.PI*2);ctx.fill();ctx.strokeStyle='rgba(255,253,229,.45)';ctx.lineWidth=.7;ctx.stroke();if(p.n){ctx.fillStyle='#20322f';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='bold 31px Georgia, serif';ctx.fillText(String(p.n),p.x,p.y+1.8);}}
   if(pts.length>1){const x=Math.max(35,Math.min(BB_CFG.w-35,b.x)),y=Math.max(12,Math.min(...pts.map(p=>p.y))-R-17);ctx.fillStyle='rgba(12,47,38,.9)';ctx.strokeStyle='#d0b577';ctx.lineWidth=.8;ctx.beginPath();ctx.roundRect(x-33,y-10,66,21,10);ctx.fill();ctx.stroke();ctx.fillStyle='#f4edd4';ctx.font='12px "Noto Sans JP", sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('合計 '+b.sum,x,y+.5);}
  }
  if(s.placing&&s.placer===0&&aim.place){const p=aim.place,valid=bbValidPlacement(s,p.x,p.y);ctx.save();ctx.globalAlpha=.65;ctx.fillStyle=valid?'#f4e5be':'#b77a65';ctx.strokeStyle=valid?'#fff4ce':'#e7a591';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.beginPath();ctx.arc(p.x,p.y,R,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#1e352c';ctx.font='bold 29px Georgia,serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(s.returnBalls[0],p.x,p.y);ctx.restore();}
- for(const e of s.events){const age=s.now-e.at;if(age<0||age>.45||!['break','place'].includes(e.kind))continue;ctx.save();ctx.globalAlpha=(1-age/.45)*.6;ctx.strokeStyle='#dbc395';ctx.lineWidth=1;for(const p of e.kind==='break'?e.points:[e]){ctx.beginPath();ctx.arc(p.x,p.y,R+age*18,0,Math.PI*2);ctx.stroke();}ctx.restore();}
+ for(const e of s.events){const age=s.now-e.at;if(age<0||age>.45||!['weaken','break','place'].includes(e.kind))continue;ctx.save();ctx.globalAlpha=(1-age/.45)*.6;ctx.strokeStyle=e.kind==='weaken'?'#d58a72':'#dbc395';ctx.lineWidth=1;for(const p of e.kind==='place'?[e]:e.points){ctx.beginPath();ctx.arc(p.x,p.y,R+age*18,0,Math.PI*2);ctx.stroke();}ctx.restore();}
  // Ivory ghosts converge, then a restrained champagne-gold bloom rewards the completed hand.
  for(const e of s.events){const age=s.now-e.at;if(age<0)continue;
   if(e.kind==='shot'&&age<.16){const k=age/.16;ctx.save();ctx.globalAlpha=(1-k)*.3;ctx.strokeStyle='#e6d4a0';ctx.lineWidth=1.1;ctx.beginPath();ctx.arc(e.x,e.y,R+6*k,e.angle+Math.PI*.65,e.angle+Math.PI*1.35);ctx.stroke();ctx.restore();}
@@ -5986,7 +5995,7 @@ function BilliardsMode({onBack}){
    s.phase==='ready'&&h('p',{className:'bb-instructions'},'合計10を作ると、もう1打。つなげる玉は最大4個。'),
    !s.paused&&h('div',{className:'bb-levels','aria-label':'AIの強さ'},Object.entries(BB_CFG.levels).map(([id,c])=>h('button',{key:id,'aria-pressed':level===id,onClick:()=>setLevel(id)},c.label))),
    h('button',{className:'bb-primary',onClick:s.paused?resume:start},s.paused?'つづける':s.phase==='ended'?'もう一度':'はじめる'),h('button',{className:'bb-secondary',onClick:onBack},'ホームへ'),h('button',{className:'bb-secondary',onClick:toggleSound,'aria-pressed':!muted},muted?'効果音 OFF':'効果音 ON'),
-   h('details',null,h('summary',null,'あそびかた'),h('p',null,'数字の玉どうしがぶつかると結合。数字はそのまま残り、塊になって転がります。白い玉が塊に当たると全解除。2〜4個で合計10になると得点。5・4・1や5・3・2、5・5も完成です。合計10を超える組み合わせは結合せず跳ね返ります。'),h('p',null,'数字は1・4・5が各2個、2・3が各3個の計12個。白い玉は別に1個。全部バラバラで開始。相手が作った塊も使えます。15点先取で勝ち。'),h('p',null,'役なし1点、ワンペア2点、ツーペア3点、スリーカード4点、ストレート5点。5・4・1や5・3・2、5・5は役なし。2・2・2・4や1・3・3・3でスリーカード。ストレートは1・2・3・4です。'),h('p',null,'10を完成させるたびに手番が続きます。連続回数に上限はありません。10を作れなかったときに交代します。'),h('p',null,'完成した組み合わせの玉だけを、次に打つ人の相手が配置します。5個以上になる組み合わせや、4個で合計10にならない組み合わせも結合せず跳ね返ります。'),h('p',null,'引っぱる長さで強さを調節。引っぱり始めた位置の近くへ指を戻して離すと取り消せます。白い玉が壁際でも、盤面のどこからでも操作できます。'))))));
+   h('details',null,h('summary',null,'あそびかた'),h('p',null,'数字の玉どうしがぶつかると結合。数字はそのまま残り、塊になって転がります。白い玉が塊に1回当たると輪郭が金色から銅色になり、もう1回当たると分解します。2〜4個で合計10になると得点。5・4・1や5・3・2、5・5も完成です。合計10を超える組み合わせは結合せず跳ね返ります。'),h('p',null,'数字は1・4・5が各2個、2・3が各3個の計12個。白い玉は別に1個。全部バラバラで開始。相手が作った塊も使えます。15点先取で勝ち。'),h('p',null,'役なし1点、ワンペア2点、ツーペア3点、スリーカード4点、ストレート5点。5・4・1や5・3・2、5・5は役なし。2・2・2・4や1・3・3・3でスリーカード。ストレートは1・2・3・4です。'),h('p',null,'10を完成させるたびに手番が続きます。連続回数に上限はありません。10を作れなかったときに交代します。'),h('p',null,'完成した組み合わせの玉だけを、次に打つ人の相手が配置します。5個以上になる組み合わせや、4個で合計10にならない組み合わせも結合せず跳ね返ります。'),h('p',null,'引っぱる長さで強さを調節。引っぱり始めた位置の近くへ指を戻して離すと取り消せます。白い玉が壁際でも、盤面のどこからでも操作できます。'))))));
 }
 // ── END BILLIARDS UI ──
 

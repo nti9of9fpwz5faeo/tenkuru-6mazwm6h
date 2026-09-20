@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict');
 const {engine}=require('./rush-mode.cjs');
 const walk=(x,out=[])=>{if(x&&typeof x==='object'){out.push(x);(x.children||[]).flat(Infinity).forEach(y=>walk(y,out));}return out;};
-function start(){const e=engine();e.app.startRushBattle('normal');while(e.app.countNumR.current>=0)e.clock.advance(1);e.app.openRound();return e;}
+function start(){const e=engine();e.app.startChargeBattle('normal');while(e.app.countNumR.current>=0)e.clock.advance(1);e.app.openRound();return e;}
 const hasClass=(n,c)=>(n.props.className||'').split(' ').includes(c);
 {
  const e=engine(),{handNeighbor,handPath}=e.api;
@@ -65,7 +65,7 @@ const hasClass=(n,c)=>(n.props.className||'').split(' ').includes(c);
  a.setDealer([2]);e.clock.advance(2000);assert.equal(arrived,0);assert.equal(canceled,1);
  a.setDealer(Array(10).fill(2));a.cursorToCard(a.dIdsR.current[9],()=>arrived++,()=>true);
  a.goHome();e.clock.advance(2000);assert.equal(arrived,0);
- a.startRushBattle('normal');assert.equal(a.pCursorR.current,2);assert.equal(a.dCursorSlotR.current,2);
+ a.startChargeBattle('normal');assert.equal(a.pCursorR.current,2);assert.equal(a.dCursorSlotR.current,2);
 }
 // Side preference is validated and persisted, available from home and pause.
 {

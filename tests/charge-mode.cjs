@@ -156,6 +156,6 @@ for(const who of ['player','dealer']){
 {
  const e=deadlock();e.clock.advance(650);e.app.goHome();e.clock.advance(2000);assert.equal(e.app.phaseR.current,'charge');assert.equal(walk(e.render()).filter(n=>n.props.className==='charge-reset-notice').length,0);
  const last=start();last.clock.advance(59400);last.app.dealPlayer([1,5]);last.app.setDealer([1,5]);last.app.resolvePlay(5,[2,1],3,'dealer',1);last.clock.advance(600);assert.equal(last.app.phaseR.current,'gameEnd');assert.equal(last.app.pPtR.current,0);assert.equal(last.app.dPtR.current,0);
- const rush=engine();rush.app.startRushBattle('hard');while(rush.app.countNumR.current>=0)rush.clock.advance(1);rush.app.dealPlayer([1,5]);rush.app.setDealer([1,5]);rush.app.resolvePlay(5,[2,1],3,'dealer',1);rush.clock.advance(1500);assert.equal(rush.app.fieldSumR.current,8,'new rule is scoped to charge mode');
+ const rush=engine();rush.app.startRushBattle('hard');while(rush.app.countNumR.current>=0)rush.clock.advance(1);rush.app.dealPlayer([1,5]);rush.app.setDealer([1,5]);rush.app.resolvePlay(5,[2,1],3,'dealer',1);rush.clock.advance(1500);assert.equal(rush.app.fieldSumR.current,0,'v293: rush has no burst, so a stuck board resets like charge');
 }
 console.log('PASS: charge hand bars and single-row opponent; automatic deadlock reset preserving hands/charge/score/clock; fixed-center victory meter; exact/overshoot/burst 20-point-lead finishes; timed wins/draws; equal energy; CPU; pause/retry; saves.');

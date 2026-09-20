@@ -107,6 +107,14 @@ for(const when of ['countdown','settlement','break']){
  e.clock.advance(4100);assert.equal(e.app.rnR.current,2);
  const b=engine();b.app.stageOptsR.current={};b.app.phaseR.current='playing';b.app.pPtR.current=4;b.app.resolvePlay(5,[3,4],7,'player',1);assert.equal(b.app.pPtR.current,2);assert.equal(b.app.dPtR.current,0);
 }
-console.log('PASS: rush home entry; role scoring; uninterrupted deadline; burst; board reset; exact-deadline rejection; ties; both match winners; refill; leave/cancel; unchanged saves and normal rules.');
+// v293: rush has no burst. A card that would pass 10 bounces back and stays in hand; the CPU never plays past 10.
+{
+ const e=start();freshRound(e);e.app.dealPlayer([5,4,3,...Array(7).fill(null)]);e.app.setDealer([]);
+ e.app.playCard(0);e.clock.advance(400);e.app.playCard(1);e.clock.advance(400);
+ assert.equal(e.app.fieldSumR.current,9);
+ e.app.playCard(2);e.clock.advance(400);
+ assert.equal(e.app.fieldSumR.current,9,'over-10 card is bounced, not played');assert.equal(e.app.pHR.current[2],3,'bounced card stays in hand');assert.equal(e.app.dPtR.current,0,'no burst point');
+}
+console.log('PASS: rush home entry; role scoring; uninterrupted deadline; burst; v293 no-burst bounce; board reset; exact-deadline rejection; ties; both match winners; refill; leave/cancel; unchanged saves and normal rules.');
 
 }

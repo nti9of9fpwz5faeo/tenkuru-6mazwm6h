@@ -2334,6 +2334,13 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .energy-playing .gp-field-cards{display:flex;flex-wrap:nowrap;gap:calc(8 * var(--u));}
 .energy-field-slot{width:var(--card-w);height:calc(var(--card-w) * 1.4);flex:0 0 var(--card-w);border:calc(1.5 * var(--u)) dashed #87a7bc70;border-radius:calc(7 * var(--u));background:#ffffff20;}
 .gp-screen.cursor-playing.energy-playing>.gp-hand-area{grid-row:4;--card-w:calc(55 * var(--u));}
+/* v293 10秒ラッシュ：十字キーをなくして手札を直接タップ。下の操作列ぶん手札を下げる */
+.gp-screen.cursor-playing.rush-playing{grid-template-rows:calc(60 * var(--u)) calc(132 * var(--u)) minmax(calc(108 * var(--u)),1fr) calc(177 * var(--u));}
+.rush-playing .player-hand-slot{padding:0;border:0;background:transparent;font:inherit;color:inherit;touch-action:manipulation;cursor:pointer;}
+.rush-playing .player-hand-slot.empty{border:1px dashed #9aaec066;background:#ffffff20;}
+.rush-playing .player-hand-slot:active:not(:disabled){transform:scale(.96);}
+.rush-playing .player-hand-slot.rush-bounce{animation:rushBounce .32s ease;}
+@keyframes rushBounce{0%{transform:none;}25%{transform:translateY(calc(-18 * var(--u)));}55%{transform:translateY(calc(4 * var(--u)));}75%{transform:translateX(calc(-4 * var(--u)));}100%{transform:none;}}
 .energy-playing .player-hand-slot{padding:0;border:0;background:transparent;font:inherit;color:inherit;touch-action:manipulation;cursor:pointer;}
 .energy-playing .player-hand-slot.empty{border:1px dashed #9aaec066;}
 .energy-playing .player-hand-slot:disabled{cursor:default;}
@@ -3578,7 +3585,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v292'; // エナジー：押した札が手札から場へ移る（手札のその場所は空く）。10完成で空いた所に補充。10をこえたら場の札は手札に戻る。場の札を押しても手札に戻る
+const APP_VER='v293'; // 10秒ラッシュ：カーソル（十字キー）をやめて手札を直接タップに戻した。バーストを削除し、10をこえる札ははじき返す（相手も10こえは出さない）。他のモードは変更なし
+// const APP_VER='v292'; // エナジー：押した札が手札から場へ移る（手札のその場所は空く）。10完成で空いた所に補充。10をこえたら場の札は手札に戻る。場の札を押しても手札に戻る
 // const APP_VER='v291'; // エナジー：v290の「3回行動」を取り消して10秒制に戻した（v289と同じ遊び方）
 // const APP_VER='v290'; // エナジー：10秒制をやめて「10を3回つくったら放出」に（取り消し済み）
 // const APP_VER='v289'; // エナジー：札を1〜5（同じ数字は3枚まで）に修正。いつもの役（ワンペア〜ストレート）のボーナスエネルギーを追加（使った色それぞれに。量は EN_CFG.roleBonus）
@@ -4164,7 +4172,7 @@ function RushScreen({onBattle,onBack}){
     h('p',{className:'rush-eyebrow'},'TEN-KURU'),h('h1',null,'10秒ラッシュ'),
     h('p',{className:'rush-lead'},'取られても、すぐ取り返せる。'),
     h('div',{className:'rush-rule-grid'},h('div',null,h('b',null,'10秒'),'1ラウンド'),h('div',null,h('b',null,'5勝'),'先に取れば勝利')),
-    h('ul',{className:'rush-rules'},h('li',null,'10を作ると役の得点を獲得。場を空にして続行！'),h('li',null,'バーストは相手に1点。時間は止まらない。'),h('li',null,'10秒終了時、得点が多い側が1ラウンド獲得。'),h('li',null,'同点は引き分け。勝ち数は増えず、次へ。'),h('li',null,'手札は使い切ったら補充。各ラウンド開始時も配り直し。')),
+    h('ul',{className:'rush-rules'},h('li',null,'10を作ると役の得点を獲得。場を空にして続行！'),h('li',null,'10をこえる札ははじき返される。時間は止まらない。'),h('li',null,'10秒終了時、得点が多い側が1ラウンド獲得。'),h('li',null,'同点は引き分け。勝ち数は増えず、次へ。'),h('li',null,'手札は使い切ったら補充。各ラウンド開始時も配り直し。')),
     h('fieldset',{className:'rush-difficulty'},h('legend',null,'相手の強さ'),[['normal','ふつう'],['hard','むずかしい']].map(([value,label])=>h('label',{key:value},h('input',{type:'radio',name:'rush-difficulty',value,checked:diff===value,onChange:()=>setDiff(value)}),label))),
     h('button',{className:'rush-primary',onClick:()=>onBattle(diff)},'チャレンジする'),
     h('button',{className:'rush-secondary',onClick:onBack},'ホームへ')
@@ -5383,6 +5391,7 @@ function App(){
   const[phase,setPhase]=useState('menu');
   const[demoMode,setDemoMode]=useState(false);
   const[pH,setPH]=useState([]);
+  const[rushBounce,setRushBounce]=useState(null); // v293
   const[dH,setDH]=useState([]);
   const[field,setField]=useState([]);
   const[fieldColors,setFieldColors]=useState([]);
@@ -6536,7 +6545,7 @@ function App(){
         timeLeftR.current=left;setTimeLeft(Math.ceil(left));updateCharge();
         if(isSurvival())survivalTopUp(); // v263 予備から手札へ
         if(left<=0){if(isSurvival())finishSurvivalMatch();else if(isCharge())finishChargeMatch();else finishRushRound(rn);}
-        else if(isCharge()||isSurvival())checkChargeStuck();
+        else if(isCharge()||isSurvival()||isRush())checkChargeStuck(); // v293 ラッシュもバーストがなくなったので詰みは場をリセット
       };
       update();if(!rushClosedR.current)timerRef.current=setInterval(update,50);return;
     }
@@ -6559,7 +6568,7 @@ function App(){
   // Energy shortages are not deadlocks: a numerically safe card can wait for recharge.
   function checkChargeStuck(){
     const field=fieldR.current,flight=flyR.current;
-    if((!isCharge()&&!isSurvival())||phaseR.current!=='playing'||rushClosedR.current||pausedR.current||countNumR.current>=0||resolvingR.current||lockR.current||sceneOnR.current||pStopR.current||rStopR.current||eraseBusyR.current||!field.length){chargeStuckR.current=null;return;}
+    if((!isCharge()&&!isSurvival()&&!isRush())||phaseR.current!=='playing'||rushClosedR.current||pausedR.current||countNumR.current>=0||resolvingR.current||lockR.current||sceneOnR.current||pStopR.current||rStopR.current||eraseBusyR.current||!field.length){chargeStuckR.current=null;return;}
     // Wait for an ordinary empty-hand refill, and count a card still in flight.
     if(!pHR.current.some(v=>v!==null)||(!dHR.current.length&&!flight)){chargeStuckR.current=null;return;}
     const safe=v=>v!=null&&canPlay(v,fieldSumR.current,field)&&fieldSumR.current+v<=10;
@@ -7008,7 +7017,7 @@ function App(){
     const rf=dRingR.current;
     const eligible=i=>!isHoldRing(rf[i])&&dIdsR.current[i]!==r2PendingCardR.current&&dFrzR.current[dIdsR.current[i]]==null; // v246 凍った札は出せない
     const avail=dHand.filter((v,i)=>eligible(i)); // v79: 星環付きは温存。v121: レイピアが今タップした札は専用処理に任せる
-    const playable=avail.filter(v=>canPlay(v,cs,cf)&&(!isStandardEnergy()||energyR.current.dealer+1e-9>=v));
+    const playable=avail.filter(v=>canPlay(v,cs,cf)&&(!isRush()||cs+v<=10)&&(!isStandardEnergy()||energyR.current.dealer+1e-9>=v));
     if(denyActive())oLog('call');
     if(!playable.length){if(denyActive())oLog('no_playable');scheduleAi(rn);return;}
     const wins=playable.filter(v=>cs+v===10);
@@ -7050,7 +7059,7 @@ function App(){
     // v121: この時点で選んだ固有IDを、カーソル→タップ→飛行→着地まで選び直さない。
     const ok=cursorToCard(cardId,()=>commitDealerPlay({id:cardId,value:chosen},rn),()=>{
       const j=dIdsR.current.indexOf(cardId);
-      return phaseR.current==='playing'&&!resolvingR.current&&countNumR.current<0&&!pausedR.current&&j>=0&&!isHoldRing(dRingR.current[j])&&dIdsR.current[j]!==r2PendingCardR.current&&canPlay(dHR.current[j],fieldSumR.current,fieldR.current);
+      return phaseR.current==='playing'&&!resolvingR.current&&countNumR.current<0&&!pausedR.current&&j>=0&&!isHoldRing(dRingR.current[j])&&dIdsR.current[j]!==r2PendingCardR.current&&canPlay(dHR.current[j],fieldSumR.current,fieldR.current)&&(!isRush()||fieldSumR.current+dHR.current[j]<=10);
     },()=>{if(phaseR.current==='playing'&&!resolvingR.current)scheduleAi(rn);});
     if(!ok)scheduleAi(rn);
   }
@@ -7061,7 +7070,7 @@ function App(){
     if(flyR.current||resolvingR.current||(linkR.current&&!rStopR.current)||sceneOnR.current||eraseBusyR.current||pausedR.current){if(phaseR.current==='playing'&&!resolvingR.current)scheduleAi(rn);return;}
     const idx=dIdsR.current.indexOf(pick.id);
     const dHand=dHR.current,rf=dRingR.current,cf=fieldR.current,cs=fieldSumR.current;
-    if(idx<0||dHand[idx]!==pick.value||isHoldRing(rf[idx])||pick.id===r2PendingCardR.current||dFrzR.current[pick.id]!=null||!canPlay(dHand[idx],cs,cf)||countNumR.current>=0){scheduleAi(rn);return;}
+    if(idx<0||dHand[idx]!==pick.value||isHoldRing(rf[idx])||pick.id===r2PendingCardR.current||dFrzR.current[pick.id]!=null||!canPlay(dHand[idx],cs,cf)||(isRush()&&cs+dHand[idx]>10)||countNumR.current>=0){scheduleAi(rn);return;}
     if(!spendCharge('dealer')){scheduleAi(rn);return;}
     if(!spendEnergy('dealer',pick.value)){scheduleAi(rn);return;}
     const chosen=dHand[idx],pickedRf=rf[idx];
@@ -7089,7 +7098,7 @@ function App(){
       if(isTimedMode()&&rushExpired())return;
       flyR.current=null;
       const cf2=fieldR.current,cs2=fieldSumR.current;
-      const ok=phaseR.current==='playing'&&countNumR.current<0&&!resolvingR.current&&!eraseBusyR.current&&!pausedR.current&&!pStopR.current&&canPlay(f.value,cs2,cf2); // v137: 時間停止中は着地させず手札へ返す（10超えはバーストとして着地する）
+      const ok=phaseR.current==='playing'&&countNumR.current<0&&!resolvingR.current&&!eraseBusyR.current&&!pausedR.current&&!pStopR.current&&canPlay(f.value,cs2,cf2)&&!(isRush()&&cs2+f.value>10); // v293 ラッシュは10こえを着地させず手札へ返す / v137: 時間停止中は着地させず手札へ返す（10超えはバーストとして着地する）
       if(!ok){ // 戻す
         setFlyCard(c=>c?{...c,back:true}:c);setTimeout(()=>setFlyCard(null),380);
         refundCharge(f);const h2=[...dHR.current,f.value],r2=[...dRingR.current,f.rf||false],ids2=[...dIdsR.current,f.id];setDealer(h2,r2,ids2);
@@ -7146,6 +7155,10 @@ function App(){
     if(confuseR.current[idx]!=null){value=confuseR.current[idx];} // v112: 幻惑中は見えてる数字が出る
     // v163: バースト制に戻す。canPlayが通す手はそのまま出せる（10超えはバースト）
     if(!value||!canPlay(value,cs,cf))return;
+    if(isRush()&&cs+value>10){ // v293 10秒ラッシュ：バーストなし。10をこえる札ははじき返す
+      try{resumeAC();}catch(e){}
+      setRushBounce({i:idx,k:Date.now()});setTimeout(()=>setRushBounce(null),330);return;
+    }
     if(cs+value>10&&COLLISION_MS>0&&Date.now()-dLandAtR.current<COLLISION_MS){ // v179 相手の札が落ちた直後の事故バースト → 返却
       if(!bounceMsgR.current){bounceMsgR.current=true;fxCollisionStamp();setTimeout(()=>{bounceMsgR.current=false;},900);}
       return;
@@ -7555,11 +7568,12 @@ function App(){
         Array.from({length:5},(_,col)=>{
           const i=row*5+col,v=pH[i]??null,dv=confuse[i]!=null?confuse[i]:v,dk=lantern&&!lantern.lit.includes(i);
           const unavailable=v==null||chargeEmpty||(standardEnergy&&energy.player+1e-9<dv)||countNum>=0||!canPlay(dv,fieldSum,field)||rStop||!!pLock[i]||pFrz[i]!=null||(cmdIdx!=null&&cmdIdx!==i);
-          return h(standardEnergy?'button':'div',{key:i,type:standardEnergy?'button':undefined,onClick:standardEnergy?()=>playCard(i):undefined,disabled:standardEnergy?(unavailable||paused||resolvingR.current||lockR.current):undefined,className:'player-hand-slot'+(v==null?' empty':'')+(!standardEnergy&&pCursor===i?' selected':''),'data-slot':i,'aria-label':v==null?'空き枠':(dk?'裏向き':dv)+'のカード','aria-current':!standardEnergy&&pCursor===i?'true':undefined},
+          const directTap=standardEnergy||so.rush; // v293 ラッシュはカーソルをやめて直接タップ
+          return h(directTap?'button':'div',{key:i,type:directTap?'button':undefined,onClick:standardEnergy?()=>playCard(i):so.rush?()=>{if(countNumR.current>0){countSkipR.current&&countSkipR.current();return;}if(skipR.current&&resolvingR.current){skipR.current();return;}playCard(i);}:undefined,disabled:standardEnergy?(unavailable||paused||resolvingR.current||lockR.current):so.rush?(v==null||paused):undefined,className:'player-hand-slot'+(v==null?' empty':'')+(!directTap&&pCursor===i?' selected':'')+(so.rush&&rushBounce&&rushBounce.i===i?' rush-bounce':''),'data-slot':i,'aria-label':v==null?'空き枠':(dk?'裏向き':dv)+'のカード','aria-current':!directTap&&pCursor===i?'true':undefined},
             v!=null&&h(SlideCard,{value:dk?'?':dv,dark:dk,onPlay:()=>{},disabled:unavailable,cardState:countNum>=0?null:handCardState(dv,fieldSum,field),frozen:pFrz[i],justFrozen:justFrz.includes(i),pRing:pRing===i,shuffling:shufAll,marked:marked.includes(i),newRefill:so.survival&&survivalReward&&survivalReward.who==='player'&&performance.now()<survivalReward.until&&survivalReward.slots.includes(i),cardRole:'player',isSpecial:!!pSp[i],linkPick:linkMode&&canPlay(dv,fieldSum,field),rLock:!!pLock[i],rCmd:cmdIdx===i,rWait:cmdIdx!=null&&cmdIdx!==i,confused:confuse[i]!=null}));
         }))))
     ),
-    standardEnergy?h(EnergyMeter,{value:energy.player,reward:energyReward}):h(HandControls,{side:controlSide,onMove:movePlayerCursor,onPlay:playSelectedCard,canMove:playerCanNavigate(),canPlay:!paused&&(countNum>0||skipOn||(!pMoving&&playerCanNavigate()&&selectedPlayable)),playLabel:countNum>0?'開始':skipOn?'次へ':'出す'}),
+    standardEnergy?h(EnergyMeter,{value:energy.player,reward:energyReward}):so.rush?null:h(HandControls,{side:controlSide,onMove:movePlayerCursor,onPlay:playSelectedCard,canMove:playerCanNavigate(),canPlay:!paused&&(countNum>0||skipOn||(!pMoving&&playerCanNavigate()&&selectedPlayable)),playLabel:countNum>0?'開始':skipOn?'次へ':'出す'}),
 
     // SPACER (below hand)
     h('div',{className:'gp-spacer'})

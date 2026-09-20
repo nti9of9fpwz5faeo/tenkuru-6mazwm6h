@@ -2180,6 +2180,7 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .fall-hand{display:grid;grid-template-columns:repeat(5,auto);gap:6px 8px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.6);box-shadow:0 4px 16px rgba(70,100,150,.12);}
 .fall-hand.shuf .fall-hcard{animation:fallShuf .4s ease;}
 @keyframes fallShuf{0%{transform:translateX(-8px);opacity:.3}100%{transform:none;opacity:1}}
+.fall-play .fall-hand{margin-top:14px;} /* v298 手札（数字ボタン）と場の間を少しだけ空ける */
 .fall-hcard{background:none;border:none;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .fall-hcard:active{transform:scale(.94);}
 .fall-hcard.shake{animation:fallShake .32s ease;}
@@ -3624,7 +3625,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v297'; // セパレート（試作）：場を2人で分ける。自分の札は自分の場だけ、ぴったり10で役の点、10こえははじき返す、相手が10を作ると自分の場はリセット（札は捨て）、先に15点で勝ち。出せる札がなければその場をリセット。数値は SEP_CFG
+const APP_VER='v298'; // テンフォール：手札10枚をやめて1〜5の数字ボタン5つに（何回でも押せる・押した数字が下のマスの左から入る）。入れ替えスワイプと案内文は削除。落ち札・💥・点数はそのまま
+// const APP_VER='v297'; // セパレート（試作）：場を2人で分ける。自分の札は自分の場だけ、ぴったり10で役の点、10こえははじき返す、相手が10を作ると自分の場はリセット（札は捨て）、先に15点で勝ち。出せる札がなければその場をリセット。数値は SEP_CFG
 // const APP_VER='v296'; // 通常ステージ・チャレンジを十字キー前の元の対戦に戻した：元のラウンド制（点数先取・バーストあり）、札を直接タップ、元の画面レイアウト。エネルギーゲージ（v286/v287）は停止（ENERGY_CFG.enabled）。ラッシュのバーストなし・チャージ/サバイバルの十字キーはそのまま
 // const APP_VER='v295'; // 10秒ラッシュ・通常ステージの対戦画面を v281 以前の見た目に戻した（cursor-playing の固定グリッドを外す）。チャージ・サバイバル・チャレンジはそのまま
 // const APP_VER='v294'; // 通常ステージ（エリア1、チャレンジ以外）も10秒ラッシュの遊び方に：10秒×5ラウンド先取、手札は直接タップ、バーストなし（10こえははじき返す）。相手の強さはステージのまま
@@ -5003,7 +5005,7 @@ function FallMode({onBack}){
   const S=useRef(null);
   const[,setTick]=useState(0);
   const swipeR=useRef(null),swipedR=useRef(false);
-  function fresh(){return{phase:'ready',row:[null,null,null,null],falls:[],hand:createDeck(),score:0,nextSpawn:0,count:null,clearUntil:0,flash:null,shake:-1,shakeUntil:0,id:1,best:0,tens:0,booms:0,fallUsed:0};}
+  function fresh(){return{phase:'ready',row:[null,null,null,null],falls:[],hand:[1,2,3,4,5],score:0,nextSpawn:0,count:null,clearUntil:0,flash:null,shake:-1,shakeUntil:0,id:1,best:0,tens:0,booms:0,fallUsed:0};}
   if(!S.current)S.current=fresh();
   function start(){const best=S.current.best;S.current=fresh();const s=S.current;s.best=best;const now=performance.now();s.phase='play';s.nextSpawn=now+600;s.last=now;try{playGoSE();}catch(e){}setTick(t=>t+1);}
   function flash(kind,text,sub){S.current.flash={kind,text,sub,at:performance.now()};}
@@ -5025,7 +5027,7 @@ function FallMode({onBack}){
     const k=s.row.findIndex(c=>!c);if(k<0)return;
     const v=s.hand[i],vals=s.row.map(c=>c?c.v:null),before=vals.reduce((a,x)=>a+(x||0),0),sum=before+v;
     if(sum>10||!canPlay(v,before,vals)){s.shake=i;s.shakeUntil=now+320;try{playMissSE();}catch(e){}setTick(t=>t+1);return;}
-    s.row[k]={v,from:'me'};s.count=null;s.hand[i]=fallRand();try{playPlaceSE(true);}catch(e){} // v277 落ちてる札は消さない（フリーズするだけ）
+    s.row[k]={v,from:'me'};s.count=null;try{playPlaceSE(true);}catch(e){} // v298 手札は1〜5のボタン固定（使っても変わらない） / v277 落ちてる札は消さない（フリーズするだけ）
     if(sum===10)resolve('ten');setTick(t=>t+1);}
   function quit(){const s=S.current;if(s.phase!=='play')return;s.phase='end';s.best=Math.max(s.best,s.score);try{playWinSE(false);}catch(e){}setTick(t=>t+1);}
   function shuffle(){const s=S.current;if(s.phase!=='play')return;s.hand=createDeck();s.shufAt=performance.now();try{fxAir();}catch(e){}setTick(t=>t+1);}
@@ -5053,7 +5055,7 @@ function FallMode({onBack}){
     return h('main',{className:'rush-screen fall-screen'},h('section',{className:'rush-card'},
       h('p',{className:'rush-eyebrow'},'TEN-KURU · お試し'),h('h1',null,s.phase==='end'?'しゅうりょう':'テンフォール'),
       s.phase==='end'?h('div',{className:'fall-result'},h('b',null,s.score),h('span',null,'pt'),h('p',null,'10完成 '+s.tens+'回　💥 '+s.booms+'回　落ち札 '+s.fallUsed+'枚'),s.best>0&&h('p',null,'ベスト '+s.best+'pt'))
-        :h('ul',{className:'rush-rules'},h('li',null,'4つのレーンに札がゆっくり落ちてくる。時間制限なし、やめるまで続く。'),h('li',null,'下の4マスを左から順に埋めて、合計10を作る（何枚でもOK）。役もいつも通り。'),h('li',null,'着地した札は'+FALL_CFG.countMs/1000+'秒カウント。すぐ右に手札を出せば止まる。'),h('li',null,'空いたマスを飛ばして着地・カウント切れ・10を超えると💥　札が確定したレーンの落ち札は止まる。'),h('li',null,'落ちてきた札を使うほど高得点。手札は左→右になぞると入れ替わる。')),
+        :h('ul',{className:'rush-rules'},h('li',null,'4つのレーンに札がゆっくり落ちてくる。時間制限なし、やめるまで続く。'),h('li',null,'下の4マスを左から順に埋めて、合計10を作る（何枚でもOK）。役もいつも通り。'),h('li',null,'着地した札は'+FALL_CFG.countMs/1000+'秒カウント。すぐ右に数字を出せば止まる。'),h('li',null,'空いたマスを飛ばして着地・カウント切れ・10を超えると💥　札が確定したレーンの落ち札は止まる。'),h('li',null,'落ちてきた札を使うほど高得点。下の1〜5のボタンで好きな数字を何回でも出せる。')),
       h('button',{className:'rush-primary',onClick:start},s.phase==='end'?'もう一度':'はじめる'),h('button',{className:'rush-secondary',onClick:onBack},'ホームへ')));
   }
   const sum=s.row.reduce((a,c)=>a+(c?c.v:0),0);
@@ -5075,12 +5077,8 @@ function FallMode({onBack}){
         return h('div',{key:'f'+f.id,className:'fall-card'+(s.row[f.lane]?' frz':''),style:{left:U(f.lane*laneW+(laneW-cardW)/2),top:U(y)}},card(f.v,'dealer'));}),
       fl&&h('div',{key:'fl'+fl.at,className:'fall-flash '+fl.kind,style:{top:U(laneH-70)}},h('b',null,fl.text),fl.sub&&h('span',null,fl.sub))),
     h('div',{className:'fall-sum'},'合計 ',h('b',{className:sum>0?'on':''},sum),' / 10'),
-    h('div',{className:'fall-hand'+(s.shufAt&&now-s.shufAt<400?' shuf':''),
-      onTouchStart:e=>{const t=e.touches[0];swipeR.current={x:t.clientX,y:t.clientY};swipedR.current=false;},
-      onTouchMove:e=>{const st=swipeR.current;if(!st||swipedR.current)return;const t=e.touches[0];if(t.clientX-st.x>70&&Math.abs(t.clientY-st.y)<55){swipedR.current=true;shuffle();}},
-      onTouchEnd:()=>{swipeR.current=null;setTimeout(()=>{swipedR.current=false;},260);}},
-      s.hand.map((v,i)=>h('button',{key:'h'+i,className:'fall-hcard'+(s.shake===i&&now<s.shakeUntil?' shake':''),onClick:()=>tap(i)},card(v,'player',{'--card-w':U(56)})))),
-    h('div',{className:'fall-hint'},'← 手札を左から右になぞると入れ替え →'));
+    h('div',{className:'fall-hand'}, // v298 1〜5の数字ボタン（入れ替えスワイプは廃止）
+      s.hand.map((v,i)=>h('button',{key:'h'+i,className:'fall-hcard'+(s.shake===i&&now<s.shakeUntil?' shake':''),onClick:()=>tap(i),'aria-label':v+'を出す'},card(v,'player',{'--card-w':U(58)})))));
 }
 // ── v280 ひとりモード（仮）：相手なし。場の札に手札を足して10。完成したら右上の「次の札」が場に出る（先の先まで見えている） ──
 const SOLO_CFG={

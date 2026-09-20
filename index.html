@@ -3585,7 +3585,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v294'; // 通常ステージ（エリア1、チャレンジ以外）も10秒ラッシュの遊び方に：10秒×5ラウンド先取、手札は直接タップ、バーストなし（10こえははじき返す）。相手の強さはステージのまま
+const APP_VER='v295'; // 10秒ラッシュ・通常ステージの対戦画面を v281 以前の見た目に戻した（cursor-playing の固定グリッドを外す）。チャージ・サバイバル・チャレンジはそのまま
+// const APP_VER='v294'; // 通常ステージ（エリア1、チャレンジ以外）も10秒ラッシュの遊び方に：10秒×5ラウンド先取、手札は直接タップ、バーストなし（10こえははじき返す）。相手の強さはステージのまま
 // const APP_VER='v293'; // 10秒ラッシュ：カーソル（十字キー）をやめて手札を直接タップに戻した。バーストを削除し、10をこえる札ははじき返す（相手も10こえは出さない）。他のモードは変更なし
 // const APP_VER='v292'; // エナジー：押した札が手札から場へ移る（手札のその場所は空く）。10完成で空いた所に補充。10をこえたら場の札は手札に戻る。場の札を押しても手札に戻る
 // const APP_VER='v291'; // エナジー：v290の「3回行動」を取り消して10秒制に戻した（v289と同じ遊び方）
@@ -7394,7 +7395,7 @@ function App(){
   const selectedPlayable=selectedValue!=null&&!chargeEmpty&&canPlay(selectedValue,fieldSum,field)&&!pLock[pCursor]&&pFrz[pCursor]==null&&(cmdIdx==null||cmdIdx===pCursor);
   const rival=(form2&&so.form2Name)||so.rivalName||'DEALER';
   // v62: 第7は「ルナ」／v70: 第2形態は「レイピア」
-  return h('div',{className:'gp-screen cursor-playing'+(standardEnergy?' energy-playing':'')+(so.charge?' charge-playing':'')+(so.survival?' survival-playing':'')+(so.rush?' rush-playing':'')+(endHold?' end-hold':'')+(so.challenge?' ch7':'')+(so.ch8?' ch8':'')+(so.ch9?' ch9':'')+(so.ch10?' ch10':'')+(form2?' f2':'')+(screenPop?' form2-pop':'')+(lkFx?' lk-on':'')},
+  return h('div',{className:'gp-screen'+(so.rush?'':' cursor-playing')+(standardEnergy?' energy-playing':'')+(so.charge?' charge-playing':'')+(so.survival?' survival-playing':'')+(so.rush?' rush-playing':'')+(endHold?' end-hold':'')+(so.challenge?' ch7':'')+(so.ch8?' ch8':'')+(so.ch9?' ch9':'')+(so.ch10?' ch10':'')+(form2?' f2':'')+(screenPop?' form2-pop':'')+(lkFx?' lk-on':'')},
     h(ChampionLayer,{champ:stageOptsR.current&&stageOptsR.current.champion?CHAMPIONS[stageOptsR.current.champion]:null}), // v61 チャンピオン戦は立ち絵
     so.challenge&&h('div',{className:'champ-layer'},
       form2

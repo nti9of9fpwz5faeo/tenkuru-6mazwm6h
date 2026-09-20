@@ -1,7 +1,7 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
-const html=fs.readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8'),source=html.split('// ── BILLIARDS ENGINE v305 ──')[1].split('// ── END BILLIARDS ENGINE ──')[0],ctx={Math,performance};vm.createContext(ctx);
-vm.runInContext(html.slice(html.indexOf('function calcPts(cards){'),html.indexOf('// v286: normal battles'))+source+';this.api={BB_CFG,bbRole,bbBody,bbPoints,bbCreate,bbStart,bbShoot,bbPhysics,bbStep,bbJoin,bbBreak,bbPlace,bbValidPlacement,bbPlacementOptions,bbChoosePlacement,bbCandidates,bbEvaluate,bbRay};',ctx);
-const {BB_CFG,bbRole,bbBody,bbPoints,bbCreate,bbStart,bbShoot,bbPhysics,bbStep,bbJoin,bbBreak,bbPlace,bbValidPlacement,bbPlacementOptions,bbChoosePlacement,bbCandidates,bbEvaluate,bbRay}=ctx.api;
+const html=fs.readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8'),source=html.split('// ── BILLIARDS ENGINE v306 ──')[1].split('// ── END BILLIARDS ENGINE ──')[0],ctx={Math,performance};vm.createContext(ctx);
+vm.runInContext(html.slice(html.indexOf('function calcPts(cards){'),html.indexOf('// v286: normal battles'))+source+';this.api={BB_CFG,bbRole,bbBody,bbPoints,bbCreate,bbStart,bbShoot,bbPhysics,bbStep,bbJoin,bbBreak,bbFollowingPlayer,bbPlace,bbValidPlacement,bbPlacementOptions,bbChoosePlacement,bbCandidates,bbEvaluate,bbRay};',ctx);
+const {BB_CFG,bbRole,bbBody,bbPoints,bbCreate,bbStart,bbShoot,bbPhysics,bbStep,bbJoin,bbBreak,bbFollowingPlayer,bbPlace,bbValidPlacement,bbPlacementOptions,bbChoosePlacement,bbCandidates,bbEvaluate,bbRay}=ctx.api;
 function game(parts){const s=bbCreate('normal',()=>.5);s.bodies=parts.map((b,i)=>bbBody(i+1,b[0],b[1],b[2].map((n,j)=>({x:j*40,y:0,n}))));s.nextId=100;bbStart(s);return s;}
 function settle(s){for(let i=0;i<1300&&s.moving;i++)bbStep(s);assert.equal(s.moving,false);}
 function placeAll(s){const who=s.placer;while(s.placing){const p=bbChoosePlacement(s,()=>.5);assert(p);assert(bbPlace(s,who,p.x,p.y));}}
@@ -21,10 +21,17 @@ const survivors=JSON.stringify(s.bodies),inventory=numbers(s);assert(bbPlace(s,0
 // All five ranks receive the correct points. BOTH players get an extra shot for 5+5 too.
 for(const [values,points,label]of [[[5,5],1,'役なし'],[[1,1,3,5],2,'ワンペア'],[[2,2,3,3],3,'ツーペア'],[[1,3,3,3],4,'スリーカード'],[[1,2,3,4],5,'ストレート']]){const role=bbRole(values);assert.equal(role.points,points);assert.equal(role.label,label);for(const who of [0,1]){
  s=game([[220,600,[0]],[80,100,[values[0]]],[180,100,values.slice(1)]]);s.turn=who;const all=numbers(s);bbShoot(s,Math.PI/2,.08);bbJoin(s,s.bodies[1],s.bodies[2]);settle(s);assert.equal(s.placer,1-who);assert.equal(s.returnBalls.length,values.length);assert.equal(s.scores[who],points);assert.equal(s.events.filter(e=>e.kind==='bonus').length,0);placeAll(s);assert.equal(s.turn,who);assert.equal(s.shots,1);assert.deepEqual(numbers(s),all);assert.equal(s.events.filter(e=>e.kind==='bonus').length,1);
- // A second ten yields points and opponent placement, but never a third consecutive shot.
+ // A second ten still retains the same player, with placement by the next shooter's opponent.
  s.bodies=[s.bodies[0],bbBody(300,80,100,[{x:0,y:0,n:values[0]}]),bbBody(301,180,100,values.slice(1).map((n,i)=>({x:i*40,y:0,n})))];
- bbShoot(s,Math.PI/2,.08);bbJoin(s,s.bodies[1],s.bodies[2]);settle(s);assert.equal(s.placer,1-who);placeAll(s);assert.equal(s.turn,1-who);assert.equal(s.shots,0);assert.equal(s.scores[who],points*2);assert.equal(s.events.filter(e=>e.kind==='bonus').length,1);
+ bbShoot(s,Math.PI/2,.08);bbJoin(s,s.bodies[1],s.bodies[2]);settle(s);assert.equal(s.placer,1-who);assert.equal(s.nextShooter,who);assert.notEqual(s.placer,s.nextShooter);placeAll(s);assert.equal(s.turn,who);assert.equal(s.shots,2);assert.equal(s.scores[who],points*2);assert.equal(s.events.filter(e=>e.kind==='bonus').length,2);
 }}
+// Long no-role streaks retain both players through shot 8, then a miss hands over.
+for(const who of [0,1]){s=game([[220,600,[0]],[80,100,[5]],[150,100,[5]]]);s.turn=who;
+ for(let shot=1;shot<=8;shot++){s.bodies=[bbBody(1,220,600,[{x:0,y:0,n:0}]),bbBody(2,80,100,[{x:0,y:0,n:5}]),bbBody(3,150,100,[{x:0,y:0,n:5}])];bbShoot(s,Math.PI/2,.08);bbJoin(s,s.bodies[1],s.bodies[2]);settle(s);assert.equal(s.nextShooter,who);assert.equal(s.placer,1-who);const p=bbPlacementOptions(s)[0];assert(!bbPlace(s,who,p.x,p.y));placeAll(s);assert.equal(s.turn,who);assert.equal(s.shots,shot);assert.equal(s.scores[who],shot);}
+ s.bodies=[bbBody(1,220,600,[{x:0,y:0,n:0}]),bbBody(2,80,100,[{x:0,y:0,n:1}])];bbShoot(s,Math.PI/2,.08);settle(s);assert.equal(s.turn,1-who);assert.equal(s.shots,0);
+}
+// Placement ownership follows the computed NEXT player, even for a handover with a pending return.
+for(const who of [0,1]){s=game([[220,600,[0]]]);s.turn=who;s.returnBalls=[1];bbShoot(s,Math.PI/2,.08);settle(s);assert.equal(s.nextShooter,1-who);assert.equal(s.placer,who);placeAll(s);assert.equal(s.turn,1-who);assert.equal(s.shots,0);}
 // Multiple tens in one shot all return to the opposing placer, with just one bonus shot.
 s=game([[220,600,[0]],[80,100,[5]],[150,100,[5]],[80,260,[1]],[150,260,[3,3,3]]]);const multi=numbers(s);bbShoot(s,Math.PI/2,.08);bbJoin(s,s.bodies[1],s.bodies[2]);bbJoin(s,s.bodies[1],s.bodies[2]);settle(s);assert.equal(s.returnBalls.length,6);assert.equal(s.scores[0],5);placeAll(s);assert.equal(s.events.filter(e=>e.kind==='bonus').length,1);assert.deepEqual(numbers(s),multi);
 // Numeric >10 contact bounces rather than joining. White does not contact this cluster.
@@ -37,4 +44,4 @@ s=game([[220,600,[0]],[80,100,[5]],[150,100,[5]]]);s.scores[0]=14;bbShoot(s,Math
 s=game([[220,530,[0]],[220,390,[5]],[220,260,[5]]]);s.turn=1;snapshot=JSON.stringify(s);let best=-Infinity;for(const c of bbCandidates(s).slice(0,60))best=Math.max(best,bbEvaluate(s,c));assert(best>=200);assert.equal(JSON.stringify(s),snapshot);assert(bbRay(s,-Math.PI/2)<140);
 // Repeated real shots/placements conserve all 12 numbers; boundaries and finite physics hold.
 s=bbCreate('normal',()=>.5);bbStart(s);const twelve=numbers(s);for(let shot=0;shot<35;shot++){assert(bbShoot(s,shot*2.399,.6+(shot%3)*.2));settle(s);assert.deepEqual(numbers(s),twelve);if(s.phase==='ended')break;placeAll(s);for(const b of s.bodies)for(const p of bbPoints(b)){assert(Number.isFinite(p.x)&&Number.isFinite(p.y));assert(p.x>=19&&p.x<=421,JSON.stringify(p));assert(p.y>=19&&p.y<=s.h-19,JSON.stringify(p));}assert.deepEqual(numbers(s),twelve);}
-console.log('PASS: cue breaks all components, no instant rejoin, numeric completion, both placers, invalid/pause guards, all-role bonuses including 5+5, cap of two, multi-ten queue, no auto-refill, win, AI, 35-shot conservation and stability.');
+console.log('PASS: cue breaks all components, no instant rejoin, numeric completion, both placers, invalid/pause guards, all-role bonuses including 5+5, unlimited streaks, next-shooter-based placement, multi-ten queue, no auto-refill, win, AI, 35-shot conservation and stability.');

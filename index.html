@@ -3573,7 +3573,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v288'; // エナジー（試作）：手札10枚（数字＋光/緑/赤）。最初の札で10秒→合計10で使った札の色にエネルギー（同色2枚以上ボーナス、全部同色で強ボーナス）→10秒後に放出してモンスターにダメージ。弱点なし。数値は EN_CFG
+const APP_VER='v289'; // エナジー：札を1〜5（同じ数字は3枚まで）に修正。いつもの役（ワンペア〜ストレート）のボーナスエネルギーを追加（使った色それぞれに。量は EN_CFG.roleBonus）
+// const APP_VER='v288'; // エナジー（試作）：手札10枚（数字＋光/緑/赤）。最初の札で10秒→合計10で使った札の色にエネルギー（同色2枚以上ボーナス、全部同色で強ボーナス）→10秒後に放出してモンスターにダメージ。弱点なし。数値は EN_CFG
 // const APP_VER='v287'; // 通常対戦：相手のエネルギーを場の上に表示（手札は非表示のまま）
 // const APP_VER='v284'; // サイコロ：AIを超弱体化（考える間隔 2.6〜4.2秒、賢い手は30%だけ・残りはでたらめ。数値は DICE_CFG の aiMinMs/aiJitterMs/aiSmartRate）
 // const APP_VER='v283'; // サイコロ試作モード追加（既存モードは変更なし）
@@ -5239,21 +5240,24 @@ function DicePad({index,enabled,onRoll}){
   h('span',{className:'dc-pad-label'},index===2?'LEFT':'RIGHT'));
 }
 // v288: エナジーモード（試作）。手札10枚（数字＋光/緑/赤）→最初の札で10秒スタート→合計10でエネルギー→10秒後に放出してモンスターにダメージ。数値は EN_CFG
-const EN_CFG={roundMs:10000,monsterHp:120,dmgPerEnergy:1,perCard:1,pairBonus:2,allBonus:5,releaseMs:1400,hitAtMs:650,maxVisual:24,colors:['light','green','red']};
+const EN_CFG={roundMs:10000,monsterHp:120,dmgPerEnergy:1,perCard:1,pairBonus:2,allBonus:5,roleBonus:{'役なし':0,'ワンペア':2,'ツーペア':4,'スリーカード':6,'ストレート':8},releaseMs:1400,hitAtMs:650,maxVisual:24,colors:['light','green','red']};
 const EN_COLOR={light:{name:'光',main:'#f3cf63',deep:'#a57b12',bg:'linear-gradient(160deg,#fffbe8,#f7e3a0)',img:'img/energy-light.webp'},green:{name:'緑',main:'#39b964',deep:'#17693a',bg:'linear-gradient(160deg,#f0fff4,#b5ebc6)',img:'img/energy-green.webp'},red:{name:'赤',main:'#e4513e',deep:'#8e2218',bg:'linear-gradient(160deg,#fff3f0,#f6bcb2)',img:'img/energy-red.webp'}};
 let enSerial=0;
-function enCard(random=Math.random){return{id:++enSerial,n:1+Math.floor(random()*9),c:EN_CFG.colors[Math.floor(random()*EN_CFG.colors.length)]};}
+// 札はいつものテンクルと同じ1〜5、手札の中で同じ数字は3枚まで（createDeck と同じ決まり）
+function enCard(rest=[],random=Math.random){const ok=[1,2,3,4,5].filter(v=>rest.filter(c=>c.n===v).length<3);return{id:++enSerial,n:ok[Math.floor(random()*ok.length)],c:EN_CFG.colors[Math.floor(random()*EN_CFG.colors.length)]};}
+function enDeal(random=Math.random){const hd=[];while(hd.length<10)hd.push(enCard(hd,random));return hd;}
 function enGain(cards){
- // 使った札の色にそれぞれ平等に1ずつ。同じ色が2枚以上ならその色にボーナス、全部同じ色ならもっと強いボーナス
+ // ①使った札の色にそれぞれ平等に1ずつ ②役（いつもの calcPts）のボーナスを使った色それぞれに ③同じ色が2枚以上ならその色にボーナス、全部同じ色ならもっと強いボーナス
  const g={light:0,green:0,red:0},cnt={light:0,green:0,red:0};
  cards.forEach(c=>{g[c.c]+=EN_CFG.perCard;cnt[c.c]++;});
- const used=Object.keys(cnt).filter(k=>cnt[k]>0);
+ const used=Object.keys(cnt).filter(k=>cnt[k]>0),role=calcPts(cards.map(c=>c.n)).voice,rb=EN_CFG.roleBonus[role]||0;
+ used.forEach(k=>{g[k]+=rb;});
  if(used.length===1)g[used[0]]+=EN_CFG.allBonus;
  else used.forEach(k=>{if(cnt[k]>=2)g[k]+=EN_CFG.pairBonus;});
- return{g,bonus:used.length===1?'all':used.some(k=>cnt[k]>=2)?'pair':null};
+ return{g,role,bonus:used.length===1?'all':used.some(k=>cnt[k]>=2)?'pair':null};
 }
 function EnergyMode({onBack}){
- const[hand,setHand]=useState(()=>Array.from({length:10},()=>enCard()));
+ const[hand,setHand]=useState(()=>enDeal());
  const[sel,setSel]=useState([]);
  const[en,setEn]=useState({light:0,green:0,red:0});
  const[phase,setPhase]=useState('idle'); // idle→rush→release→idle / win
@@ -5276,12 +5280,12 @@ function EnergyMode({onBack}){
   try{playPlaceSE(true);}catch(e){}
   if(sum<10){setSel(next);return;}
   if(sum>10){setSel([]);setFlash({type:'over',k:Date.now()});return;}
-  const {g,bonus}=enGain(cards);
+  const {g,role,bonus}=enGain(cards);
   setEn(e=>({light:e.light+g.light,green:e.green+g.green,red:e.red+g.red}));
-  setHand(hd=>hd.map(c=>next.includes(c.id)?enCard():c));setSel([]);
-  setFlash({type:bonus||'ten',k:Date.now()});try{fxBell({f:bonus==='all'?1318:bonus==='pair'?1175:1046,v:.08,d:.35});}catch(e){}
+  setHand(hd=>{const rest=hd.filter(c=>!next.includes(c.id)),out=[];hd.forEach(c=>{if(next.includes(c.id)){const nc=enCard([...rest,...out]);out.push(nc);}});let i=0;return hd.map(c=>next.includes(c.id)?out[i++]:c);});setSel([]);
+  setFlash({type:bonus||'ten',role,k:Date.now()});try{fxBell({f:bonus==='all'?1318:bonus==='pair'?1175:1046,v:.08,d:.35});}catch(e){}
  }
- function restart(){setHp(EN_CFG.monsterHp);setEn({light:0,green:0,red:0});setHand(Array.from({length:10},()=>enCard()));setSel([]);setPhase('idle');setLeft(EN_CFG.roundMs);setPop(null);}
+ function restart(){setHp(EN_CFG.monsterHp);setEn({light:0,green:0,red:0});setHand(enDeal());setSel([]);setPhase('idle');setLeft(EN_CFG.roundMs);setPop(null);}
  const sum=hand.filter(c=>sel.includes(c.id)).reduce((a,c)=>a+c.n,0);
  const orb=(k)=>{const v=en[k],r=Math.min(v,EN_CFG.maxVisual)/EN_CFG.maxVisual,size=46+r*54,glow=4+r*26,rel=phase==='release';
   return h('div',{key:k,className:'en-orb-slot'},
@@ -5298,7 +5302,7 @@ function EnergyMode({onBack}){
   h('div',{className:'en-status'},
    phase==='idle'?h('span',{className:'en-hint'},'札を押すと10秒スタート'):phase==='rush'?h('span',{className:'en-time'+(left<3000?' en-time-low':'')},(left/1000).toFixed(1)):phase==='release'?h('span',{className:'en-time'},'放出！'):null,
    phase==='rush'&&h('span',{className:'en-sum'},'合計 '+sum),
-   flash&&h('span',{key:flash.k,className:'en-flash en-flash-'+flash.type},flash.type==='all'?'全部同じ色！':flash.type==='pair'?'同じ色ボーナス':flash.type==='over'?'10をこえた':'10！')),
+   flash&&h('span',{key:flash.k,className:'en-flash en-flash-'+flash.type},flash.type==='over'?'10をこえた':((flash.role&&flash.role!=='役なし'?flash.role:'10！')+(flash.type==='all'?' ＋ 全部同じ色！':flash.type==='pair'?' ＋ 同じ色':'')))),
   h('div',{className:'en-mat'},hand.map(c=>h('button',{key:c.id,className:'en-card'+(sel.includes(c.id)?' en-sel':''),onClick:()=>tap(c),style:{background:EN_COLOR[c.c].bg,borderColor:EN_COLOR[c.c].main,color:EN_COLOR[c.c].deep}},h('span',{className:'en-card-dot',style:{background:EN_COLOR[c.c].main}}),c.n))),
   phase==='win'&&h('div',{className:'en-overlay'},h('div',{className:'en-dialog'},h('h1',null,'撃破！'),h('button',{onClick:restart},'もう一度'),h('button',{className:'en-sub',onClick:onBack},'ホームへ'))));
 }

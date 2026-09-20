@@ -2563,6 +2563,30 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 @media(max-height:640px){.cr-hud{height:48px}.cr-tray{padding-top:6px;padding-bottom:7px}.cr-card{height:70px}.cr-tray-head{margin-bottom:4px}.cr-played .cr-slot{height:55px;width:42px;font-size:29px}.cr-dialog{padding:17px}.cr-dialog h1{font-size:23px}}
 @media(prefers-reduced-motion:reduce){.cr-combo{animation:none}.cr-meter i,.cr-card{transition:none}}
 
+/* v303 — Billiards: generated felt / walnut table and ivory compound balls. */
+.bb-screen{height:100dvh;width:100%;background:#221e19;color:#f5ebcb;font-family:'Noto Sans JP',sans-serif;display:flex;justify-content:center;isolation:isolate}
+.bb-shell{width:100%;max-width:620px;height:100%;display:flex;flex-direction:column;position:relative;background:radial-gradient(ellipse at 50% 0%,#161b18aa,transparent 65%),linear-gradient(100deg,#30241c,#493426 55%,#2f251e);padding:env(safe-area-inset-top) 5px env(safe-area-inset-bottom)}
+.bb-hud{height:66px;flex-shrink:0;display:grid;grid-template-columns:1fr 1.12fr 1fr 44px;align-items:center;gap:7px;padding:6px 5px}
+.bb-score{height:43px;border:1px solid #bda46d;border-radius:28px;background:linear-gradient(130deg,#1d1d18,#0e1412);display:flex;align-items:center;justify-content:space-evenly;gap:5px;padding:0 9px;box-shadow:inset 0 1px 2px #fff1}
+.bb-score span{font-size:13px;white-space:nowrap;color:#e5e0ce}.bb-score b{font:700 31px Georgia,serif;color:#f5e6bd;line-height:1}
+.bb-turn{text-align:center;font-family:'Noto Serif JP',serif;font-size:14px;white-space:nowrap;letter-spacing:.03em}.bb-turn small{display:block;margin:3px auto 0;padding-top:3px;width:80%;border-top:1px solid #bda46d;font:10px 'Noto Sans JP',sans-serif;color:#c8b68d}
+.bb-pause{border:1px solid #bda46d;border-radius:50%;width:44px;height:44px;color:#f3dfad;background:radial-gradient(ellipse at top,#625039,#28231a);font:700 22px Georgia,serif;cursor:pointer}
+.bb-board-space{position:relative;flex:1;min-height:0;container-type:size;display:flex;align-items:center;justify-content:center}
+.bb-table{width:100%;height:100%;position:relative;background:#155443 url('assets/billiards/table.webp') center/100% 100% no-repeat;border-radius:6%;box-shadow:0 5px 12px #0008;overflow:hidden}
+.bb-canvas{position:absolute;left:7%;top:4%;width:86%;height:92%;touch-action:none;cursor:crosshair;outline-offset:-3px;border-radius:1px}
+.bb-footer{height:85px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:10px 12px 15px}
+.bb-power{width:62%;height:15px;border:1px solid #dab77b;border-radius:12px;background:#111b17;box-shadow:0 1px 1px #ffe6b25c,inset 0 2px 4px #0009;padding:2px;overflow:hidden}
+.bb-power i{height:100%;display:block;border-radius:8px;background:linear-gradient(#fff3c1,#b7883b);box-shadow:0 0 6px #ffd28199}
+.bb-footer p{font-family:'Noto Serif JP',serif;min-height:22px;font-size:13px;letter-spacing:.12em;color:#e5dbc5}
+.bb-overlay{position:absolute;z-index:5;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;background:#061a16a8;backdrop-filter:blur(5px)}
+.bb-dialog{max-width:370px;max-height:calc(100dvh - 42px);overflow:auto;width:100%;padding:25px 22px 19px;border:1px solid #bca474;border-radius:20px;background:linear-gradient(140deg,#254236f5,#112b23fa);box-shadow:0 18px 60px #0008,inset 0 0 0 4px #c7a66d15;text-align:center;touch-action:pan-y}
+.bb-eyebrow{font:11px Georgia,serif;letter-spacing:.3em;color:#d4bb86;margin-bottom:10px}.bb-dialog h1{font:700 28px 'Noto Serif JP',serif;margin:0 0 14px;color:#f5e9c8}.bb-lead{font-size:14px;line-height:1.8;color:#e4d8b7}.bb-instructions{font-size:13px;line-height:1.9;margin:16px 0;color:#d4d9c8}
+.bb-levels{display:flex;gap:6px;margin:20px 0 16px}.bb-levels button{flex:1;min-height:44px;font:13px 'Noto Sans JP',sans-serif;border:1px solid #9b98745c;background:#081e195c;color:#d2d4c6;border-radius:8px;cursor:pointer}.bb-levels button[aria-pressed=true]{background:#d7bd82;color:#1b342a;border-color:#f3dfad;font-weight:700}
+.bb-primary,.bb-secondary{display:block;width:100%;min-height:44px;border-radius:10px;font:14px 'Noto Sans JP',sans-serif;cursor:pointer;margin-top:9px}.bb-primary{border:1px solid #f4dfaa;background:linear-gradient(#ead6a6,#b68e4e);color:#29362b;font-weight:700;box-shadow:0 4px 10px #0004}.bb-secondary{background:transparent;color:#ded7be;border:1px solid #bda46d60}.bb-dialog details{margin-top:14px;text-align:left;font-size:12px;line-height:1.8;color:#d8dccd}.bb-dialog summary{cursor:pointer;padding:8px;text-align:center}.bb-dialog details p{margin:9px 0}.bb-result{font:700 45px Georgia,serif;margin:16px 0;color:#f5e4b6}.bb-result span{font-size:24px;color:#b7bcaa}
+.bb-screen button:focus-visible,.bb-canvas:focus-visible{outline:3px solid #ffedb5;outline-offset:3px}
+@media(max-width:360px){.bb-hud{gap:4px;grid-template-columns:1fr 1.04fr 1fr 44px;padding-inline:0}.bb-turn{font-size:12px}.bb-score{padding:0 6px}.bb-score span{font-size:11px}.bb-score b{font-size:27px}.bb-footer p{font-size:12px}}
+@media(max-height:620px){.bb-hud{height:57px}.bb-footer{height:65px;gap:5px;padding:7px}.bb-dialog{padding:16px}.bb-dialog h1{font-size:24px;margin-bottom:8px}.bb-instructions{margin:10px 0}.bb-levels{margin:12px 0}}
+
 </style>
 <link rel="stylesheet" href="shared-board.css">
 </head>
@@ -3708,7 +3732,7 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v302'; // 通常対戦：手札選択→場の空き枠タップで配置
+const APP_VER='v303'; // ビリヤード：白い玉・数字の結合・交互ターン・3段階AI・専用SE
 // const APP_VER='v299'; // テンフォール：新デザイン素材（背景・盤面・札・マス・ボタン・合計/点数の枠・10完成/💥の演出・説明パネル）を組み込み。ルールは変更なし
 // const APP_VER='v298'; // テンフォール：手札10枚をやめて1〜5の数字ボタン5つに（何回でも押せる・押した数字が下のマスの左から入る）。入れ替えスワイプと案内文は削除。落ち札・💥・点数はそのまま
 // const APP_VER='v297'; // セパレート（試作）：場を2人で分ける。自分の札は自分の場だけ、ぴったり10で役の点、10こえははじき返す、相手が10を作ると自分の場はリセット（札は捨て）、先に15点で勝ち。出せる札がなければその場をリセット。数値は SEP_CFG
@@ -4258,13 +4282,14 @@ function SkillPanel(){
     )
   );
 }
-function TitleScreen({onColorRoom,onSeparate,onEnergy,onDice,onShared,onPlay,onPuzzlux,onRush,onCharge,onSurvival,onFall,onSolo,onTune,onTutorial,onSettings,musicOn,toggleMusic}){
+function TitleScreen({onBilliards,onColorRoom,onSeparate,onEnergy,onDice,onShared,onPlay,onPuzzlux,onRush,onCharge,onSurvival,onFall,onSolo,onTune,onTutorial,onSettings,musicOn,toggleMusic}){
   const btnBase={borderRadius:14,padding:'15px 0',fontSize:13,fontWeight:800,letterSpacing:2,cursor:'pointer',fontFamily:"'Inter',sans-serif",background:'rgba(255,255,255,.78)',boxShadow:'0 4px 16px rgba(70,100,150,.16), inset 0 1px 0 #fff',width:'100%'};
   return h('div',{style:{height:'100dvh',overflowY:'auto',touchAction:'pan-y',flexDirection:'column',background:"url('img/title-bg.jpg') center/cover no-repeat, #eef2f8",display:'flex',alignItems:'center',justifyContent:'flex-start',padding:16,position:'relative'}},
     h('div',{style:{margin:'auto',flexShrink:0,textAlign:'center',display:'flex',flexDirection:'column',alignItems:'center',gap:18,width:'100%',maxWidth:340,animation:'fadeUp 0.5s ease'}},
       h('div',{style:{fontSize:10,letterSpacing:8,color:'#5a80ab',fontWeight:700,fontFamily:"'Inter',sans-serif"}},'✦ CARD GAME ✦'),
       h('img',{src:'img/logo.webp',alt:'テンクル',style:{width:'100%',maxWidth:330,height:'auto',filter:'drop-shadow(0 8px 22px rgba(80,110,160,.28))',animation:'float 3.5s ease-in-out infinite'}}),
       h('div',{style:{display:'flex',flexDirection:'column',gap:12,width:'100%',marginTop:6}},
+        h('button',{onClick:onBilliards,style:{...btnBase,fontSize:16,border:'1.5px solid #c6aa73',background:'linear-gradient(135deg,#2a5643,#102e25)',color:'#f3e2b7'}},'ビリヤード'),
         h('button',{onClick:onColorRoom,style:{...btnBase,fontSize:16,border:'1.5px solid #c5b38e',background:'linear-gradient(110deg,#e4f5ff 55%,#fff0d9)',color:'#196b9c'}},'カラールーム'),
         h('button',{onClick:onSeparate,style:{...btnBase,fontSize:16,border:'1.5px solid #2a8ae0',background:'#fff',color:'#1a6ad0'}},'セパレート'),
         h('button',{onClick:onEnergy,style:{...btnBase,fontSize:16,border:'1.5px solid #f3cf63',background:'linear-gradient(135deg,#2a3350,#141a2c)',color:'#f3e1aa'}},'エナジー'),
@@ -5714,6 +5739,182 @@ function ColorRoomMode({onBack}){
 function tapFieldPlaces(field,places=[]){
  const used=new Set();return field.map((_,i)=>{let slot=places[i];if(!Number.isInteger(slot)||slot<0||slot>3||used.has(slot))slot=[0,1,2,3].find(n=>!used.has(n));used.add(slot);return slot;});
 }
+
+// ── BILLIARDS ENGINE v303 ──
+// Shared, pocketless compound-ball billiards. Fixed 120 Hz; rendering and AI use the same engine.
+const BB_CFG={w:440,h:706,r:20,target:5,step:1/120,friction:125,maxSpeed:1120,levels:{easy:{label:'やさしい',samples:18,error:.075},normal:{label:'ふつう',samples:60,error:.012},hard:{label:'つよい',samples:130,error:.001}}};
+function bbBody(id,x,y,parts){const b={id,x,y,vx:0,vy:0,a:0,w:0,parts:parts.map(p=>({...p})),sum:parts.reduce((s,p)=>s+p.n,0)};b.mass=parts.length;b.inertia=parts.reduce((s,p)=>s+p.x*p.x+p.y*p.y+BB_CFG.r**2/2,0);return b;}
+function bbPoints(b){const c=Math.cos(b.a),s=Math.sin(b.a);return b.parts.map(p=>({x:b.x+p.x*c-p.y*s,y:b.y+p.x*s+p.y*c,n:p.n}));}
+function bbCreate(level='normal'){
+ const s={h:BB_CFG.h,bodies:[],nextId:1,turn:0,scores:[0,0],phase:'ready',paused:false,level:BB_CFG.levels[level]?level:'normal',moving:false,elapsed:0,quiet:0,now:0,turnNo:0,events:[],eventId:0,merged:0,winner:null,aiWait:0};
+ const add=(x,y,ns)=>{s.bodies.push(bbBody(s.nextId++,x,y,ns));};
+ add(220,545,[{x:0,y:0,n:0}]);add(65,76,[{x:0,y:0,n:4}]);
+ add(316,144,[{x:-38,y:-12,n:3},{x:0,y:0,n:2},{x:38,y:12,n:4}]);
+ add(80,273,[{x:-19,y:-6,n:2},{x:19,y:6,n:3}]);
+ add(209,210,[{x:0,y:0,n:5}]);add(139,388,[{x:0,y:0,n:1}]);add(349,357,[{x:0,y:0,n:2}]);add(350,491,[{x:0,y:0,n:5}]);return s;
+}
+function bbEvent(s,kind,data={}){s.events.push({id:++s.eventId,kind,at:s.now,...data});if(s.events.length>80)s.events.splice(0,s.events.length-80);}
+function bbStart(s){if(s.phase==='ready'){s.phase='active';s.aiWait=.8;}}
+function bbShoot(s,angle,power){if(s.phase!=='active'||s.paused||s.moving||!Number.isFinite(angle)||!Number.isFinite(power)||power<.035)return false;const cue=s.bodies.find(b=>b.sum===0);if(!cue)return false;const speed=BB_CFG.maxSpeed*Math.min(1,Math.max(.08,power));cue.vx=Math.cos(angle)*speed;cue.vy=Math.sin(angle)*speed;s.moving=true;s.elapsed=0;s.quiet=0;bbEvent(s,'shot',{power});return true;}
+function bbImpulse(a,b,p,nx,ny,restitution){
+ const ax=p.x-a.x,ay=p.y-a.y,bx=b?p.x-b.x:0,by=b?p.y-b.y:0;
+ const rvx=(b?b.vx-b.w*by:0)-(a.vx-a.w*ay),rvy=(b?b.vy+b.w*bx:0)-(a.vy+a.w*ax),vn=rvx*nx+rvy*ny;
+ if(vn>=0)return 0;const ca=ax*ny-ay*nx,cb=bx*ny-by*nx;
+ const j=-(1+restitution)*vn/(1/a.mass+(b?1/b.mass:0)+ca*ca/a.inertia+(b?cb*cb/b.inertia:0));
+ a.vx-=j*nx/a.mass;a.vy-=j*ny/a.mass;a.w-=j*ca/a.inertia;if(b){b.vx+=j*nx/b.mass;b.vy+=j*ny/b.mass;b.w+=j*cb/b.inertia;}return -vn;
+}
+function bbJoin(s,a,b){
+ const ps=[...bbPoints(a),...bbPoints(b)],mass=a.mass+b.mass,x=(a.x*a.mass+b.x*b.mass)/mass,y=(a.y*a.mass+b.y*b.mass)/mass;
+ const c=bbBody(s.nextId++,x,y,ps.map(p=>({x:p.x-x,y:p.y-y,n:p.n})));
+ c.vx=(a.vx*a.mass+b.vx*b.mass)/mass;c.vy=(a.vy*a.mass+b.vy*b.mass)/mass;
+ c.w=(a.w*a.inertia+b.w*b.inertia+(a.x-x)*a.mass*a.vy-(a.y-y)*a.mass*a.vx+(b.x-x)*b.mass*b.vy-(b.y-y)*b.mass*b.vx)/c.inertia;
+ s.bodies=s.bodies.filter(o=>o!==a&&o!==b);s.merged++;
+ if(c.sum===10){s.scores[s.turn]++;bbEvent(s,'ten',{x,y,points:ps,who:s.turn});if(s.scores[s.turn]>=BB_CFG.target){s.phase='ended';s.winner=s.turn;s.moving=false;bbEvent(s,'end',{who:s.turn});}}
+ else{s.bodies.push(c);bbEvent(s,'join',{x,y,sum:c.sum});}return c;
+}
+function bbPhysics(s,dt){
+ const R=BB_CFG.r;
+ for(const b of s.bodies){b.x+=b.vx*dt;b.y+=b.vy*dt;b.a+=b.w*dt;const speed=Math.hypot(b.vx,b.vy),f=Math.max(0,1-BB_CFG.friction*dt/(speed||1));b.vx*=f;b.vy*=f;b.w*=Math.exp(-3*dt);if(Math.abs(b.w)<.012)b.w=0;
+  for(let pass=0;pass<2;pass++)for(const p of bbPoints(b)){
+   let nx=0,ny=0,depth=0;if(p.x<R){nx=-1;depth=R-p.x;}else if(p.x>BB_CFG.w-R){nx=1;depth=p.x-(BB_CFG.w-R);}if(depth){b.x-=nx*depth;const v=bbImpulse(b,null,{x:p.x+nx*R,y:p.y},nx,0,.82);if(v>35)bbEvent(s,'rail',{power:v/700});}
+   depth=0;if(p.y<R){ny=-1;depth=R-p.y;}else if(p.y>s.h-R){ny=1;depth=p.y-(s.h-R);}if(depth){b.y-=ny*depth;const v=bbImpulse(b,null,{x:p.x,y:p.y+ny*R},0,ny,.82);if(v>35)bbEvent(s,'rail',{power:v/700});}
+  }
+ }
+ for(let i=0;i<s.bodies.length;i++)for(let j=i+1;j<s.bodies.length;j++){
+  const a=s.bodies[i],b=s.bodies[j];let contact=null;
+  for(const p of bbPoints(a)){for(const q of bbPoints(b)){const dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy);if(d<2*R){contact={p,q,d,nx:d>1e-8?dx/d:1,ny:d>1e-8?dy/d:0};break;}}if(contact)break;}
+  if(!contact)continue;const {p,q,d,nx,ny}=contact,pt={x:(p.x+q.x)/2,y:(p.y+q.y)/2};
+  const rvx=(b.vx-b.w*(pt.y-b.y))-(a.vx-a.w*(pt.y-a.y)),rvy=(b.vy+b.w*(pt.x-b.x))-(a.vy+a.w*(pt.x-a.x));
+  if(a.sum>0&&b.sum>0&&a.sum+b.sum<=10&&rvx*nx+rvy*ny<-.3){bbJoin(s,a,b);return;}
+  const depth=2*R-d+.01,ma=(1/a.mass)/(1/a.mass+1/b.mass);a.x-=nx*depth*ma;a.y-=ny*depth*ma;b.x+=nx*depth*(1-ma);b.y+=ny*depth*(1-ma);
+  const v=bbImpulse(a,b,pt,nx,ny,.92);if(v>24)bbEvent(s,'hit',{power:v/700});
+ }
+}
+function bbCanTen(s){let mask=1;for(const b of s.bodies)if(b.sum>0)mask|=mask<<b.sum;return !!(mask&(1<<10));}
+function bbAddAtFree(s,n,rng=Math.random){
+ const occupied=s.bodies.flatMap(bbPoints),candidates=[];for(let y=50;y<s.h-40;y+=60)for(let x=45;x<BB_CFG.w-35;x+=58)candidates.push({x:x+(rng()-.5)*12,y:y+(rng()-.5)*12});
+ // Prefer the largest available gap; never move an existing ball to make room.
+ let best=null,gap=0;for(const p of candidates){const d=Math.min(...occupied.map(q=>Math.hypot(p.x-q.x,p.y-q.y)));if(d>gap){gap=d;best=p;}}
+ if(!best||gap<BB_CFG.r*2+6)return false;s.bodies.push(bbBody(s.nextId++,best.x,best.y,[{x:0,y:0,n}]));return true;
+}
+function bbReplenish(s,rng=Math.random){let added=0;const count=s.bodies.reduce((n,b)=>n+(b.sum?b.parts.length:0),0);
+ if(count<6)for(const n of (rng()<.5?[1,2,3,4]:[5,5])){if(bbAddAtFree(s,n,rng))added++;}
+ for(let i=0;!bbCanTen(s)&&i<5;i++){const largest=Math.max(...s.bodies.map(b=>b.sum)),n=largest>=5?10-largest:5;if(bbAddAtFree(s,n,rng))added++;else break;}
+ if(added)bbEvent(s,'refill',{count:added});
+}
+function bbStep(s,dt=BB_CFG.step,simulation=false){if(s.phase!=='active'||s.paused)return;s.now+=dt;if(!s.moving){s.aiWait=Math.max(0,s.aiWait-dt);return;}
+ s.elapsed+=dt;bbPhysics(s,dt);if(s.phase!=='active')return;
+ const moving=s.bodies.some(b=>Math.hypot(b.vx,b.vy)>2||Math.abs(b.w)>.04);s.quiet=moving?0:s.quiet+dt;
+ if(s.quiet>.18||s.elapsed>10){for(const b of s.bodies){b.vx=0;b.vy=0;b.w=0;}s.moving=false;s.turn=1-s.turn;s.turnNo++;s.aiWait=.85;if(!simulation)bbReplenish(s);bbEvent(s,'turn',{who:s.turn});}
+}
+function bbRay(s,angle){const cue=s.bodies.find(b=>!b.sum),dx=Math.cos(angle),dy=Math.sin(angle),r=BB_CFG.r;let distance=500;
+ if(dx>0)distance=Math.min(distance,(BB_CFG.w-r-cue.x)/dx);if(dx<0)distance=Math.min(distance,(r-cue.x)/dx);if(dy>0)distance=Math.min(distance,(s.h-r-cue.y)/dy);if(dy<0)distance=Math.min(distance,(r-cue.y)/dy);
+ for(const b of s.bodies)if(b.sum)for(const p of bbPoints(b)){const x=p.x-cue.x,y=p.y-cue.y,t=x*dx+y*dy,side=x*x+y*y-t*t;if(side<(2*r)**2){const hit=t-Math.sqrt((2*r)**2-side);if(hit>=0)distance=Math.min(distance,hit);}}
+ return Math.max(0,distance);
+}
+function bbCandidates(s){const cue=s.bodies.find(b=>!b.sum),nums=s.bodies.filter(b=>b.sum),out=[],seen=new Set();
+ const add=(a,p)=>{const key=Math.round(a*120)+':'+Math.round(p*100);if(!seen.has(key)){seen.add(key);out.push({angle:a,power:p});}};
+ // Ghost-ball contact points aim a numbered ball toward a compatible ball/cluster.
+ const pairs=[];for(const a of nums)for(const b of nums)if(a!==b&&a.sum+b.sum<=10)for(const p of bbPoints(a))for(const q of bbPoints(b)){
+  const dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy),gx=p.x-dx/d*40,gy=p.y-dy/d*40,dist=Math.hypot(gx-cue.x,gy-cue.y),dot=((gx-cue.x)*dx+(gy-cue.y)*dy)/(dist*d);
+  if(dot<.2)continue;const angle=Math.atan2(gy-cue.y,gx-cue.x);pairs.push({angle,rank:(a.sum+b.sum===10?100:0)+dot*10-dist*.005,power:Math.min(1,Math.sqrt(2*BB_CFG.friction*(dist+d*a.mass+30))/BB_CFG.maxSpeed)});
+ }
+ pairs.sort((a,b)=>b.rank-a.rank);for(const p of pairs){add(p.angle,Math.min(1,p.power*1.15));add(p.angle,Math.min(1,p.power*1.55));}
+ for(const b of nums)for(const p of bbPoints(b)){add(Math.atan2(p.y-cue.y,p.x-cue.x),.65);add(Math.atan2(p.y-cue.y,p.x-cue.x),.95);}
+ for(let i=0;i<24;i++)add(i*Math.PI/12,.85);return out;
+}
+function bbRisk(s){const cue=s.bodies.find(b=>!b.sum),nums=s.bodies.filter(b=>b.sum);let risk=0;
+ for(const a of nums)for(const b of nums)if(a!==b&&a.sum+b.sum===10){const p=bbPoints(a)[0],q=bbPoints(b)[0],dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy),gx=p.x-dx/d*40,gy=p.y-dy/d*40,cd=Math.hypot(gx-cue.x,gy-cue.y),dot=((gx-cue.x)*dx+(gy-cue.y)*dy)/(cd*d||1);if(dot>.35&&bbRay(s,Math.atan2(gy-cue.y,gx-cue.x))>=cd-5)risk=Math.max(risk,dot*14);}
+ return risk;
+}
+function bbEvaluate(s,shot){const c=JSON.parse(JSON.stringify(s));c.events=[];c.phase='active';c.paused=false;c.turn=1;const before=c.scores[1],joined=c.merged;bbShoot(c,shot.angle,shot.power);for(let i=0;i<1250&&c.moving;i++)bbStep(c,BB_CFG.step,true);return (c.scores[1]-before)*200+(c.merged-joined)*4-bbRisk(c);}
+// ── END BILLIARDS ENGINE ──
+
+// Original synthesized SE: ivory-ball clicks, soft cushions, bonding chimes and a ten fanfare.
+function bbAudio(){let enabled=true,disposed=false;const nodes=new Set(),last={};let master=null;
+ try{master=AC.createGain();master.gain.value=.65;master.connect(AC.destination);}catch(e){}
+ function tone(f,d,v,delay=0,type='sine',end=f){if(!enabled||disposed||!master)return;const t=AC.currentTime+delay,o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(end,t+d);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.002);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(master);nodes.add(o);o.onended=()=>{nodes.delete(o);o.disconnect();g.disconnect();};o.start(t);o.stop(t+d+.01);}
+ function click(v,f){if(!enabled||disposed||!master)return;const len=Math.floor(AC.sampleRate*.045),buffer=AC.createBuffer(1,len,AC.sampleRate),data=buffer.getChannelData(0);for(let i=0;i<len;i++)data[i]=(Math.random()*2-1)*Math.exp(-i/(AC.sampleRate*.007));const src=AC.createBufferSource(),g=AC.createGain(),filter=AC.createBiquadFilter();src.buffer=buffer;filter.type='bandpass';filter.frequency.value=f;filter.Q.value=.7;g.gain.value=v;src.connect(filter);filter.connect(g);g.connect(master);nodes.add(src);src.onended=()=>{nodes.delete(src);src.disconnect();filter.disconnect();g.disconnect();};src.start();}
+ function play(kind,power=1){if(!enabled||disposed||!master)return;try{const t=AC.currentTime;if((kind==='hit'||kind==='rail')&&t-(last[kind]||-1)<.045)return;last[kind]=t;const v=Math.min(.14,.025+power*.09);
+  if(kind==='shot'){click(.15,1900);tone(330,.065,.085,0,'sine',100);}
+  else if(kind==='hit'){click(v,2700);tone(1550,.045,v*.65,0,'sine',720);}
+  else if(kind==='rail'){click(v*.5,600);tone(180,.075,v*.8,0,'sine',85);}
+  else if(kind==='join'){tone(660,.16,.055);tone(990,.23,.045,.045);}
+  else if(kind==='ten'){click(.10,3400);[523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(f,.46,.09,i*.065));}
+  else if(kind==='win'){[523,659,784,1047,1319].forEach((f,i)=>tone(f,.65,.075,i*.10));}
+  else if(kind==='lose'){tone(392,.3,.06);tone(294,.45,.06,.2);}
+  else if(kind==='turn'){tone(740,.11,.025);}
+  else if(kind==='refill'){tone(420,.12,.035);tone(630,.16,.025,.07);}
+ }catch(e){}}
+ function stop(){for(const n of nodes)try{n.stop();}catch(e){}nodes.clear();}
+ return{play,stop,setEnabled(v){enabled=v;if(!v)stop();},dispose(){disposed=true;stop();master?.disconnect();}};
+}
+function bbDraw(ctx,s,aim,width,height){
+ ctx.clearRect(0,0,width,height);ctx.save();ctx.scale(width/BB_CFG.w,height/s.h);const R=BB_CFG.r,cue=s.bodies.find(b=>!b.sum);
+ // A single guide ends at the first collision. It never promises a path through an obstruction.
+ if(cue&&!s.moving&&s.phase==='active'&&!s.paused){const a=s.turn===1?(s.aiAim?.angle??-Math.PI/2):aim.angle,dx=Math.cos(a),dy=Math.sin(a),len=bbRay(s,a),power=s.turn===1?(s.aiAim?.power||.25):aim.power;
+  ctx.save();ctx.globalAlpha=s.turn===1?.35:.85;ctx.strokeStyle='#fffbea';ctx.lineWidth=2.3;ctx.setLineDash([1,11]);ctx.lineCap='round';ctx.beginPath();ctx.moveTo(cue.x+dx*(R+5),cue.y+dy*(R+5));ctx.lineTo(cue.x+dx*Math.max(R+5,len),cue.y+dy*Math.max(R+5,len));ctx.stroke();ctx.setLineDash([]);
+  if(len>R+5){ctx.globalAlpha*=.55;ctx.lineWidth=1;ctx.beginPath();ctx.arc(cue.x+dx*len,cue.y+dy*len,R,0,Math.PI*2);ctx.stroke();}
+  ctx.globalAlpha=.96;const start=R+7+power*35,end=start+78;ctx.lineWidth=5;const gx=cue.x-dx*start,gy=cue.y-dy*start,ex=cue.x-dx*end,ey=cue.y-dy*end,g=ctx.createLinearGradient(gx,gy,ex,ey);g.addColorStop(0,'#f6edc8');g.addColorStop(.06,'#397c75');g.addColorStop(.10,'#e9d29b');g.addColorStop(.75,'#a2773a');g.addColorStop(1,'#e5c37c');ctx.strokeStyle=g;ctx.beginPath();ctx.moveTo(gx,gy);ctx.lineTo(ex,ey);ctx.stroke();ctx.lineWidth=1.2;ctx.strokeStyle='#f1d899';ctx.beginPath();ctx.arc(ex,ey,10,0,Math.PI*2);ctx.stroke();ctx.restore();
+ }
+ for(const b of s.bodies){const pts=bbPoints(b);
+  ctx.save();ctx.fillStyle='rgba(0,0,0,.22)';ctx.shadowColor='rgba(0,0,0,.32)';ctx.shadowBlur=7;ctx.shadowOffsetY=6;for(const p of pts){ctx.beginPath();ctx.arc(p.x,p.y+2,R,0,Math.PI*2);ctx.fill();}ctx.restore();
+  if(pts.length>1){ctx.save();ctx.fillStyle='#f5dfa0';ctx.shadowColor='#f4c970';ctx.shadowBlur=9;ctx.beginPath();for(const p of pts){ctx.moveTo(p.x+R+1.8,p.y);ctx.arc(p.x,p.y,R+1.8,0,Math.PI*2);}ctx.fill();ctx.restore();}
+  for(const p of pts){const g=ctx.createRadialGradient(p.x-7,p.y-10,1,p.x-2,p.y-3,R+10);g.addColorStop(0,p.n?'#fffdf0':'#fffef6');g.addColorStop(.50,p.n?'#eee9d4':'#e9e7dc');g.addColorStop(.8,'#c4bda5');g.addColorStop(1,'#898777');ctx.fillStyle=g;ctx.beginPath();ctx.arc(p.x,p.y,R,0,Math.PI*2);ctx.fill();ctx.strokeStyle='rgba(255,253,229,.45)';ctx.lineWidth=.7;ctx.stroke();if(p.n){ctx.fillStyle='#20322f';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='bold 31px Georgia, serif';ctx.fillText(String(p.n),p.x,p.y+1.8);}}
+  if(pts.length>1){const x=Math.max(35,Math.min(BB_CFG.w-35,b.x)),y=Math.max(12,Math.min(...pts.map(p=>p.y))-R-17);ctx.fillStyle='rgba(12,47,38,.9)';ctx.strokeStyle='#d0b577';ctx.lineWidth=.8;ctx.beginPath();ctx.roundRect(x-33,y-10,66,21,10);ctx.fill();ctx.stroke();ctx.fillStyle='#f4edd4';ctx.font='12px "Noto Sans JP", sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('合計 '+b.sum,x,y+.5);}
+ }
+ for(const e of s.events){const age=s.now-e.at;if(age<0||age>1.15)continue;if(e.kind==='ten'){const k=age/1.15;ctx.save();ctx.globalAlpha=1-k;ctx.strokeStyle='#fff4c3';ctx.lineWidth=3*(1-k);ctx.beginPath();ctx.arc(e.x,e.y,20+80*k,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#fff1b0';for(let i=0;i<18;i++){const a=i*Math.PI*2/18,d=25+75*k;ctx.beginPath();ctx.arc(e.x+Math.cos(a)*d,e.y+Math.sin(a)*d,2.5*(1-k),0,Math.PI*2);ctx.fill();}ctx.shadowColor='#dba950';ctx.shadowBlur=12;ctx.font='bold 48px Georgia, serif';ctx.textAlign='center';ctx.fillText('10',e.x,e.y-20*k);ctx.font='bold 16px "Noto Sans JP", sans-serif';ctx.fillText((e.who===0?'自分':'相手')+' +1',e.x,e.y+31-20*k);ctx.restore();}}
+ ctx.restore();
+}
+function BilliardsMode({onBack}){
+ const game=useRef(null);if(!game.current)game.current=bbCreate();const canvas=useRef(null),sound=useRef(null),aim=useRef({angle:-1.95,power:0}),drag=useRef(null),job=useRef(null),dialog=useRef(null),pauseBtn=useRef(null),[level,setLevel]=useState('normal'),[muted,setMuted]=useState(false),[,render]=useState(0);
+ const paint=()=>render(v=>v+1),s=game.current,modal=s.phase!=='active'||s.paused;
+ function cancelDrag(){drag.current=null;aim.current.power=0;}
+ function start(){sound.current?.stop();resumeAC();game.current=bbCreate(level);bbStart(game.current);job.current=null;aim.current={angle:-1.95,power:0};cancelDrag();paint();}
+ function pause(){if(game.current.phase!=='active')return;game.current.paused=true;cancelDrag();sound.current?.stop();paint();}
+ function resume(){game.current.paused=false;resumeAC();paint();requestAnimationFrame(()=>pauseBtn.current?.focus());}
+ function toggleSound(){setMuted(v=>{sound.current?.setEnabled(v);return !v;});}
+ function canInput(){const g=game.current;return g.phase==='active'&&!g.paused&&!g.moving&&g.turn===0;}
+ function point(e){const r=canvas.current.getBoundingClientRect();return{x:(e.clientX-r.left)*BB_CFG.w/r.width,y:(e.clientY-r.top)*game.current.h/r.height};}
+ function down(e){if(!canInput()||e.button!==0||drag.current)return;e.preventDefault();resumeAC();const p=point(e);drag.current={id:e.pointerId,...p};try{e.currentTarget.setPointerCapture(e.pointerId);}catch(err){cancelDrag();}}
+ function move(e){const d=drag.current;if(!d||d.id!==e.pointerId||!canInput())return;const p=point(e),dx=d.x-p.x,dy=d.y-p.y,len=Math.hypot(dx,dy);if(len>3)aim.current.angle=Math.atan2(dy,dx);aim.current.power=Math.min(1,len/145);paint();}
+ function up(e){if(drag.current?.id!==e.pointerId)return;move(e);if(canInput())bbShoot(game.current,aim.current.angle,aim.current.power);cancelDrag();if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId);paint();}
+ function key(e){if(!canInput())return;if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '].includes(e.key)){e.preventDefault();if(e.key==='ArrowLeft')aim.current.angle-=.04;if(e.key==='ArrowRight')aim.current.angle+=.04;if(e.key==='ArrowUp')aim.current.power=Math.min(1,(aim.current.power||.3)+.05);if(e.key==='ArrowDown')aim.current.power=Math.max(.08,(aim.current.power||.3)-.05);if(e.key===' '){resumeAC();bbShoot(game.current,aim.current.angle,aim.current.power||.5);aim.current.power=0;}paint();}}
+ useEffect(()=>{
+  sound.current=bbAudio();const node=canvas.current,ctx=node.getContext('2d');let frame,last=performance.now(),acc=0,seen=0,prev=game.current,uiTime=0;
+  function draw(t){const g=game.current;const rect=node.getBoundingClientRect(),worldHeight=BB_CFG.w*rect.height/rect.width;if(Number.isFinite(worldHeight)&&Math.abs(worldHeight-g.h)>.5){const ratio=worldHeight/g.h;g.h=worldHeight;for(const b of g.bodies){b.y*=ratio;const ps=bbPoints(b),lo=Math.min(...ps.map(p=>p.y)),hi=Math.max(...ps.map(p=>p.y));if(lo<BB_CFG.r)b.y+=BB_CFG.r-lo;if(hi>g.h-BB_CFG.r)b.y-=hi-(g.h-BB_CFG.r);}cancelDrag();job.current=null;delete g.aiAim;}if(g!==prev){prev=g;seen=0;acc=0;}const dt=Math.min(.05,Math.max(0,(t-last)/1000));last=t;
+   if(g.phase==='active'&&!g.paused){acc+=dt;while(acc>=BB_CFG.step){bbStep(g);acc-=BB_CFG.step;}
+    if(!g.moving&&g.turn===1){if(g.aiAim){if(g.aiWait<=0){bbShoot(g,g.aiAim.angle,g.aiAim.power);delete g.aiAim;job.current=null;}}
+     else if(g.aiWait<=0){if(!job.current){const all=bbCandidates(g),cfg=BB_CFG.levels[g.level];let candidates=all.slice(0,cfg.samples);if(g.level==='easy')candidates=all.filter((_,i)=>i%Math.max(1,Math.floor(all.length/cfg.samples))===0).slice(0,cfg.samples);job.current={candidates,index:0,best:null,score:-Infinity};}
+      const j=job.current,end=performance.now()+6;do{const c=j.candidates[j.index++],v=bbEvaluate(g,c)+(g.level==='easy'?Math.random()*50:Math.random()*.1);if(v>j.score){j.best=c;j.score=v;}}while(j.index<j.candidates.length&&performance.now()<end);
+      if(j.index>=j.candidates.length){const cfg=BB_CFG.levels[g.level];g.aiAim={...j.best,angle:j.best.angle+(Math.random()-.5)*cfg.error};g.aiWait=.45;job.current=null;}
+     }
+    }
+   }else{acc=0;if(g.phase==='ended'&&!g.paused)g.now+=dt;}
+   for(const e of g.events)if(e.id>seen){seen=e.id;sound.current?.play(e.kind==='end'?(e.who===0?'win':'lose'):e.kind,e.power??1);}
+   const r=node.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2),w=Math.round(r.width*dpr),ht=Math.round(r.height*dpr);if(node.width!==w||node.height!==ht){node.width=w;node.height=ht;}if(ctx&&w&&ht)bbDraw(ctx,g,aim.current,w,ht);
+   if(t-uiTime>80){uiTime=t;paint();}frame=requestAnimationFrame(draw);
+  }
+  frame=requestAnimationFrame(draw);const hide=()=>{if(document.hidden)pause();},blur=()=>pause(),esc=e=>{if(e.key==='Escape'){game.current.paused?resume():pause();}};
+  document.addEventListener('visibilitychange',hide);window.addEventListener('blur',blur);window.addEventListener('keydown',esc);
+  return()=>{cancelAnimationFrame(frame);sound.current?.dispose();job.current=null;document.removeEventListener('visibilitychange',hide);window.removeEventListener('blur',blur);window.removeEventListener('keydown',esc);};
+ },[]);
+ useEffect(()=>{if(modal)dialog.current?.querySelector('button')?.focus();},[modal,s.phase]);
+ function trap(e){if(e.key!=='Tab')return;const els=[...e.currentTarget.querySelectorAll('button,summary')].filter(el=>el.getClientRects().length),first=els[0],end=els[els.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();end.focus();}else if(!e.shiftKey&&document.activeElement===end){e.preventDefault();first.focus();}}
+ const recent=s.events.findLast(e=>e.kind==='refill'&&s.now-e.at<1.4),status=s.phase==='ended'?'対戦終了':s.moving?'転がっています':s.turn===0?'あなたの番':'相手の番';
+ return h('main',{className:'bb-screen'},h('div',{className:'bb-shell'},
+  h('header',{className:'bb-hud',inert:modal?'':undefined},h('div',{className:'bb-score'},h('span',null,'自分'),h('b',null,s.scores[0])),h('div',{className:'bb-turn',role:'status','aria-live':'polite'},status,h('small',null,'5点先取')),h('div',{className:'bb-score'},h('span',null,'相手'),h('b',null,s.scores[1])),h('button',{className:'bb-pause',ref:pauseBtn,onClick:pause,'aria-label':'一時停止'},'Ⅱ')),
+  h('div',{className:'bb-board-space',inert:modal?'':undefined},h('div',{className:'bb-table'},h('canvas',{ref:canvas,className:'bb-canvas',tabIndex:modal?-1:0,'aria-label':'ビリヤード盤面。盤面のどこでも引っぱって離すと白い玉を打ちます。キーボードは左右で方向、上下で強さ、スペースで打球。',onPointerDown:down,onPointerMove:move,onPointerUp:up,onPointerCancel:()=>{cancelDrag();paint();},onLostPointerCapture:()=>{cancelDrag();paint();},onKeyDown:key,onContextMenu:e=>e.preventDefault()}))),
+  h('footer',{className:'bb-footer',inert:modal?'':undefined},h('div',{className:'bb-power',role:'meter','aria-label':'打つ強さ','aria-valuemin':0,'aria-valuemax':100,'aria-valuenow':Math.round(aim.current.power*100)},h('i',{style:{width:aim.current.power*100+'%'}})),h('p',null,recent?'玉を補充しました':s.moving?'':s.turn===1?'相手が狙っています':'盤面を引っぱって、はなす')),
+  modal&&h('div',{className:'bb-overlay'},h('section',{className:'bb-dialog',ref:dialog,role:'dialog','aria-modal':true,'aria-labelledby':'bb-title',onKeyDown:trap},h('p',{className:'bb-eyebrow'},'TEN-KURU'),h('h1',{id:'bb-title'},s.paused?'一時停止':s.phase==='ended'?(s.winner===0?'あなたの勝ち':'相手の勝ち'):'ビリヤード'),
+   s.phase==='ready'&&h('p',{className:'bb-lead'},'ぶつけて、つないで、10を奪う。'),
+   s.phase==='ended'&&h('div',{className:'bb-result'},s.scores[0],h('span',null,' — '),s.scores[1]),
+   s.phase==='ready'&&h('p',{className:'bb-instructions'},'盤面を引っぱって離すと、白い玉を打ちます。交互に1打。10を完成させた人に1点。'),
+   !s.paused&&h('div',{className:'bb-levels','aria-label':'AIの強さ'},Object.entries(BB_CFG.levels).map(([id,c])=>h('button',{key:id,'aria-pressed':level===id,onClick:()=>setLevel(id)},c.label))),
+   h('button',{className:'bb-primary',onClick:s.paused?resume:start},s.paused?'つづける':s.phase==='ended'?'もう一度':'はじめる'),h('button',{className:'bb-secondary',onClick:onBack},'ホームへ'),h('button',{className:'bb-secondary',onClick:toggleSound,'aria-pressed':!muted},muted?'効果音 OFF':'効果音 ON'),
+   h('details',null,h('summary',null,'あそびかた'),h('p',null,'数字の玉どうしがぶつかると結合。数字はそのまま残り、塊になって転がります。白い玉は結合しません。10を超える組み合わせは跳ね返ります。'),h('p',null,'相手が作った塊も使えます。10を完成させた側に1点、先に5点で勝ち。得点しても次は相手の番です。'),h('p',null,'玉が少なくなった時、または残った塊では10を作れない時に、空いた場所へ数字を補充します。既存の玉の位置は変わりません。'),h('p',null,'引っぱる長さで強さを調節。指を戻せばキャンセルできます。白い玉が壁際でも、盤面のどこからでも操作できます。'))))));
+}
+// ── END BILLIARDS UI ──
 
 function App(){
   const[controlSide,setControlSide]=useState(loadControlSide);
@@ -7723,6 +7924,7 @@ function App(){
   function goHome(){if(isSurvival()){goSurvival();return;}if(stageR.current&&stageR.current.ar===4){goCharge();return;}if(stageR.current&&stageR.current.ar===3){goRush();return;}if(stageR.current&&stageR.current.ar===2){goTune();return;}if(stageR.current&&stageR.current.ar===1){goPzxPanel();return;}if(stageR.current){goMap();return;}roundTokR.current++;clearTimers();exitLink();stopBGM();setPhase('menu');}
 
   const curStage=stageCtx?STAGES.areas[stageCtx.ar].stages[stageCtx.st]:null;
+  if(phase==='billiards')return h(BilliardsMode,{onBack:()=>{setPhase('menu');phaseR.current='menu';}});
   if(phase==='colorRoom')return h(ColorRoomMode,{onBack:()=>{setPhase('menu');phaseR.current='menu';}});
   if(phase==='separate')return h(SeparateMode,{onBack:()=>{setPhase('menu');phaseR.current='menu';}});
   if(phase==='energy')return h(EnergyMode,{onBack:()=>{setPhase('menu');phaseR.current='menu';}});
@@ -7737,7 +7939,7 @@ function App(){
   if(phase==='tune')return h(TuneScreen,{onBattle:startTuneBattle,onBack:()=>{setPhase('menu');phaseR.current='menu';}}); // v239
   if(phase==='pzx')return h(PzxPanel,{save,onBattle:startPzxStage,onEnter:()=>{setPhase('pzxmap');phaseR.current='pzxmap';},onBack:()=>{setPhase('menu');phaseR.current='menu';},onReset:()=>{updSave(s=>{s.pzx={got:[],boss:false};return s;});}}); // v214/v218 リセットは進行だけ消す（本編の★は無関係）
   if(phase==='pzxmap')return h(PzxWorld,{onPick:startPzxStage,onBack:()=>{setPhase('pzx');phaseR.current='pzx';}}); // v225/v231
-  if(phase==='menu')return h(TitleScreen,{onColorRoom:()=>{setPhase('colorRoom');phaseR.current='colorRoom';},onSeparate:()=>{setPhase('separate');phaseR.current='separate';},onEnergy:()=>{setPhase('energy');phaseR.current='energy';},onDice:()=>{setPhase('dice');phaseR.current='dice';},onShared:()=>{setPhase('shared');phaseR.current='shared';},onPlay:()=>{setPhase('map');phaseR.current='map';},onPuzzlux:()=>{setPhase('pzx');phaseR.current='pzx';},onRush:goRush,onCharge:goCharge,onSurvival:goSurvival,onFall:()=>{setPhase('fall');phaseR.current='fall';},onSolo:()=>{setPhase('solo');phaseR.current='solo';},onTune:()=>{setPhase('tune');phaseR.current='tune';},onTutorial:()=>openTutorial(null),onSettings:()=>{setPhase('controlSettings');phaseR.current='controlSettings';},musicOn:musicEnabled,toggleMusic});
+  if(phase==='menu')return h(TitleScreen,{onBilliards:()=>{setPhase('billiards');phaseR.current='billiards';},onColorRoom:()=>{setPhase('colorRoom');phaseR.current='colorRoom';},onSeparate:()=>{setPhase('separate');phaseR.current='separate';},onEnergy:()=>{setPhase('energy');phaseR.current='energy';},onDice:()=>{setPhase('dice');phaseR.current='dice';},onShared:()=>{setPhase('shared');phaseR.current='shared';},onPlay:()=>{setPhase('map');phaseR.current='map';},onPuzzlux:()=>{setPhase('pzx');phaseR.current='pzx';},onRush:goRush,onCharge:goCharge,onSurvival:goSurvival,onFall:()=>{setPhase('fall');phaseR.current='fall';},onSolo:()=>{setPhase('solo');phaseR.current='solo';},onTune:()=>{setPhase('tune');phaseR.current='tune';},onTutorial:()=>openTutorial(null),onSettings:()=>{setPhase('controlSettings');phaseR.current='controlSettings';},musicOn:musicEnabled,toggleMusic});
   if(phase==='champIntro'&&curStage&&curStage.champion)return h(ChampionIntroScreen,{champ:CHAMPIONS[curStage.champion],stage:curStage,onStart:()=>goIntro(pendingDiff)});
   if(phase==='intro'&&curStage&&curStage.intro)return h(IntroVideoScreen,{src:curStage.intro,onDone:()=>goBrief(pendingDiff)}); // v120
   if(phase==='brief'&&curStage)return h(BriefScreen,{stage:curStage,onStart:()=>startGame(pendingDiff)}); // v119

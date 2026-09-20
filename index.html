@@ -2387,6 +2387,7 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .en-time{font:800 26px 'Inter',sans-serif;}
 .en-time-low{color:#ff8a6a;}
 .en-sum{font-size:13px;color:#f2ecd8cc;}
+.en-acts{display:flex;gap:8px;}.en-acts i{width:14px;height:14px;border-radius:50%;border:2px solid #f3cf63;box-sizing:border-box;}.en-acts i.on{background:#f3cf63;box-shadow:0 0 8px #f3cf63;}
 .en-flash{position:absolute;top:-26px;font-weight:800;font-size:18px;animation:enFlash .8s ease forwards;pointer-events:none;text-shadow:0 2px 6px #000;}
 .en-flash-all{color:#ffe07a;font-size:22px;}.en-flash-pair{color:#9ff0b8;}.en-flash-over{color:#ff8a6a;font-size:14px;}.en-flash-ten{color:#fff;}
 @keyframes enFlash{0%{opacity:0;transform:translateY(8px) scale(.8);}25%{opacity:1;transform:none;}100%{opacity:0;transform:translateY(-14px);}}
@@ -3573,7 +3574,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v289'; // エナジー：札を1〜5（同じ数字は3枚まで）に修正。いつもの役（ワンペア〜ストレート）のボーナスエネルギーを追加（使った色それぞれに。量は EN_CFG.roleBonus）
+const APP_VER='v290'; // エナジー：10秒制をやめて「10を3回つくったら放出」に（EN_CFG.actions）。残り回数は●で表示、10をこえても回数は減らない
+// const APP_VER='v289'; // エナジー：札を1〜5（同じ数字は3枚まで）に修正。いつもの役（ワンペア〜ストレート）のボーナスエネルギーを追加（使った色それぞれに。量は EN_CFG.roleBonus）
 // const APP_VER='v288'; // エナジー（試作）：手札10枚（数字＋光/緑/赤）。最初の札で10秒→合計10で使った札の色にエネルギー（同色2枚以上ボーナス、全部同色で強ボーナス）→10秒後に放出してモンスターにダメージ。弱点なし。数値は EN_CFG
 // const APP_VER='v287'; // 通常対戦：相手のエネルギーを場の上に表示（手札は非表示のまま）
 // const APP_VER='v284'; // サイコロ：AIを超弱体化（考える間隔 2.6〜4.2秒、賢い手は30%だけ・残りはでたらめ。数値は DICE_CFG の aiMinMs/aiJitterMs/aiSmartRate）
@@ -5240,7 +5242,7 @@ function DicePad({index,enabled,onRoll}){
   h('span',{className:'dc-pad-label'},index===2?'LEFT':'RIGHT'));
 }
 // v288: エナジーモード（試作）。手札10枚（数字＋光/緑/赤）→最初の札で10秒スタート→合計10でエネルギー→10秒後に放出してモンスターにダメージ。数値は EN_CFG
-const EN_CFG={roundMs:10000,monsterHp:120,dmgPerEnergy:1,perCard:1,pairBonus:2,allBonus:5,roleBonus:{'役なし':0,'ワンペア':2,'ツーペア':4,'スリーカード':6,'ストレート':8},releaseMs:1400,hitAtMs:650,maxVisual:24,colors:['light','green','red']};
+const EN_CFG={actions:3,monsterHp:120,dmgPerEnergy:1,perCard:1,pairBonus:2,allBonus:5,roleBonus:{'役なし':0,'ワンペア':2,'ツーペア':4,'スリーカード':6,'ストレート':8},releaseMs:1400,hitAtMs:650,maxVisual:24,colors:['light','green','red']};
 const EN_COLOR={light:{name:'光',main:'#f3cf63',deep:'#a57b12',bg:'linear-gradient(160deg,#fffbe8,#f7e3a0)',img:'img/energy-light.webp'},green:{name:'緑',main:'#39b964',deep:'#17693a',bg:'linear-gradient(160deg,#f0fff4,#b5ebc6)',img:'img/energy-green.webp'},red:{name:'赤',main:'#e4513e',deep:'#8e2218',bg:'linear-gradient(160deg,#fff3f0,#f6bcb2)',img:'img/energy-red.webp'}};
 let enSerial=0;
 // 札はいつものテンクルと同じ1〜5、手札の中で同じ数字は3枚まで（createDeck と同じ決まり）
@@ -5260,32 +5262,32 @@ function EnergyMode({onBack}){
  const[hand,setHand]=useState(()=>enDeal());
  const[sel,setSel]=useState([]);
  const[en,setEn]=useState({light:0,green:0,red:0});
- const[phase,setPhase]=useState('idle'); // idle→rush→release→idle / win
- const[left,setLeft]=useState(EN_CFG.roundMs);
+ const[phase,setPhase]=useState('idle'); // idle→rush→release→idle / win（v290：時間ではなく「10を3回つくったら放出」）
+ const[left,setLeft]=useState(EN_CFG.actions);
  const[hp,setHp]=useState(EN_CFG.monsterHp);
  const[pop,setPop]=useState(null),[flash,setFlash]=useState(null),[hit,setHit]=useState(0);
- const endAt=useRef(0),enRef=useRef(en),hpRef=useRef(hp);enRef.current=en;hpRef.current=hp;
- useEffect(()=>{if(phase!=='rush')return;const t=setInterval(()=>{const l=Math.max(0,endAt.current-performance.now());setLeft(l);if(l<=0){clearInterval(t);release();}},50);return()=>clearInterval(t);},[phase]);
+ const enRef=useRef(en),hpRef=useRef(hp);enRef.current=en;hpRef.current=hp;
  function release(){
   setSel([]);setPhase('release');
   const total=enRef.current.light+enRef.current.green+enRef.current.red,dmg=total*EN_CFG.dmgPerEnergy;
   setTimeout(()=>{const nh=Math.max(0,hpRef.current-dmg);setHp(nh);setHit(x=>x+1);setPop({dmg,k:Date.now()});try{fxBell({f:392,v:.12,d:.6});}catch(e){}setEn({light:0,green:0,red:0});},EN_CFG.hitAtMs);
-  setTimeout(()=>{setPhase(hpRef.current<=0?'win':'idle');setLeft(EN_CFG.roundMs);},EN_CFG.releaseMs);
+  setTimeout(()=>{setPhase(hpRef.current<=0?'win':'idle');setLeft(EN_CFG.actions);},EN_CFG.releaseMs);
  }
  function tap(card){
-  if(phase==='release'||phase==='win')return;
-  if(phase==='idle'){endAt.current=performance.now()+EN_CFG.roundMs;setPhase('rush');}
+  if(phase==='release'||phase==='win'||left<=0)return;
+  if(phase==='idle')setPhase('rush');
   if(sel.includes(card.id)){setSel(sel.filter(x=>x!==card.id));return;}
   const next=[...sel,card.id],cards=hand.filter(c=>next.includes(c.id)),sum=cards.reduce((a,c)=>a+c.n,0);
   try{playPlaceSE(true);}catch(e){}
   if(sum<10){setSel(next);return;}
   if(sum>10){setSel([]);setFlash({type:'over',k:Date.now()});return;}
   const {g,role,bonus}=enGain(cards);
-  setEn(e=>({light:e.light+g.light,green:e.green+g.green,red:e.red+g.red}));
+  const ne={light:en.light+g.light,green:en.green+g.green,red:en.red+g.red};enRef.current=ne;setEn(ne);
+  const rest=left-1;setLeft(rest);if(rest<=0)setTimeout(release,450);
   setHand(hd=>{const rest=hd.filter(c=>!next.includes(c.id)),out=[];hd.forEach(c=>{if(next.includes(c.id)){const nc=enCard([...rest,...out]);out.push(nc);}});let i=0;return hd.map(c=>next.includes(c.id)?out[i++]:c);});setSel([]);
   setFlash({type:bonus||'ten',role,k:Date.now()});try{fxBell({f:bonus==='all'?1318:bonus==='pair'?1175:1046,v:.08,d:.35});}catch(e){}
  }
- function restart(){setHp(EN_CFG.monsterHp);setEn({light:0,green:0,red:0});setHand(enDeal());setSel([]);setPhase('idle');setLeft(EN_CFG.roundMs);setPop(null);}
+ function restart(){setHp(EN_CFG.monsterHp);setEn({light:0,green:0,red:0});setHand(enDeal());setSel([]);setPhase('idle');setLeft(EN_CFG.actions);setPop(null);}
  const sum=hand.filter(c=>sel.includes(c.id)).reduce((a,c)=>a+c.n,0);
  const orb=(k)=>{const v=en[k],r=Math.min(v,EN_CFG.maxVisual)/EN_CFG.maxVisual,size=46+r*54,glow=4+r*26,rel=phase==='release';
   return h('div',{key:k,className:'en-orb-slot'},
@@ -5300,8 +5302,8 @@ function EnergyMode({onBack}){
    pop&&h('div',{key:pop.k,className:'en-dmg'},'-'+pop.dmg)),
   h('div',{className:'en-orbs'},EN_CFG.colors.map(orb)),
   h('div',{className:'en-status'},
-   phase==='idle'?h('span',{className:'en-hint'},'札を押すと10秒スタート'):phase==='rush'?h('span',{className:'en-time'+(left<3000?' en-time-low':'')},(left/1000).toFixed(1)):phase==='release'?h('span',{className:'en-time'},'放出！'):null,
-   phase==='rush'&&h('span',{className:'en-sum'},'合計 '+sum),
+   phase==='release'?h('span',{className:'en-time'},'放出！'):h('span',{className:'en-acts','aria-label':'あと'+left+'回'},Array.from({length:EN_CFG.actions},(_,i)=>h('i',{key:i,className:i<left?'on':''}))),
+   phase!=='release'&&h('span',{className:'en-sum'},'合計 '+sum),
    flash&&h('span',{key:flash.k,className:'en-flash en-flash-'+flash.type},flash.type==='over'?'10をこえた':((flash.role&&flash.role!=='役なし'?flash.role:'10！')+(flash.type==='all'?' ＋ 全部同じ色！':flash.type==='pair'?' ＋ 同じ色':'')))),
   h('div',{className:'en-mat'},hand.map(c=>h('button',{key:c.id,className:'en-card'+(sel.includes(c.id)?' en-sel':''),onClick:()=>tap(c),style:{background:EN_COLOR[c.c].bg,borderColor:EN_COLOR[c.c].main,color:EN_COLOR[c.c].deep}},h('span',{className:'en-card-dot',style:{background:EN_COLOR[c.c].main}}),c.n))),
   phase==='win'&&h('div',{className:'en-overlay'},h('div',{className:'en-dialog'},h('h1',null,'撃破！'),h('button',{onClick:restart},'もう一度'),h('button',{className:'en-sub',onClick:onBack},'ホームへ'))));

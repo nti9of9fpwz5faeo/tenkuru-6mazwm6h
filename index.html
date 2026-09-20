@@ -2516,6 +2516,18 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .dc-overlay{position:absolute;inset:0;z-index:20;background:#001e17b5;backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:20px;touch-action:pan-y;}.dc-dialog{width:min(355px,100%);max-height:calc(100dvh - 40px);overflow:auto;padding:26px;border:1px solid #b9a468;border-radius:20px;background:linear-gradient(145deg,#103f33,#062a22);box-shadow:0 20px 60px #0008;color:#f1e8c8;}.dc-eyebrow{font:600 9px 'Inter',sans-serif;letter-spacing:3px;color:#c8b77d;}.dc-dialog h1{font-size:28px;margin:12px 0 18px;}.dc-dialog p:not(.dc-eyebrow){font-size:14px;line-height:1.9;margin:12px 0;}.dc-dialog .dc-lead{font-size:16px!important;font-weight:700;}.dc-dialog .dc-note{font-size:12px!important;color:#d4c58e;}.dc-dialog small{display:block;font-size:11px;color:#a8bcb0;}.dc-dialog button{display:block;width:100%;padding:13px;border-radius:10px;font-size:16px;font-weight:700;margin-top:12px;cursor:pointer;}.dc-primary{border:1px solid #f5e4ad;background:linear-gradient(135deg,#ebd69b,#b99a51);color:#183f30;}.dc-secondary{border:1px solid #ac995c80;background:transparent;color:#e4d6ab;}.dc-dialog .dc-result{font-size:25px!important;font-weight:700;}
 /* END DICE MODE CSS */
 
+/* v302: normal battle, select a hand card then choose an empty shared slot. */
+.tap-place-playing .tp-field-cell{position:relative;flex:0 0 var(--card-w);width:var(--card-w);height:calc(var(--card-w) * 1.4);}
+.tap-place-playing .tp-field-cell>.card-stage{width:100%;height:100%;}
+.tap-place-playing .tp-empty{display:block;width:100%;height:100%;padding:0;border:2px dashed #8aa9bc88;border-radius:calc(7 * var(--u));background:#eaf4fa44;color:#6f9ab5;font:400 calc(26 * var(--u)) sans-serif;touch-action:manipulation;cursor:default;}
+.tap-place-playing .tp-empty.ready{border-style:solid;border-color:#53c6f3;background:#e3f7ff88;box-shadow:inset 0 0 16px #53bce733,0 0 9px #24b8fa33;cursor:pointer;color:#0876aa;}
+.tap-place-playing .tp-empty.ready:active{transform:scale(.97);}
+.tap-place-playing .player-hand-slot{border:0;padding:0;background:transparent;font:inherit;touch-action:manipulation;cursor:pointer;}
+.tap-place-playing .player-hand-slot.empty{background:none;border:0;}
+.tap-place-playing .player-hand-slot:disabled{cursor:default;}
+.tap-place-playing .tp-empty:focus-visible,.tap-place-playing .player-hand-slot:focus-visible{outline:3px solid #008bd0;outline-offset:3px;}
+.tap-place-playing .tp-hint{text-align:center;min-height:calc(18 * var(--u));margin-top:calc(7 * var(--u));font-size:calc(11 * var(--u));font-weight:700;color:#4a728e;letter-spacing:.04em;}
+
 /* COLOR ROOM: isolated mode, no shared battle styles. */
 .cr-screen{position:fixed;inset:0;background:#efe1c8;color:#233952;font-family:'Noto Sans JP',sans-serif;display:flex;justify-content:center;touch-action:manipulation;user-select:none}
 .cr-shell{width:min(100%,540px);height:100%;display:flex;flex-direction:column;position:relative;background:linear-gradient(#e9d8bc,#e9e0d1);overflow:hidden;padding-bottom:calc(clamp(34px,6dvh,62px) + env(safe-area-inset-bottom))}
@@ -3696,7 +3708,7 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v301'; // カラールーム：落ち着いた色・大きな手札・使い切り補充・完成不能時リセット
+const APP_VER='v302'; // 通常対戦：手札選択→場の空き枠タップで配置
 // const APP_VER='v299'; // テンフォール：新デザイン素材（背景・盤面・札・マス・ボタン・合計/点数の枠・10完成/💥の演出・説明パネル）を組み込み。ルールは変更なし
 // const APP_VER='v298'; // テンフォール：手札10枚をやめて1〜5の数字ボタン5つに（何回でも押せる・押した数字が下のマスの左から入る）。入れ替えスワイプと案内文は削除。落ち札・💥・点数はそのまま
 // const APP_VER='v297'; // セパレート（試作）：場を2人で分ける。自分の札は自分の場だけ、ぴったり10で役の点、10こえははじき返す、相手が10を作ると自分の場はリセット（札は捨て）、先に15点で勝ち。出せる札がなければその場をリセット。数値は SEP_CFG
@@ -5698,6 +5710,11 @@ function ColorRoomMode({onBack}){
 }
 // ── END COLOR ROOM ──
 
+// Logical card order remains chronological; this mapping controls physical slots only.
+function tapFieldPlaces(field,places=[]){
+ const used=new Set();return field.map((_,i)=>{let slot=places[i];if(!Number.isInteger(slot)||slot<0||slot>3||used.has(slot))slot=[0,1,2,3].find(n=>!used.has(n));used.add(slot);return slot;});
+}
+
 function App(){
   const[controlSide,setControlSide]=useState(loadControlSide);
   const[pCursor,setPCursor]=useState(HAND_NAV.start),pCursorR=useRef(HAND_NAV.start);
@@ -5717,6 +5734,7 @@ function App(){
     if(countNumR.current>0){countSkipR.current&&countSkipR.current();return;}
     if(skipR.current&&resolvingR.current){skipR.current();return;}
     if(!playerCanNavigate()||performance.now()<pMoveUntilR.current)return;
+    if(isTapPlace()){chooseHandCard(pCursorR.current);return;}
     playCard(pCursorR.current);
   }
   useEffect(()=>()=>clearTimeout(pMoveTimerR.current),[]);
@@ -5727,6 +5745,25 @@ function App(){
   const[rushBounce,setRushBounce]=useState(null); // v293
   const[dH,setDH]=useState([]);
   const[field,setField]=useState([]);
+  const[fieldPlaces,setFieldPlaces]=useState([]),fieldPlacesR=useRef([]);
+  const[tapPick,setTapPick]=useState(null),tapPickR=useRef(null);
+  function setPlaces(values){fieldPlacesR.current=values;setFieldPlaces(values);}
+  function clearTapPick(){tapPickR.current=null;setTapPick(null);}
+  function isTapPlace(){return !isTimedMode()&&!isStandardEnergy();}
+  function openFieldSlot(){const used=tapFieldPlaces(fieldR.current,fieldPlacesR.current);return [0,1,2,3].find(slot=>!used.includes(slot));}
+  function fieldSlotEmpty(slot){return Number.isInteger(slot)&&slot>=0&&slot<4&&!tapFieldPlaces(fieldR.current,fieldPlacesR.current).includes(slot);}
+  function chooseHandCard(index){
+    if(!isTapPlace()||!playerCanNavigate())return;
+    const value=pHR.current[index],shown=confuseR.current[index]??value;
+    if(!value||!canPlay(shown,fieldSumR.current,fieldR.current)||pFrzR.current[index]!=null||pLockR.current[index]||(cmdIdxR.current!=null&&cmdIdxR.current!==index))return;
+    if(tapPickR.current&&tapPickR.current.index===index){clearTapPick();return;}
+    const pick={index,value,shown,hand:pHR.current,round:roundTokR.current};tapPickR.current=pick;setTapPick(pick);
+  }
+  function placePickedCard(slot){
+    const pick=tapPickR.current;if(!isTapPlace()||!pick||!playerCanNavigate()||!fieldSlotEmpty(slot))return;
+    if(pick.hand!==pHR.current||pick.value!==pHR.current[pick.index]||pick.shown!==(confuseR.current[pick.index]??pHR.current[pick.index])||pick.round!==roundTokR.current){clearTapPick();return;}
+    playCard(pick.index,slot);
+  }
   const[fieldColors,setFieldColors]=useState([]);
   const[fieldSum,setFieldSum]=useState(0);
   // v54: LINK CARD（手札スロットごとの特殊フラグ／場のカードごとの特殊フラグ／時間停止中）
@@ -5877,13 +5914,13 @@ function App(){
     if(!canPause())return;
     stopEnergy();returnEnergyFlight();
     if(isTimedMode()){if(rushExpired())return;updateCharge();timeLeftR.current=Math.max(0,(rushDeadlineR.current-performance.now())/1000);}
-    pausedR.current=true;setPaused(true);cancelCursor();
+    clearTapPick();pausedR.current=true;setPaused(true);cancelCursor();
     clearInterval(timerRef.current);clearTimeout(aiRef.current);
     try{if(bgmAudio)bgmAudio.pause();}catch(e){}
   }
   useEffect(()=>{
-    const pauseHidden=()=>{if(isStandardEnergy()&&!pausedR.current&&document.hidden)togglePause();};
-    const pauseBlur=()=>{if(isStandardEnergy()&&!pausedR.current)togglePause();};
+    const pauseHidden=()=>{if((isStandardEnergy()||isTapPlace())&&!pausedR.current&&document.hidden)togglePause();};
+    const pauseBlur=()=>{if((isStandardEnergy()||isTapPlace())&&!pausedR.current)togglePause();};
     document.addEventListener('visibilitychange',pauseHidden);window.addEventListener('blur',pauseBlur);
     return()=>{document.removeEventListener('visibilitychange',pauseHidden);window.removeEventListener('blur',pauseBlur);};
   },[]);
@@ -6233,7 +6270,8 @@ function App(){
   }
   function removeFieldIdx(idxs){
     const keep=i=>!idxs.includes(i);
-    const nf=fieldR.current.filter((v,i)=>keep(i));const ns=nf.reduce((a,b)=>a+b,0);
+    const places=tapFieldPlaces(fieldR.current,fieldPlacesR.current).filter((_,i)=>keep(i));
+    const nf=fieldR.current.filter((v,i)=>keep(i));const ns=nf.reduce((a,b)=>a+b,0);setPlaces(places);clearTapPick();
     setField(nf);fieldR.current=nf;setFieldSum(ns);fieldSumR.current=ns;
     setFieldColors(p=>p.filter((v,i)=>keep(i)));colorsR.current=colorsR.current.filter((v,i)=>keep(i));
     setFieldSp(p=>p.filter((v,i)=>keep(i)));setFieldShift(p=>p.filter((v,i)=>keep(i)));setFieldRing(p=>p.filter((v,i)=>keep(i)));
@@ -6373,7 +6411,7 @@ function App(){
     });
     // 鱗粉に隠れてる間に4枚を並べる
     at(LK_T.fieldOut-150,()=>{ // 蝶が通り過ぎた直後、霧の中で並べる
-      const nf=ringed.slice();setField(nf);fieldR.current=nf;fieldSumR.current=nf.reduce((a,b)=>a+b,0);setFieldSum(fieldSumR.current);
+      const nf=ringed.slice();setPlaces(nf.map((_,i)=>i));clearTapPick();setField(nf);fieldR.current=nf;fieldSumR.current=nf.reduce((a,b)=>a+b,0);setFieldSum(fieldSumR.current);
       setFieldColors(nf.map(()=>'dealer'));colorsR.current=nf.map(()=>'dealer');setFieldSp(nf.map(()=>false));setFieldShift(nf.map(()=>false));setFieldRing(nf.map(()=>'luna'));
     });
     at(LK_T.reveal,()=>{setLkFx(s=>s&&({...s,dust:'out'}));try{playPlaceSE(false);fxBell({f:1760,v:0.06,d:1.0,bright:1.2,rev:0.7});}catch(e){}});
@@ -6464,6 +6502,7 @@ function App(){
   useEffect(()=>{fieldR.current=field;},[field]);
   useEffect(()=>{fieldSumR.current=fieldSum;},[fieldSum]);
   useEffect(()=>{phaseR.current=phase;},[phase]);
+  useEffect(()=>{const p=tapPickR.current;if(p&&(phase!=='playing'||p.hand!==pH||p.shown!==(confuse[p.index]??pH[p.index])||pFrz[p.index]!=null||pLock[p.index]||(cmdIdx!=null&&cmdIdx!==p.index)||rStop||paused||countNum>=0||!canPlay(p.shown,fieldSum,field)))clearTapPick();},[pH,field,fieldSum,confuse,pFrz,pLock,cmdIdx,rStop,paused,countNum,phase]);
 
 
   // 曲サイクル：1 → 2 → 3 → ミュート(0) → 1 → …
@@ -6478,10 +6517,11 @@ function App(){
       return next;
     });
   }
-  function clearTimers(){stopEnergy();returnEnergyFlight();cancelCursor();clearTimeout(aiRef.current);clearInterval(timerRef.current);clearTimeout(countRef.current);clearTimeout(rushNextR.current);clearTimeout(rushSettleR.current);clearTimeout(rushToastR.current);}
+  function clearTimers(){clearTapPick();stopEnergy();returnEnergyFlight();cancelCursor();clearTimeout(aiRef.current);clearInterval(timerRef.current);clearTimeout(countRef.current);clearTimeout(rushNextR.current);clearTimeout(rushSettleR.current);clearTimeout(rushToastR.current);}
   // v54: プレイヤー手札を配る（特殊フラグも同時に付与）
   // プレイヤーへ手札10枚を配る。何周目かを数え、appearOnDeal 周目からクロノリンクを1枚付ける
   function dealPlayer(hand){
+    clearTapPick();
     const c=chronoR.current;c.deals++;
     const sp=new Array(hand.length).fill(false);
     if(hand.length){
@@ -6644,7 +6684,7 @@ function App(){
     form2R.current=false;setForm2(false);shiftPendingR.current=false;setShiftScene(null);sceneOnR.current=false;setScreenPop(false);setPtBurst(false);srPendingR.current=false;setFieldRing([]);setSrBanner(false);setLkFx(null);dIdsR.current=[];dSlotsR.current=Array(10).fill(null);setDSlots(Array(10).fill(null));dCurR.current=null;setDCur({id:null,tap:false});r2R.current={rounds:0,timeLeft:0,cmdNext:null,tappedThisRound:false};r2PendingCardR.current=null;setTimeRounds(0);setTapCardId(null);setLocks([]);setCmd(null);rStopR.current=false;setRStop(false);setEraseIdx([]);colorsR.current=[]; // v70/v75/v79/v85/v121
     dealPlayer(p);setDealer(d);exitLink();
     setPPt(0);setDPt(0);pPtR.current=0;dPtR.current=0;
-    setRNum(1);setField([]);setFieldSum(0);fieldR.current=[];fieldSumR.current=0;
+    setRNum(1);setField([]);setPlaces([]);clearTapPick();setFieldSum(0);fieldR.current=[];fieldSumR.current=0;
     setFlashMsg(null);setBurstAnim(false);setResetFA(false);setGameEndData(null);
     if(trackNumR.current>0)startBGM(trackNumR.current,stageBgm());
     if(opts.challenge){ // v95: 第7は画像を読み込んでからカウントダウン（最大4秒待ち）
@@ -6673,7 +6713,7 @@ function App(){
     rStopR.current=false;setRStop(false);rStopT.current.forEach(clearTimeout);rStopT.current=[];setCmd(null);setEraseIdx([]);pausedR.current=false;setPaused(false);setInfoRing(null);flyR.current=null;setFlyCard(null);cancelCursor(); // v84/v91/v107/v109/v112
     // v118: 幻惑はラウンドをまたいで続く。その2枚を場に出すまで解けない（配り直しとステージ離脱でのみ解除）
     setPhase('playing');phaseR.current='playing';
-    setField([]);setFieldSum(0);fieldR.current=[];fieldSumR.current=0;setFieldSp([]);
+    setField([]);setPlaces([]);clearTapPick();setFieldSum(0);fieldR.current=[];fieldSumR.current=0;setFieldSp([]);
     setFieldColors([]); // v46: 時間切れ後に前ラウンドの色記録が残って自分のカードがオレンジになるバグ修正
     setFlashMsg(null);if(!keepT)setTimeLeft(roundSecR.current);setComboShow(null);setTimeUpShow(false);setFieldShift([]);
     const skip=rn>1&&COUNT_CFG.laterSkip; // v174 区切りなし
@@ -7404,6 +7444,8 @@ function App(){
     const idx=dIdsR.current.indexOf(pick.id);
     const dHand=dHR.current,rf=dRingR.current,cf=fieldR.current,cs=fieldSumR.current;
     if(idx<0||dHand[idx]!==pick.value||isHoldRing(rf[idx])||pick.id===r2PendingCardR.current||dFrzR.current[pick.id]!=null||!canPlay(dHand[idx],cs,cf)||(isRush()&&cs+dHand[idx]>10)||countNumR.current>=0){scheduleAi(rn);return;}
+    const placeSlot=isTapPlace()?openFieldSlot():undefined;
+    if(isTapPlace()&&placeSlot==null){scheduleAi(rn);return;}
     if(!spendCharge('dealer')){scheduleAi(rn);return;}
     if(!spendEnergy('dealer',pick.value)){scheduleAi(rn);return;}
     const chosen=dHand[idx],pickedRf=rf[idx];
@@ -7414,7 +7456,7 @@ function App(){
     const cardEl=document.querySelector('.gp-dealer-cards .gp-dealer-card[data-card-id="'+pick.id+'"]');const fc=document.querySelector('.gp-field-cards');
     const fr=fc?fc.getBoundingClientRect():{left:0,top:300*u,width:window.innerWidth,height:80*u};
     const cr=cardEl?cardEl.getBoundingClientRect():{left:fr.left+fr.width/2-10*u,top:fr.top-70*u,width:20*u,height:30*u};
-    const targetSlot=isStandardEnergy()&&fc&&fc.querySelector('.energy-field-slot'),target=targetSlot&&targetSlot.getBoundingClientRect();
+    const targetSlot=fc&&(isTapPlace()?fc.querySelector('.tp-field-cell[data-field-slot="'+placeSlot+'"]'):isStandardEnergy()?fc.querySelector('.energy-field-slot'):null),target=targetSlot&&targetSlot.getBoundingClientRect();
     const gap=5*u,cardW=target?target.width:(fr.width-3*gap)/4,n=fieldR.current.length;
     const x0=cr.left+cr.width/2,y0=cr.top+cr.height/2,x1=target?target.left+target.width/2:fr.left+n*(cardW+gap)+cardW/2,y1=target?target.top+target.height/2:fr.top+fr.height/2;
     const newDH=dHand.filter((_,i)=>i!==idx),newRf=rf.filter((_,i)=>i!==idx),newIds=dIdsR.current.filter((_,i)=>i!==idx);
@@ -7423,7 +7465,7 @@ function App(){
     const _so2=stageOptsR.current||{};
     // v135: 初手だけ降下も速める
     const FLY_MS=Math.max(120,Math.round(((fieldR.current.length===0&&_so2.flyMsFirst)?_so2.flyMsFirst:(_so2.flyMs||(_so2.speed<1?380:680)))*_csK())); // v240 降下も cardSpeed で速く
-    flyR.current={id:pick.id,value:chosen,face,rf:pickedRf,chargePaid:isCharge(),energyPaid:isStandardEnergy()?chosen:0};setFlyCard({k:Date.now(),value:chosen,face,x0,y0,x1,y1,w:cardW,d:FLY_MS});
+    flyR.current={id:pick.id,value:chosen,face,rf:pickedRf,placeSlot,chargePaid:isCharge(),energyPaid:isStandardEnergy()?chosen:0};setFlyCard({k:Date.now(),value:chosen,face,x0,y0,x1,y1,w:cardW,d:FLY_MS});
     try{fxAir({v:0.03,a:0.02,d:0.5,hp:4000,rev:0.5});}catch(e){}
     const flight=flyR.current; // 返却した同じ札を再び投げても、古い着地処理と区別する
     setTimeout(()=>{
@@ -7431,7 +7473,7 @@ function App(){
       if(isTimedMode()&&rushExpired())return;
       flyR.current=null;
       const cf2=fieldR.current,cs2=fieldSumR.current;
-      const ok=phaseR.current==='playing'&&countNumR.current<0&&!resolvingR.current&&!eraseBusyR.current&&!pausedR.current&&!pStopR.current&&canPlay(f.value,cs2,cf2)&&!(isRush()&&cs2+f.value>10); // v293 ラッシュは10こえを着地させず手札へ返す / v137: 時間停止中は着地させず手札へ返す（10超えはバーストとして着地する）
+      const ok=phaseR.current==='playing'&&countNumR.current<0&&!resolvingR.current&&!eraseBusyR.current&&!pausedR.current&&!pStopR.current&&(!isTapPlace()||fieldSlotEmpty(f.placeSlot))&&canPlay(f.value,cs2,cf2)&&!(isRush()&&cs2+f.value>10); // v293 ラッシュは10こえを着地させず手札へ返す / v137: 時間停止中は着地させず手札へ返す（10超えはバーストとして着地する）
       if(!ok){ // 戻す
         setFlyCard(c=>c?{...c,back:true}:c);setTimeout(()=>setFlyCard(null),380);
         refundCharge(f);const h2=[...dHR.current,f.value],r2=[...dRingR.current,f.rf||false],ids2=[...dIdsR.current,f.id];setDealer(h2,r2,ids2);
@@ -7455,13 +7497,14 @@ function App(){
         setDealer([...keep,...nd],[...keepRf,...nd.map(()=>false)],[...dIdsR.current,...nd.map(()=>null)]);
       }
       dLandAtR.current=Date.now(); // v179
-      const ended=resolvePlay(f.value,cf2,cs2,'dealer',rn);
+      const ended=resolvePlay(f.value,cf2,cs2,'dealer',rn,false,false,f.placeSlot);
       if(isSurvival()&&checkSurvivalEmpty())return;
       if(!ended)scheduleAi(rn);
     },FLY_MS);
   }
 
-  function playCard(idx){
+  function playCard(idx,placeSlot){
+    if(isTapPlace()&&placeSlot!=null&&!fieldSlotEmpty(placeSlot))return;
     if(isTimedMode()&&countNumR.current<0&&rushExpired())return;
     if(phaseR.current!=='playing'||countNumR.current>=0||sceneOnR.current)return; // v75: 変身演出中は操作不可
     if(pFrzR.current[idx]!=null){ // v127: 凍っている札は出せない
@@ -7504,6 +7547,7 @@ function App(){
     if(cmdIdxR.current!=null&&cmdIdxR.current!==idx){fxLockHint('指名された札から');return;} // v84 指名
     if(!spendCharge('player'))return;
     if(!spendEnergy('player',value))return;
+    clearTapPick();
     if(cmdIdxR.current===idx)setCmd(null);
     const isSp=!!pSpR.current[idx];
     const wasLink=linkR.current;   // 時間停止中の「追加の1枚」か
@@ -7533,7 +7577,7 @@ function App(){
     if(pRingR.current===idx)activatePlayerRing(); // v136: 星環の札を出した → 効果が3ラウンド続く
     pLandAtR.current=Date.now(); // v179
     { const g=gkR.current;if(g.chain!=null&&value===g.chain)g.chain=null;if(g.silenceRn===rNum)g.coolUntil=Date.now()+GIMMICKS.silence.cool; } // v197
-    const ended=resolvePlay(value,cf,cs,'player',rNum,isSp,shifted);
+    const ended=resolvePlay(value,cf,cs,'player',rNum,isSp,shifted,placeSlot);
     if(isSurvival()&&checkSurvivalEmpty())return;
     // v137: 自分が場の合計をちょうど6にしたら相手を3秒止める。
     // activatePlayerRing が先に走るので、環を出したそのターンに6になった場合も発動する
@@ -7557,8 +7601,9 @@ function App(){
     clearTimeout(aiRef.current);scheduleAi(rNum);
   }
 
-  function resolvePlay(value,curField,curSum,who,rn,isSp,shifted){
+  function resolvePlay(value,curField,curSum,who,rn,isSp,shifted,placeSlot){
     if(isTimedMode()&&rushExpired())return true;
+    if(isTapPlace()){const used=tapFieldPlaces(curField,fieldPlacesR.current);const target=placeSlot==null?[0,1,2,3].find(n=>!used.includes(n)):placeSlot;setPlaces([...used,target]);}
     const nf=[...curField,value],ns=curSum+value;
     setField(nf);setFieldSum(ns);fieldR.current=nf;fieldSumR.current=ns;
     setFieldColors(prev=>[...prev,who]);colorsR.current=[...colorsR.current,who];
@@ -7642,7 +7687,7 @@ function App(){
       const waitT=setTimeout(()=>proceed(false),waitMs);
       if(!flow&&!shiftNow){skipR.current=()=>proceed(true);setSkipOn(true);}
         }
-  function resetField(){setField([]);setFieldSum(0);fieldR.current=[];fieldSumR.current=0;setFieldColors([]);colorsR.current=[];setFieldSp([]);setFieldShift([]);setFieldRing([]);}
+  function resetField(){setField([]);setPlaces([]);clearTapPick();setFieldSum(0);fieldR.current=[];fieldSumR.current=0;setFieldColors([]);colorsR.current=[];setFieldSp([]);setFieldShift([]);setFieldRing([]);}
   function endGame(pp,dp,byTime,afterFx){
     const win=byTime?(pp>dp?'player':(pp<dp?'dealer':'draw')):(pp>=winPtR.current?'player':'dealer'); // v175 時間切れは点数比較
     if(hitFxR.current&&!afterFx){ // v198/v202 決着の瞬間：進行と操作を止めて WIN/LOSE を見せてから結果へ（パズルクス用に残置）
@@ -7720,13 +7765,14 @@ function App(){
   }
 
   const so=stageOptsR.current||{};
-  const standardEnergy=isStandardEnergy();
+  const standardEnergy=isStandardEnergy(),tapPlace=isTapPlace();
+  const physicalPlaces=tapFieldPlaces(field,fieldPlaces),pickReady=tapPlace&&tapPick&&playerCanNavigate()&&canPlay(tapPick.shown,fieldSum,field);
   const chargeEmpty=so.charge&&charge.player+1e-9<1;
   const selectedValue=confuse[pCursor]!=null?confuse[pCursor]:pH[pCursor];
   const selectedPlayable=selectedValue!=null&&!chargeEmpty&&canPlay(selectedValue,fieldSum,field)&&!pLock[pCursor]&&pFrz[pCursor]==null&&(cmdIdx==null||cmdIdx===pCursor);
   const rival=(form2&&so.form2Name)||so.rivalName||'DEALER';
   // v62: 第7は「ルナ」／v70: 第2形態は「レイピア」
-  return h('div',{className:'gp-screen'+((so.charge||so.survival)?' cursor-playing':'')+(standardEnergy?' energy-playing':'')+(so.charge?' charge-playing':'')+(so.survival?' survival-playing':'')+(so.rush?' rush-playing':'')+(endHold?' end-hold':'')+(so.challenge?' ch7':'')+(so.ch8?' ch8':'')+(so.ch9?' ch9':'')+(so.ch10?' ch10':'')+(form2?' f2':'')+(screenPop?' form2-pop':'')+(lkFx?' lk-on':'')},
+  return h('div',{className:'gp-screen'+(tapPlace?' tap-place-playing':'')+((so.charge||so.survival)?' cursor-playing':'')+(standardEnergy?' energy-playing':'')+(so.charge?' charge-playing':'')+(so.survival?' survival-playing':'')+(so.rush?' rush-playing':'')+(endHold?' end-hold':'')+(so.challenge?' ch7':'')+(so.ch8?' ch8':'')+(so.ch9?' ch9':'')+(so.ch10?' ch10':'')+(form2?' f2':'')+(screenPop?' form2-pop':'')+(lkFx?' lk-on':'')},
     h(ChampionLayer,{champ:stageOptsR.current&&stageOptsR.current.champion?CHAMPIONS[stageOptsR.current.champion]:null}), // v61 チャンピオン戦は立ち絵
     so.challenge&&h('div',{className:'champ-layer'},
       form2
@@ -7862,10 +7908,12 @@ function App(){
       h('div',{className:'field-planet'}),
 
       h('div',{className:'gp-field-cards'},
+        tapPlace?Array.from({length:4},(_,slot)=>{const i=physicalPlaces.indexOf(slot);return h('div',{key:slot,className:'tp-field-cell'+(i>=0?' filled':''),'data-field-slot':slot},i>=0?h('div',{className:eraseIdx.includes(i)?'fx-erase':undefined},h(FieldCard,{value:mist?'?':field[i],by:fieldColors[i],decisive:endHit&&i===field.length-1,isComplete:fieldSum===10&&i===field.length-1,isSpecial:!!fieldSp[i],shifted:!!fieldShift[i],ringed:fieldRing[i]||false})):h('button',{type:'button',className:'tp-empty'+(pickReady?' ready':''),disabled:!pickReady,onClick:()=>placePickedCard(slot),'aria-label':'場の枠'+(slot+1)+'に置く'},pickReady?'+':''));}):
         field.map((v,i)=>h('div',{key:i,className:eraseIdx.includes(i)?'fx-erase':undefined,style:{display:'contents'}},h(FieldCard,{value:mist?'?':v,by:fieldColors[i],decisive:endHit&&i===field.length-1,isComplete:fieldSum===10&&i===field.length-1,isSpecial:!!fieldSp[i],shifted:!!fieldShift[i],ringed:fieldRing[i]||false}))), // v197 霧
         so.charge&&Array.from({length:Math.max(0,4-field.length)},(_,i)=>h('div',{key:'slot'+i,className:'charge-field-slot','aria-hidden':true})),
         standardEnergy&&Array.from({length:Math.max(0,4-field.length)},(_,i)=>h('div',{key:'energy-slot'+i,className:'energy-field-slot','aria-hidden':true}))
       ),
+      tapPlace&&h('div',{className:'tp-hint',role:'status'},tapPick?'置く枠をタップ':'手札 → 空き枠'),
       // FIELD SUM（場のカードの下・前の配置に戻す＋少し強化）
       h('div',{className:'gp-field-sum gp-field-sum-strong',style:{visibility:fieldSum>0?'visible':'hidden'}},
         h('div',{className:'main'},
@@ -7903,9 +7951,9 @@ function App(){
         Array.from({length:5},(_,col)=>{
           const i=row*5+col,v=pH[i]??null,dv=confuse[i]!=null?confuse[i]:v,dk=lantern&&!lantern.lit.includes(i);
           const unavailable=v==null||chargeEmpty||(standardEnergy&&energy.player+1e-9<dv)||countNum>=0||!canPlay(dv,fieldSum,field)||rStop||!!pLock[i]||pFrz[i]!=null||(cmdIdx!=null&&cmdIdx!==i);
-          const directTap=standardEnergy||so.rush; // v293 ラッシュはカーソルをやめて直接タップ
+          const directTap=tapPlace||standardEnergy||so.rush; // v293 ラッシュはカーソルをやめて直接タップ
           const legacyTap=!directTap&&!so.charge&&!so.survival; // v296 通常・チャレンジは十字キー前と同じく札そのものをタップ
-          return h(directTap?'button':'div',{key:i,type:directTap?'button':undefined,onClick:standardEnergy?()=>playCard(i):so.rush?()=>{if(countNumR.current>0){countSkipR.current&&countSkipR.current();return;}if(skipR.current&&resolvingR.current){skipR.current();return;}playCard(i);}:undefined,disabled:standardEnergy?(unavailable||paused||resolvingR.current||lockR.current):so.rush?(v==null||paused):undefined,className:'player-hand-slot'+(legacyTap?' legacy-tap':'')+(v==null?' empty':'')+(!directTap&&!legacyTap&&pCursor===i?' selected':'')+(so.rush&&rushBounce&&rushBounce.i===i?' rush-bounce':''),'data-slot':i,'aria-label':v==null?'空き枠':(dk?'裏向き':dv)+'のカード','aria-current':!directTap&&!legacyTap&&pCursor===i?'true':undefined},
+          return h(directTap?'button':'div',{key:i,type:directTap?'button':undefined,onClick:tapPlace?()=>chooseHandCard(i):standardEnergy?()=>playCard(i):so.rush?()=>{if(countNumR.current>0){countSkipR.current&&countSkipR.current();return;}if(skipR.current&&resolvingR.current){skipR.current();return;}playCard(i);}:undefined,disabled:tapPlace?(unavailable||!playerCanNavigate()):standardEnergy?(unavailable||paused||resolvingR.current||lockR.current):so.rush?(v==null||paused):undefined,className:'player-hand-slot'+(legacyTap?' legacy-tap':'')+(v==null?' empty':'')+((tapPlace&&tapPick&&tapPick.index===i)||(!directTap&&!legacyTap&&pCursor===i)?' selected':'')+(so.rush&&rushBounce&&rushBounce.i===i?' rush-bounce':''),'data-slot':i,'aria-label':v==null?'空き枠':(dk?'裏向き':dv)+'のカード','aria-pressed':tapPlace?!!(tapPick&&tapPick.index===i):undefined,'aria-current':!directTap&&!legacyTap&&pCursor===i?'true':undefined},
             v!=null&&h(SlideCard,{value:dk?'?':dv,dark:dk,onPlay:legacyTap?()=>playCard(i):()=>{},disabled:unavailable,cardState:countNum>=0?null:handCardState(dv,fieldSum,field),frozen:pFrz[i],justFrozen:justFrz.includes(i),pRing:pRing===i,shuffling:shufAll,marked:marked.includes(i),newRefill:so.survival&&survivalReward&&survivalReward.who==='player'&&performance.now()<survivalReward.until&&survivalReward.slots.includes(i),cardRole:'player',isSpecial:!!pSp[i],linkPick:linkMode&&canPlay(dv,fieldSum,field),rLock:!!pLock[i],rCmd:cmdIdx===i,rWait:cmdIdx!=null&&cmdIdx!==i,confused:confuse[i]!=null}));
         }))))
     ),

@@ -2601,12 +2601,6 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .bb-placing-footer{gap:5px;padding-top:5px;padding-bottom:8px}.bb-return-balls{display:flex;justify-content:center;align-items:center;gap:5px;max-width:100%;min-height:35px}.bb-return-balls span{flex:0 1 30px;width:30px;height:30px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 32% 24%,#fffced,#ddd5bc 65%,#938d79);color:#24352b;font:700 22px Georgia,serif;box-shadow:0 3px 4px #0005}.bb-return-balls .next{outline:2px solid #e6c98b;outline-offset:2px}.bb-placing-footer p{font-size:12px;letter-spacing:.03em}
 
 
-/* v306 — a cancel drop zone appears only while pulling; it does not change board geometry. */
-.bb-shot-controls{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:44px}.bb-shot-controls .bb-power{width:62%;flex-shrink:1}.bb-cancel-shot{flex-shrink:0;min-width:100px;height:44px;padding:0 12px;border:1px solid #c9b17c;border-radius:10px;background:linear-gradient(#514532,#2e2b20);color:#f3e5c4;font:13px 'Noto Sans JP',sans-serif;touch-action:none}.bb-cancel-shot.active{background:#e4cca0;color:#273a2d;border-color:#fff0c6;box-shadow:0 0 12px #dfbf6d50}
-.bb-shot-controls:has(.bb-cancel-shot) .bb-power{width:45%}
-.bb-footer:has(.bb-shot-controls){padding:4px 12px 8px;gap:4px}
-@media(max-height:620px){.bb-footer:has(.bb-shot-controls){height:78px;padding:3px 8px 5px;gap:3px}.bb-footer:has(.bb-shot-controls) p{min-height:20px}}
-
 </style>
 <link rel="stylesheet" href="shared-board.css">
 </head>
@@ -3752,7 +3746,7 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v306'; // ビリヤード：打球キャンセル・10連続成功中の手番継続・次の打者の相手が配置
+const APP_VER='v307'; // ビリヤード：4球で10・数字10球・バースト再配置・ボタンなしキャンセル
 // const APP_VER='v299'; // テンフォール：新デザイン素材（背景・盤面・札・マス・ボタン・合計/点数の枠・10完成/💥の演出・説明パネル）を組み込み。ルールは変更なし
 // const APP_VER='v298'; // テンフォール：手札10枚をやめて1〜5の数字ボタン5つに（何回でも押せる・押した数字が下のマスの左から入る）。入れ替えスワイプと案内文は削除。落ち札・💥・点数はそのまま
 // const APP_VER='v297'; // セパレート（試作）：場を2人で分ける。自分の札は自分の場だけ、ぴったり10で役の点、10こえははじき返す、相手が10を作ると自分の場はリセット（札は捨て）、先に15点で勝ち。出せる札がなければその場をリセット。数値は SEP_CFG
@@ -5760,24 +5754,24 @@ function tapFieldPlaces(field,places=[]){
  const used=new Set();return field.map((_,i)=>{let slot=places[i];if(!Number.isInteger(slot)||slot<0||slot>3||used.has(slot))slot=[0,1,2,3].find(n=>!used.has(n));used.add(slot);return slot;});
 }
 
-// ── BILLIARDS ENGINE v306 ──
+// ── BILLIARDS ENGINE v307 ──
 // Shared, pocketless compound-ball billiards. Fixed 120 Hz; rendering and AI use the same engine.
-const BB_CFG={w:440,h:706,r:20,target:15,initialBalls:12,step:1/120,friction:125,maxSpeed:1120,levels:{easy:{label:'やさしい',samples:18,error:.075},normal:{label:'ふつう',samples:60,error:.012},hard:{label:'つよい',samples:130,error:.001}}};
+const BB_CFG={w:440,h:706,r:20,target:15,initialBalls:10,step:1/120,friction:125,maxSpeed:1120,levels:{easy:{label:'やさしい',samples:18,error:.075},normal:{label:'ふつう',samples:60,error:.012},hard:{label:'つよい',samples:130,error:.001}}};
 function bbBody(id,x,y,parts){const b={id,x,y,vx:0,vy:0,a:0,w:0,parts:parts.map(p=>({...p})),sum:parts.reduce((s,p)=>s+p.n,0)};b.mass=parts.length;b.inertia=parts.reduce((s,p)=>s+p.x*p.x+p.y*p.y+BB_CFG.r**2/2,0);return b;}
 function bbPoints(b){const c=Math.cos(b.a),s=Math.sin(b.a);return b.parts.map(p=>({x:b.x+p.x*c-p.y*s,y:b.y+p.x*s+p.y*c,n:p.n}));}
 function bbRole(values){const r=calcPts(values);return{points:r.total,label:r.voice};}
 function bbCreate(level='normal',rng=Math.random){
- const s={h:BB_CFG.h,bodies:[],nextId:1,turn:0,scores:[0,0],phase:'ready',paused:false,level:BB_CFG.levels[level]?level:'normal',moving:false,elapsed:0,quiet:0,now:0,turnNo:0,shots:0,shotTen:false,returnBalls:[],placing:false,placer:null,nextShooter:null,placeSeq:0,events:[],eventId:0,merged:0,winner:null,aiWait:0};
+ const s={h:BB_CFG.h,bodies:[],nextId:1,turn:0,scores:[0,0],phase:'ready',paused:false,level:BB_CFG.levels[level]?level:'normal',moving:false,elapsed:0,quiet:0,now:0,turnNo:0,shots:0,shotTen:false,shotBurst:false,returnBalls:[],returnKinds:[],placing:false,placer:null,nextShooter:null,placeSeq:0,events:[],eventId:0,merged:0,winner:null,aiWait:0};
  s.bodies.push(bbBody(s.nextId++,220,588,[{x:0,y:0,n:0}]));
- // Twelve separate numbers, including triples and every value 1–5. No premade hands.
- const values=[1,1,1,2,2,3,3,3,4,4,5,5];
+ // Ten separate numbers: two of each value 1–5. The white cue is extra.
+ const values=[1,1,2,2,3,3,4,4,5,5];
  for(let i=values.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[values[i],values[j]]=[values[j],values[i]];}
- const spots=[[66,68],[213,92],[362,65],[100,199],[245,207],[373,181],[57,333],[191,310],[333,323],[110,443],[257,431],[372,473]];
+ const spots=[[66,68],[213,92],[362,65],[100,199],[280,207],[57,333],[191,310],[333,323],[110,443],[310,463]];
  spots.forEach(([x,y],i)=>s.bodies.push(bbBody(s.nextId++,x+(rng()-.5)*14,y+(rng()-.5)*14,[{x:0,y:0,n:values[i]}])));return s;
 }
 function bbEvent(s,kind,data={}){s.events.push({id:++s.eventId,kind,at:s.now,...data});if(s.events.length>80)s.events.splice(0,s.events.length-80);}
 function bbStart(s){if(s.phase==='ready'){s.phase='active';s.aiWait=.8;}}
-function bbShoot(s,angle,power){if(s.phase!=='active'||s.paused||s.moving||s.placing||!Number.isFinite(angle)||!Number.isFinite(power)||power<.035)return false;const cue=s.bodies.find(b=>b.sum===0);if(!cue)return false;const speed=BB_CFG.maxSpeed*Math.min(1,Math.max(.08,power));cue.vx=Math.cos(angle)*speed;cue.vy=Math.sin(angle)*speed;s.moving=true;s.elapsed=0;s.quiet=0;s.shots++;s.shotTen=false;s.nextShooter=null;bbEvent(s,'shot',{power,x:cue.x,y:cue.y,angle});return true;}
+function bbShoot(s,angle,power){if(s.phase!=='active'||s.paused||s.moving||s.placing||!Number.isFinite(angle)||!Number.isFinite(power)||power<.035)return false;const cue=s.bodies.find(b=>b.sum===0);if(!cue)return false;const speed=BB_CFG.maxSpeed*Math.min(1,Math.max(.08,power));cue.vx=Math.cos(angle)*speed;cue.vy=Math.sin(angle)*speed;s.moving=true;s.elapsed=0;s.quiet=0;s.shots++;s.shotTen=false;s.shotBurst=false;s.nextShooter=null;bbEvent(s,'shot',{power,x:cue.x,y:cue.y,angle});return true;}
 function bbImpulse(a,b,p,nx,ny,restitution){
  const ax=p.x-a.x,ay=p.y-a.y,bx=b?p.x-b.x:0,by=b?p.y-b.y:0;
  const rvx=(b?b.vx-b.w*by:0)-(a.vx-a.w*ay),rvy=(b?b.vy+b.w*bx:0)-(a.vy+a.w*ax),vn=rvx*nx+rvy*ny;
@@ -5785,13 +5779,17 @@ function bbImpulse(a,b,p,nx,ny,restitution){
  const j=-(1+restitution)*vn/(1/a.mass+(b?1/b.mass:0)+ca*ca/a.inertia+(b?cb*cb/b.inertia:0));
  a.vx-=j*nx/a.mass;a.vy-=j*ny/a.mass;a.w-=j*ca/a.inertia;if(b){b.vx+=j*nx/b.mass;b.vy+=j*ny/b.mass;b.w+=j*cb/b.inertia;}return -vn;
 }
+function bbOutcome(sum,count){return count===4&&sum===10?'ten':(sum>=10||count>=4?'burst':'join');}
+function bbQueueReturn(s,points,kind){for(const p of points){s.returnBalls.push(p.n);s.returnKinds.push(kind);}}
 function bbJoin(s,a,b){
  const ps=[...bbPoints(a),...bbPoints(b)],mass=a.mass+b.mass,x=(a.x*a.mass+b.x*b.mass)/mass,y=(a.y*a.mass+b.y*b.mass)/mass;
  const c=bbBody(s.nextId++,x,y,ps.map(p=>({x:p.x-x,y:p.y-y,n:p.n})));
  c.vx=(a.vx*a.mass+b.vx*b.mass)/mass;c.vy=(a.vy*a.mass+b.vy*b.mass)/mass;
  c.w=(a.w*a.inertia+b.w*b.inertia+(a.x-x)*a.mass*a.vy-(a.y-y)*a.mass*a.vx+(b.x-x)*b.mass*b.vy-(b.y-y)*b.mass*b.vx)/c.inertia;
  s.bodies=s.bodies.filter(o=>o!==a&&o!==b);s.merged++;
- if(c.sum===10){const role=bbRole(ps.map(p=>p.n));s.scores[s.turn]+=role.points;s.shotTen=true;s.returnBalls.push(...ps.map(p=>p.n));bbEvent(s,'ten',{x,y,points:ps,who:s.turn,role,extra:true});if(s.scores[s.turn]>=BB_CFG.target){s.phase='ended';s.endedAt=s.now;s.winner=s.turn;s.moving=false;bbEvent(s,'end',{who:s.turn});}}
+ const outcome=bbOutcome(c.sum,ps.length);
+ if(outcome==='ten'){const role=bbRole(ps.map(p=>p.n));s.scores[s.turn]+=role.points;s.shotTen=true;bbQueueReturn(s,ps,'ten');bbEvent(s,'ten',{x,y,points:ps,who:s.turn,role,extra:true});}
+ else if(outcome==='burst'){s.shotBurst=true;bbQueueReturn(s,ps,'burst');bbEvent(s,'burst',{x,y,points:ps,who:s.turn,sum:c.sum});}
  else{s.bodies.push(c);bbEvent(s,'join',{x,y,sum:c.sum});}return c;
 }
 function bbBreak(s,cluster){
@@ -5820,12 +5818,14 @@ function bbPhysics(s,dt){
    const dx=target.x-white.x,dy=target.y-white.y,distance=Math.hypot(dx,dy)||1;bbImpulse(white,target,{x:(white.x+target.x)/2,y:(white.y+target.y)/2},dx/distance,dy/distance,.9);return;
   }
   const siblings=a.splitId&&a.splitId===b.splitId&&s.now<Math.max(a.splitUntil||0,b.splitUntil||0);
-  if(!siblings&&a.sum>0&&b.sum>0&&a.sum+b.sum<=10&&rvx*nx+rvy*ny<-.3){bbJoin(s,a,b);return;}
+  if(!siblings&&a.sum>0&&b.sum>0&&rvx*nx+rvy*ny<-.3){bbJoin(s,a,b);return;}
   const depth=2*R-d+.01,ma=(1/a.mass)/(1/a.mass+1/b.mass);a.x-=nx*depth*ma;a.y-=ny*depth*ma;b.x+=nx*depth*(1-ma);b.y+=ny*depth*(1-ma);
   const v=bbImpulse(a,b,pt,nx,ny,.92);if(v>24)bbEvent(s,'hit',{power:v/700});
  }
 }
-function bbFollowingPlayer(s){return s.shotTen?s.turn:1-s.turn;}
+function bbFollowingPlayer(s){return s.shotTen&&!s.shotBurst?s.turn:1-s.turn;}
+function bbSetPlacer(s){s.placer=s.returnKinds[0]==='burst'?s.nextShooter:1-s.nextShooter;}
+function bbPlacementBatch(s){const kind=s.returnKinds[0],end=s.returnKinds.findIndex(k=>k!==kind);return s.returnBalls.slice(0,end<0?undefined:end);}
 function bbNextTurn(s){
  const previous=s.turn,next=s.nextShooter??bbFollowingPlayer(s);s.placing=false;s.placer=null;s.nextShooter=null;s.aiWait=.85;s.turn=next;
  if(next===previous)bbEvent(s,'bonus',{who:s.turn});
@@ -5834,15 +5834,15 @@ function bbNextTurn(s){
 function bbValidPlacement(s,x,y){const r=BB_CFG.r;if(!Number.isFinite(x)||!Number.isFinite(y)||x<r+2||x>BB_CFG.w-r-2||y<r+2||y>s.h-r-2)return false;return s.bodies.every(b=>bbPoints(b).every(p=>Math.hypot(p.x-x,p.y-y)>=2*r+4));}
 function bbPlace(s,who,x,y){
  if(s.phase!=='active'||s.paused||s.moving||!s.placing||s.placer!==who||!s.returnBalls.length||!bbValidPlacement(s,x,y))return false;
- const n=s.returnBalls.shift();s.bodies.push(bbBody(s.nextId++,x,y,[{x:0,y:0,n}]));s.placeSeq++;s.aiWait=.4;bbEvent(s,'place',{x,y,n,who});
- if(!s.returnBalls.length)bbNextTurn(s);return true;
+ const n=s.returnBalls.shift();s.returnKinds.shift();s.bodies.push(bbBody(s.nextId++,x,y,[{x:0,y:0,n}]));s.placeSeq++;s.aiWait=.4;bbEvent(s,'place',{x,y,n,who});
+ if(!s.returnBalls.length)bbNextTurn(s);else{const previous=s.placer;bbSetPlacer(s);if(previous!==s.placer){s.aiWait=.65;bbEvent(s,'placement',{who:s.placer,count:bbPlacementBatch(s).length,next:s.nextShooter});}}return true;
 }
 function bbPlacementOptions(s){const out=[];for(let y=30;y<=s.h-28;y+=30)for(let x=30;x<=BB_CFG.w-28;x+=30)if(bbValidPlacement(s,x,y))out.push({x,y});return out;}
 function bbChoosePlacement(s,rng=Math.random){
  const options=bbPlacementOptions(s);if(!options.length)return null;if(s.level==='easy')return options[Math.floor(rng()*options.length)];
- const n=s.returnBalls[0],cue=s.bodies.find(b=>!b.sum),next=s.nextShooter??bbFollowingPlayer(s),partners=s.bodies.filter(b=>b.sum&&b.sum+n<=10);let best=options[0],score=-Infinity;
- for(const p of options){let danger=0;for(const b of partners)for(const q of bbPoints(b)){const dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy),gx=p.x-dx/d*40,gy=p.y-dy/d*40,cd=Math.hypot(gx-cue.x,gy-cue.y),dot=((gx-cue.x)*dx+(gy-cue.y)*dy)/(cd*d||1);if(dot>.2)danger=Math.max(danger,(b.sum+n===10?5:1)*dot/(1+d/100));}
-  // When the scorer shoots again, keep easy finishes away; when AI shoots next, set one up.
+ const n=s.returnBalls[0],cue=s.bodies.find(b=>!b.sum),next=s.nextShooter??bbFollowingPlayer(s),partners=s.bodies.filter(b=>b.sum&&bbOutcome(b.sum+n,b.parts.length+1)!=='burst');let best=options[0],score=-Infinity;
+ for(const p of options){let danger=0;for(const b of partners)for(const q of bbPoints(b)){const dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy),gx=p.x-dx/d*40,gy=p.y-dy/d*40,cd=Math.hypot(gx-cue.x,gy-cue.y),dot=((gx-cue.x)*dx+(gy-cue.y)*dy)/(cd*d||1);if(dot>.2)danger=Math.max(danger,(bbOutcome(b.sum+n,b.parts.length+1)==='ten'?5:1)*dot/(1+d/100));}
+  // The AI blocks the next human shooter, or sets up its own turn after a burst.
   const value=(next===1?danger:-danger)*100+Math.hypot(p.x-cue.x,p.y-cue.y)*.025+(rng()-.5)*(s.level==='hard'?1:12);
   if(value>score){score=value;best=p;}
  }return best;
@@ -5852,7 +5852,8 @@ function bbStep(s,dt=BB_CFG.step,simulation=false){if(s.phase!=='active'||s.paus
  const moving=s.bodies.some(b=>Math.hypot(b.vx,b.vy)>2||Math.abs(b.w)>.04);s.quiet=moving?0:s.quiet+dt;
  if(s.quiet>.18||s.elapsed>10){
   for(const b of s.bodies){b.vx=0;b.vy=0;b.w=0;}s.moving=false;s.aiWait=.85;s.nextShooter=bbFollowingPlayer(s);
-  if(s.returnBalls.length){s.placing=true;s.placer=1-s.nextShooter;s.placeSeq++;s.aiWait=.65;bbEvent(s,'placement',{who:s.placer,count:s.returnBalls.length,next:s.nextShooter});}
+  if(s.scores[s.turn]>=BB_CFG.target){s.phase='ended';s.endedAt=s.now;s.winner=s.turn;bbEvent(s,'end',{who:s.turn});return;}
+  if(s.returnBalls.length){s.placing=true;bbSetPlacer(s);s.placeSeq++;s.aiWait=.65;bbEvent(s,'placement',{who:s.placer,count:bbPlacementBatch(s).length,next:s.nextShooter});}
   else bbNextTurn(s);
  }
 }
@@ -5864,19 +5865,19 @@ function bbRay(s,angle){const cue=s.bodies.find(b=>!b.sum),dx=Math.cos(angle),dy
 function bbCandidates(s){const cue=s.bodies.find(b=>!b.sum),nums=s.bodies.filter(b=>b.sum),out=[],seen=new Set();
  const add=(a,p)=>{const key=Math.round(a*120)+':'+Math.round(p*100);if(!seen.has(key)){seen.add(key);out.push({angle:a,power:p});}};
  // Ghost-ball contact points aim a numbered ball toward a compatible ball/cluster.
- const pairs=[];for(const a of nums)for(const b of nums)if(a!==b&&a.sum+b.sum<=10)for(const p of bbPoints(a))for(const q of bbPoints(b)){
+ const pairs=[];for(const a of nums)for(const b of nums)if(a!==b&&bbOutcome(a.sum+b.sum,a.parts.length+b.parts.length)!=='burst')for(const p of bbPoints(a))for(const q of bbPoints(b)){
   const dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy),gx=p.x-dx/d*40,gy=p.y-dy/d*40,dist=Math.hypot(gx-cue.x,gy-cue.y),dot=((gx-cue.x)*dx+(gy-cue.y)*dy)/(dist*d);
-  if(dot<.2)continue;const angle=Math.atan2(gy-cue.y,gx-cue.x);pairs.push({angle,rank:(a.parts.length>1?-160:0)+(a.sum+b.sum===10?100+bbRole([...a.parts,...b.parts].map(p=>p.n)).points*25:0)+dot*10-dist*.005,power:Math.min(1,Math.sqrt(2*BB_CFG.friction*(dist+d*a.mass+30))/BB_CFG.maxSpeed)});
+  if(dot<.2)continue;const angle=Math.atan2(gy-cue.y,gx-cue.x);pairs.push({angle,rank:(a.parts.length>1?-160:0)+(bbOutcome(a.sum+b.sum,a.parts.length+b.parts.length)==='ten'?100+bbRole([...a.parts,...b.parts].map(p=>p.n)).points*25:0)+dot*10-dist*.005,power:Math.min(1,Math.sqrt(2*BB_CFG.friction*(dist+d*a.mass+30))/BB_CFG.maxSpeed)});
  }
  pairs.sort((a,b)=>b.rank-a.rank);for(const p of pairs){add(p.angle,Math.min(1,p.power*1.15));add(p.angle,Math.min(1,p.power*1.55));}
  for(const b of nums)for(const p of bbPoints(b)){add(Math.atan2(p.y-cue.y,p.x-cue.x),.65);add(Math.atan2(p.y-cue.y,p.x-cue.x),.95);}
  for(let i=0;i<24;i++)add(i*Math.PI/12,.85);return out;
 }
 function bbRisk(s){const cue=s.bodies.find(b=>!b.sum),nums=s.bodies.filter(b=>b.sum);let risk=0;
- for(const a of nums)for(const b of nums)if(a!==b&&a.parts.length===1&&a.sum+b.sum===10){const p=bbPoints(a)[0],q=bbPoints(b)[0],dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy),gx=p.x-dx/d*40,gy=p.y-dy/d*40,cd=Math.hypot(gx-cue.x,gy-cue.y),dot=((gx-cue.x)*dx+(gy-cue.y)*dy)/(cd*d||1);if(dot>.35&&bbRay(s,Math.atan2(gy-cue.y,gx-cue.x))>=cd-5)risk=Math.max(risk,dot*14*bbRole([...a.parts,...b.parts].map(p=>p.n)).points);}
+ for(const a of nums)for(const b of nums)if(a!==b&&a.parts.length===1&&bbOutcome(a.sum+b.sum,a.parts.length+b.parts.length)==='ten'){const p=bbPoints(a)[0],q=bbPoints(b)[0],dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy),gx=p.x-dx/d*40,gy=p.y-dy/d*40,cd=Math.hypot(gx-cue.x,gy-cue.y),dot=((gx-cue.x)*dx+(gy-cue.y)*dy)/(cd*d||1);if(dot>.35&&bbRay(s,Math.atan2(gy-cue.y,gx-cue.x))>=cd-5)risk=Math.max(risk,dot*14*bbRole([...a.parts,...b.parts].map(p=>p.n)).points);}
  return risk;
 }
-function bbEvaluate(s,shot){const c=JSON.parse(JSON.stringify(s));c.events=[];c.phase='active';c.paused=false;c.turn=1;const before=c.scores[1],joined=c.merged;bbShoot(c,shot.angle,shot.power);for(let i=0;i<1250&&c.moving;i++)bbStep(c,BB_CFG.step,true);return (c.scores[1]-before)*200+(c.merged-joined)*4+(c.shotTen?25:0)-(!c.shotTen?bbRisk(c):0);}
+function bbEvaluate(s,shot){const c=JSON.parse(JSON.stringify(s));c.events=[];c.phase='active';c.paused=false;c.turn=1;const before=c.scores[1],joined=c.merged;bbShoot(c,shot.angle,shot.power);for(let i=0;i<1250&&c.moving;i++)bbStep(c,BB_CFG.step,true);return (c.scores[1]-before)*200+(c.merged-joined)*4+(c.shotTen&&!c.shotBurst?25:0)-(c.shotBurst?100:0)-(!c.shotTen||c.shotBurst?bbRisk(c):0);}
 // ── END BILLIARDS ENGINE ──
 
 // Original synthesized SE: ivory-ball clicks, soft cushions, bonding chimes and a ten fanfare.
@@ -5895,6 +5896,7 @@ function bbAudio(){let enabled=true,disposed=false;const nodes=new Set(),last={}
    notes.forEach((f,i)=>{tone(f,.40+rank*.045,.06,i*.055);tone(f*2,.20,.009,i*.055);});
    if(rank>=4){tone(523.25,.72,.04,.19);tone(783.99,.72,.032,.19);}
   }
+  else if(kind==='burst'){click(.13,850);tone(330,.16,.055,0,'triangle',140);tone(180,.22,.035,.045,'sine',80);}
   else if(kind==='break'){click(.14,1800);tone(820,.10,.035,0,'sine',410);tone(570,.12,.025,.035,'sine',285);}
   else if(kind==='place'){click(.085,1200);tone(420,.07,.035,0,'sine',230);}
   else if(kind==='bonus'){tone(659.25,.16,.035);tone(1046.5,.27,.045,.09);}
@@ -5925,6 +5927,7 @@ function bbDraw(ctx,s,aim,width,height,reduced=false){
  // Ivory ghosts converge, then a restrained champagne-gold bloom rewards the completed hand.
  for(const e of s.events){const age=s.now-e.at;if(age<0)continue;
   if(e.kind==='shot'&&age<.16){const k=age/.16;ctx.save();ctx.globalAlpha=(1-k)*.3;ctx.strokeStyle='#e6d4a0';ctx.lineWidth=1.1;ctx.beginPath();ctx.arc(e.x,e.y,R+6*k,e.angle+Math.PI*.65,e.angle+Math.PI*1.35);ctx.stroke();ctx.restore();}
+  if(e.kind==='burst'&&age<.95){const k=age/.95;ctx.save();ctx.globalAlpha=1-k;ctx.strokeStyle='#d3ab8b';ctx.lineWidth=1.5;for(const p of e.points){ctx.beginPath();ctx.arc(p.x,p.y,R+(!reduced?k*24:0),0,Math.PI*2);ctx.stroke();}ctx.fillStyle='#ecd5bb';ctx.textAlign='center';ctx.font='bold 19px "Noto Sans JP",sans-serif';ctx.fillText('バースト',Math.max(60,Math.min(BB_CFG.w-60,e.x)),Math.max(28,e.y));ctx.restore();}
   if(e.kind!=='ten'||age>1.55)continue;const rank=e.role?.points||1,k=age/1.55,alpha=Math.min(1,age/.07)*(1-Math.max(0,(k-.45)/.55));
   ctx.save();ctx.globalAlpha=alpha;const radius=26+Math.min(1,age/.65)*(45+rank*7);
   if(age<.24&&!reduced){const f=age/.24;ctx.fillStyle='#fff6d5';for(const p of e.points){ctx.beginPath();ctx.arc(p.x+(e.x-p.x)*f,p.y+(e.y-p.y)*f,R*(1-f),0,Math.PI*2);ctx.fill();}}
@@ -5938,11 +5941,10 @@ function bbDraw(ctx,s,aim,width,height,reduced=false){
  ctx.restore();
 }
 function BilliardsMode({onBack}){
- const game=useRef(null);if(!game.current)game.current=bbCreate();const canvas=useRef(null),sound=useRef(null),aim=useRef({angle:-1.95,power:0}),drag=useRef(null),job=useRef(null),dialog=useRef(null),pauseBtn=useRef(null),cancelBtn=useRef(null),[level,setLevel]=useState('normal'),[muted,setMuted]=useState(false),[,render]=useState(0);
+ const game=useRef(null);if(!game.current)game.current=bbCreate();const canvas=useRef(null),sound=useRef(null),aim=useRef({angle:-1.95,power:0}),drag=useRef(null),job=useRef(null),dialog=useRef(null),pauseBtn=useRef(null),[level,setLevel]=useState('normal'),[muted,setMuted]=useState(false),[,render]=useState(0);
  const paint=()=>render(v=>v+1),s=game.current,modal=s.phase==='ready'||s.paused||(s.phase==='ended'&&s.now-s.endedAt>1.65);
  function cancelDrag(){drag.current=null;aim.current.power=0;delete aim.current.place;}
  function abortShot(){const d=drag.current;cancelDrag();if(d?.mode==='shot'){game.current.cancelUntil=game.current.now+.9;try{if(canvas.current?.hasPointerCapture(d.id))canvas.current.releasePointerCapture(d.id);}catch(err){}}paint();}
- function inCancelZone(e){const r=cancelBtn.current?.getBoundingClientRect();return !!r&&e.clientX>=r.left-8&&e.clientX<=r.right+8&&e.clientY>=r.top-8&&e.clientY<=r.bottom+8;}
  function start(){sound.current?.stop();resumeAC();game.current=bbCreate(level);bbStart(game.current);job.current=null;aim.current={angle:-1.95,power:0};cancelDrag();paint();}
  function pause(){if(game.current.phase!=='active')return;game.current.paused=true;cancelDrag();sound.current?.stop();paint();}
  function resume(){game.current.paused=false;resumeAC();paint();requestAnimationFrame(()=>pauseBtn.current?.focus());}
@@ -5951,9 +5953,9 @@ function BilliardsMode({onBack}){
  function point(e){const r=canvas.current.getBoundingClientRect();return{x:(e.clientX-r.left)*BB_CFG.w/r.width,y:(e.clientY-r.top)*game.current.h/r.height};}
  function canPlace(){const g=game.current;return g.phase==='active'&&!g.paused&&!g.moving&&g.placing&&g.placer===0;}
  function placeAt(p){const g=game.current;if(bbPlace(g,0,p.x,p.y)){delete aim.current.place;job.current=null;}else g.placeHintUntil=g.now+1.2;paint();}
- function down(e){if((!canInput()&&!canPlace())||e.button!==0||drag.current)return;e.preventDefault();resumeAC();const p=point(e);drag.current={id:e.pointerId,...p,cx:e.clientX,cy:e.clientY,nearOrigin:true,cancelZone:false,mode:canPlace()?'place':'shot',ticket:game.current.placeSeq};if(canPlace())aim.current.place=p;try{e.currentTarget.setPointerCapture(e.pointerId);}catch(err){cancelDrag();}paint();}
- function move(e){const d=drag.current;if(!d||d.id!==e.pointerId)return;const p=point(e);if(d.mode==='place'){if(canPlace()&&d.ticket===game.current.placeSeq){aim.current.place=p;paint();}return;}if(!canInput())return;d.nearOrigin=Math.hypot(e.clientX-d.cx,e.clientY-d.cy)<=18;d.cancelZone=inCancelZone(e);const dx=d.x-p.x,dy=d.y-p.y,len=Math.hypot(dx,dy);if(len>3&&!d.cancelZone)aim.current.angle=Math.atan2(dy,dx);aim.current.power=d.nearOrigin||d.cancelZone?0:Math.min(1,len/145);paint();}
- function up(e){const d=drag.current;if(d?.id!==e.pointerId)return;move(e);if(d.mode==='place'){if(canPlace()&&d.ticket===game.current.placeSeq)placeAt(point(e));}else if(canInput()){if(d.nearOrigin||d.cancelZone)abortShot();else bbShoot(game.current,aim.current.angle,aim.current.power);}cancelDrag();if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId);paint();}
+ function down(e){if((!canInput()&&!canPlace())||e.button!==0||drag.current)return;e.preventDefault();resumeAC();const p=point(e);drag.current={id:e.pointerId,...p,cx:e.clientX,cy:e.clientY,nearOrigin:true,mode:canPlace()?'place':'shot',ticket:game.current.placeSeq};if(canPlace())aim.current.place=p;try{e.currentTarget.setPointerCapture(e.pointerId);}catch(err){cancelDrag();}paint();}
+ function move(e){const d=drag.current;if(!d||d.id!==e.pointerId)return;const p=point(e);if(d.mode==='place'){if(canPlace()&&d.ticket===game.current.placeSeq){aim.current.place=p;paint();}return;}if(!canInput())return;d.nearOrigin=Math.hypot(e.clientX-d.cx,e.clientY-d.cy)<=24;const dx=d.x-p.x,dy=d.y-p.y,len=Math.hypot(dx,dy);if(len>3)aim.current.angle=Math.atan2(dy,dx);aim.current.power=d.nearOrigin?0:Math.min(1,len/145);paint();}
+ function up(e){const d=drag.current;if(d?.id!==e.pointerId)return;move(e);if(d.mode==='place'){if(canPlace()&&d.ticket===game.current.placeSeq)placeAt(point(e));}else if(canInput()){if(d.nearOrigin)abortShot();else bbShoot(game.current,aim.current.angle,aim.current.power);}cancelDrag();if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId);paint();}
  function key(e){
   if(canPlace()&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Enter',' '].includes(e.key)){e.preventDefault();const p=aim.current.place||bbPlacementOptions(game.current)[0];if(!p)return;aim.current.place={...p};const q=aim.current.place;if(e.key==='ArrowLeft')q.x-=10;if(e.key==='ArrowRight')q.x+=10;if(e.key==='ArrowUp')q.y-=10;if(e.key==='ArrowDown')q.y+=10;if(e.key==='Enter'||e.key===' ')placeAt(q);paint();return;}
   if(!canInput())return;if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '].includes(e.key)){e.preventDefault();if(e.key==='ArrowLeft')aim.current.angle-=.04;if(e.key==='ArrowRight')aim.current.angle+=.04;if(e.key==='ArrowUp')aim.current.power=Math.min(1,(aim.current.power||.3)+.05);if(e.key==='ArrowDown')aim.current.power=Math.max(.08,(aim.current.power||.3)-.05);if(e.key===' '){resumeAC();bbShoot(game.current,aim.current.angle,aim.current.power||.5);aim.current.power=0;}paint();}}
@@ -5979,18 +5981,18 @@ function BilliardsMode({onBack}){
  },[]);
  useEffect(()=>{if(modal)dialog.current?.querySelector('button')?.focus();},[modal,s.phase]);
  function trap(e){if(e.key!=='Tab')return;const els=[...e.currentTarget.querySelectorAll('button,summary')].filter(el=>el.getClientRects().length),first=els[0],end=els[els.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();end.focus();}else if(!e.shiftKey&&document.activeElement===end){e.preventDefault();first.focus();}}
- const celebration=s.events.findLast(e=>e.kind==='ten'&&s.now-e.at<1.55),pulling=drag.current?.mode==='shot',cancelReady=pulling&&(drag.current.nearOrigin||drag.current.cancelZone),bonus=s.shots>0&&s.shotTen&&!s.moving&&!s.placing&&s.phase==='active',status=s.phase==='ended'?'対戦終了':s.placing?(s.placer===0?'玉を配置':'相手が配置'):s.moving?'転がっています':bonus?(s.turn===0?'もう1打':'相手 もう1打'):s.turn===0?'あなたの番':'相手の番';
+ const celebration=s.events.findLast(e=>e.kind==='ten'&&s.now-e.at<1.55),pulling=drag.current?.mode==='shot',cancelReady=pulling&&drag.current.nearOrigin,bonus=s.shots>0&&s.shotTen&&!s.shotBurst&&!s.moving&&!s.placing&&s.phase==='active',status=s.phase==='ended'?'対戦終了':s.placing?(s.placer===0?'玉を配置':'相手が配置'):s.moving?'転がっています':bonus?(s.turn===0?'もう1打':'相手 もう1打'):s.turn===0?'あなたの番':'相手の番';
  return h('main',{className:'bb-screen'},h('div',{className:'bb-shell'},
   h('header',{className:'bb-hud',inert:modal?'':undefined},h('div',{className:'bb-score'},h('span',null,'自分'),h('b',{key:s.scores[0],className:s.scores[0]?'bb-score-pop':''},s.scores[0])),h('div',{className:'bb-turn'+(bonus?' bb-bonus-turn':''),role:'status','aria-live':'polite'},status,h('small',null,s.placing?(s.nextShooter===0?'次は自分が打つ':'次は相手が打つ'):BB_CFG.target+'点先取')),h('div',{className:'bb-score'},h('span',null,'相手'),h('b',{key:s.scores[1],className:s.scores[1]?'bb-score-pop':''},s.scores[1])),h('button',{className:'bb-pause',ref:pauseBtn,onClick:pause,'aria-label':'一時停止'},'Ⅱ')),
-  h('div',{className:'bb-board-space',inert:modal?'':undefined},h('div',{className:'bb-table'},h('canvas',{ref:canvas,className:'bb-canvas',tabIndex:modal?-1:0,'aria-label':s.placing?'数字の配置。盤面をタップして置きます。キーボードは矢印で位置、Enterで配置。':'ビリヤード盤面。盤面を引っぱって離すと打球。キーボードは左右で方向、上下で強さ、スペースで打球。',onPointerDown:down,onPointerMove:move,onPointerUp:up,onPointerCancel:()=>{cancelDrag();paint();},onLostPointerCapture:()=>{cancelDrag();paint();},onKeyDown:key,onContextMenu:e=>e.preventDefault()}),celebration&&h('div',{key:celebration.id,className:'bb-role-reward bb-rank-'+celebration.role.points,role:'status','aria-live':'polite'},h('span',{className:'bb-reward-who'},celebration.who===0?'自分':'相手'),h('strong',null,celebration.role.label),h('div',{className:'bb-reward-points'},'+'+celebration.role.points,h('small',null,' pt')),h('span',{className:'bb-reward-numbers'},celebration.points.map(p=>p.n).sort((a,b)=>a-b).join(' · ')),celebration.extra&&s.phase!=='ended'&&h('small',{className:'bb-reward-extra'},'もう1打')))),
-  h('footer',{className:'bb-footer'+(s.placing?' bb-placing-footer':''),inert:modal?'':undefined},s.placing?h(React.Fragment,null,h('div',{className:'bb-return-balls','aria-label':'置き直す数字'},s.returnBalls.map((n,i)=>h('span',{key:s.placeSeq+i,className:i===0?'next':''},n))),h('p',{role:'status','aria-live':'polite'},s.placer===1?'相手が玉を配置しています':s.placeHintUntil>s.now?'玉と重ならない場所に置いてね':'盤面をタップして '+s.returnBalls[0]+' を配置')):h(React.Fragment,null,h('div',{className:'bb-shot-controls'},h('div',{className:'bb-power',role:'meter','aria-label':'打つ強さ','aria-valuemin':0,'aria-valuemax':100,'aria-valuenow':Math.round(aim.current.power*100)},h('i',{style:{width:aim.current.power*100+'%'}})),pulling&&h('button',{ref:cancelBtn,className:'bb-cancel-shot'+(drag.current.cancelZone?' active':''),'aria-label':'打球をキャンセル',onPointerDown:e=>{e.preventDefault();e.stopPropagation();abortShot();},onClick:abortShot},'キャンセル')),h('p',null,pulling?(cancelReady?'離してキャンセル':'元に戻すか、キャンセルへ'):s.cancelUntil>s.now?'キャンセルしました':s.moving?'':s.turn===1?'相手が狙っています':bonus?'もう1打、狙えます':'盤面を引っぱって、はなす'))),
+  h('div',{className:'bb-board-space',inert:modal?'':undefined},h('div',{className:'bb-table'},h('canvas',{ref:canvas,className:'bb-canvas',tabIndex:modal?-1:0,'aria-label':s.placing?'数字の配置。盤面をタップして置きます。キーボードは矢印で位置、Enterで配置。':'ビリヤード盤面。盤面を引っぱって離すと打球。キーボードは左右で方向、上下で強さ、スペースで打球。',onPointerDown:down,onPointerMove:move,onPointerUp:up,onPointerCancel:()=>{cancelDrag();paint();},onLostPointerCapture:()=>{cancelDrag();paint();},onKeyDown:key,onContextMenu:e=>e.preventDefault()}),celebration&&h('div',{key:celebration.id,className:'bb-role-reward bb-rank-'+celebration.role.points,role:'status','aria-live':'polite'},h('span',{className:'bb-reward-who'},celebration.who===0?'自分':'相手'),h('strong',null,celebration.role.label),h('div',{className:'bb-reward-points'},'+'+celebration.role.points,h('small',null,' pt')),h('span',{className:'bb-reward-numbers'},celebration.points.map(p=>p.n).sort((a,b)=>a-b).join(' · ')),celebration.extra&&!s.shotBurst&&s.scores[celebration.who]<BB_CFG.target&&s.phase!=='ended'&&h('small',{className:'bb-reward-extra'},'もう1打')))),
+  h('footer',{className:'bb-footer'+(s.placing?' bb-placing-footer':''),inert:modal?'':undefined},s.placing?h(React.Fragment,null,h('div',{className:'bb-return-balls','aria-label':'置き直す数字'},bbPlacementBatch(s).map((n,i)=>h('span',{key:s.placeSeq+i,className:i===0?'next':''},n))),h('p',{role:'status','aria-live':'polite'},s.placer===1?'相手が玉を配置しています':s.placeHintUntil>s.now?'玉と重ならない場所に置いてね':'盤面をタップして '+s.returnBalls[0]+' を配置')):h(React.Fragment,null,h('div',{className:'bb-power',role:'meter','aria-label':'打つ強さ','aria-valuemin':0,'aria-valuemax':100,'aria-valuenow':Math.round(aim.current.power*100)},h('i',{style:{width:aim.current.power*100+'%'}})),h('p',null,pulling?(cancelReady?'離してキャンセル':'指を戻すとキャンセル'):s.cancelUntil>s.now?'キャンセルしました':s.moving?'':s.turn===1?'相手が狙っています':bonus?'もう1打、狙えます':'盤面を引っぱって、はなす'))),
   modal&&h('div',{className:'bb-overlay'},h('section',{className:'bb-dialog',ref:dialog,role:'dialog','aria-modal':true,'aria-labelledby':'bb-title',onKeyDown:trap},h('p',{className:'bb-eyebrow'},'TEN-KURU'),h('h1',{id:'bb-title'},s.paused?'一時停止':s.phase==='ended'?(s.winner===0?'あなたの勝ち':'相手の勝ち'):'ビリヤード'),
    s.phase==='ready'&&h('p',{className:'bb-lead'},'ぶつけて、つないで、10を奪う。'),
    s.phase==='ended'&&h('div',{className:'bb-result'},s.scores[0],h('span',null,' — '),s.scores[1]),
-   s.phase==='ready'&&h('p',{className:'bb-instructions'},'10を作り続ける限り、あなたの番。配置は次に打つ人の相手が行います。'),
+   s.phase==='ready'&&h('p',{className:'bb-instructions'},'4個で10を作ると、もう1打。10を超えるとバースト。'),
    !s.paused&&h('div',{className:'bb-levels','aria-label':'AIの強さ'},Object.entries(BB_CFG.levels).map(([id,c])=>h('button',{key:id,'aria-pressed':level===id,onClick:()=>setLevel(id)},c.label))),
    h('button',{className:'bb-primary',onClick:s.paused?resume:start},s.paused?'つづける':s.phase==='ended'?'もう一度':'はじめる'),h('button',{className:'bb-secondary',onClick:onBack},'ホームへ'),h('button',{className:'bb-secondary',onClick:toggleSound,'aria-pressed':!muted},muted?'効果音 OFF':'効果音 ON'),
-   h('details',null,h('summary',null,'あそびかた'),h('p',null,'数字の玉どうしがぶつかると結合。数字はそのまま残り、塊になって転がります。白い玉が塊に当たると全解除。数字どうしで10を超える組み合わせは跳ね返ります。'),h('p',null,'数字12個と白い玉1個、全部バラバラで開始。相手が作った塊も使えます。15点先取で勝ち。'),h('p',null,'役なし1点、ワンペア2点、ツーペア3点、スリーカード4点、ストレート5点。5＋5は役なし。ストレートは1・2・3・4、同じ数字3個以上はスリーカードです。'),h('p',null,'役なしを含め、10を完成させるたびに手番が続きます。連続回数に上限はありません。10を作れなかったときに交代します。'),h('p',null,'次に打つ人を先に決め、その反対側が消えた数字を1個ずつ配置します。相手が5＋5を作ったら相手が続けて打つので、自分が2個を配置。自分が10を作ったら相手が配置します。'),h('p',null,'引っぱる長さで強さを調節。引っぱり始めた位置の近くへ戻して離すか、下のキャンセルへ指を動かして離すと取り消せます。白い玉が壁際でも、盤面のどこからでも操作できます。'))))));
+   h('details',null,h('summary',null,'あそびかた'),h('p',null,'数字の玉どうしがぶつかると結合。数字はそのまま残り、塊になって転がります。白い玉が塊に当たると全解除。4個で合計10になったときだけ得点。10を超えたら、その組み合わせはバーストします。'),h('p',null,'数字は1〜5を2個ずつ、計10個。白い玉は別に1個。全部バラバラで開始。相手が作った塊も使えます。15点先取で勝ち。'),h('p',null,'ワンペア2点、ツーペア3点、ストレート5点。ストレートは1・2・3・4です。各数字が2個ずつなので、スリーカードはありません。'),h('p',null,'4個で10を完成させるたびに手番が続きます。連続回数に上限はありません。10を作れなかったときやバーストしたときに交代します。'),h('p',null,'完成した4個は、次に打つ人の相手が配置。バーストした玉は、次に打つ人自身が配置します。4個未満で10になった場合、4個で10にならなかった場合、塊どうしで5個以上になる場合もバースト。同じ一打で完成とバーストが起きたら、得点は入り、手番は交代します。'),h('p',null,'引っぱる長さで強さを調節。引っぱり始めた位置の近くへ指を戻して離すと取り消せます。白い玉が壁際でも、盤面のどこからでも操作できます。'))))));
 }
 // ── END BILLIARDS UI ──
 

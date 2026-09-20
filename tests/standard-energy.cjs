@@ -92,7 +92,8 @@ for(const reason of ['finish','pause','collision']){
  assert.equal(nodes.filter(n=>hasClass(n,'gp-dealer-card')).length,0);
  assert.equal(nodes.filter(n=>hasClass(n,'energy-field-slot')).length,4);
  assert.equal(nodes.filter(n=>hasClass(n,'gp-hand-row')).length,2);
- assert.equal(nodes.filter(n=>n.type===e.api.EnergyMeter).length,1);
+ assert.equal(nodes.filter(n=>n.type===e.api.EnergyMeter).length,2);
+ assert.equal(nodes.find(n=>n.type===e.api.EnergyMeter&&n.props.who==='dealer').props.value,2);
  assert.equal(nodes.filter(n=>n.type===e.api.HandControls).length,0);
  const cards=nodes.filter(n=>hasClass(n,'player-hand-slot'));assert.equal(cards.length,10);assert.equal(cards[1].props.disabled,false);assert.equal(cards[2].props.disabled,true);
  cards[1].props.onClick();near(e.app.energyR.current.player,0);assert.equal(e.app.fieldSumR.current,2);

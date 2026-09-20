@@ -2345,6 +2345,10 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .energy-playing .gp-field-sum .num{font-size:calc(25 * var(--u))!important;}
 .energy-playing .gp-field-sum .main{gap:calc(5 * var(--u));}
 .gp-screen.energy-playing>.standard-energy{grid-row:5;}
+.gp-screen.energy-playing>.standard-energy.dealer{grid-row:2;align-self:end;justify-self:center;width:calc(260 * var(--u));color:#99521d;background:#fff4e7a0;}
+.standard-energy.dealer>svg{fill:#f39b35;}
+.standard-energy.dealer .energy-cell{border-color:#d7bb99;background:#d9b99133;}
+.standard-energy.dealer .energy-cell>i{background:linear-gradient(#ffda92,#f39b35);}
 .standard-energy{position:relative;display:flex;align-items:center;gap:calc(8 * var(--u));padding:calc(6 * var(--u)) calc(10 * var(--u));background:#eaf7ffa0;border:1px solid #ffffffc0;border-radius:calc(16 * var(--u));color:#2d567e;box-shadow:inset 0 0 calc(8 * var(--u)) #fff8;}
 .standard-energy>svg{width:calc(21 * var(--u));height:calc(27 * var(--u));fill:#16b5f4;stroke:#fff;stroke-width:1;flex:none;}
 .standard-energy>b{font-size:calc(15 * var(--u));min-width:calc(42 * var(--u));text-align:right;font-variant-numeric:tabular-nums;}
@@ -2439,9 +2443,9 @@ function energyAdvance(pool,now){
   const gain=Math.max(0,now-pool.at)/ENERGY_CFG.refillMs;
   return {player:Math.min(ENERGY_CFG.max,pool.player+gain),dealer:Math.min(ENERGY_CFG.max,pool.dealer+gain),at:now};
 }
-function EnergyMeter({value,reward}){
+function EnergyMeter({value,reward,who='player'}){
   const amount=Math.max(0,Math.min(ENERGY_CFG.max,value)),ready=Math.floor(amount+1e-9);
-  return h('div',{className:'standard-energy'+(reward?' rewarding':''),role:'meter','aria-label':'自分のエネルギー','aria-valuemin':0,'aria-valuemax':ENERGY_CFG.max,'aria-valuenow':Math.round(amount*100)/100,'aria-valuetext':ready+' / '+ENERGY_CFG.max},
+  return h('div',{className:'standard-energy '+who+(reward?' rewarding':''),role:'meter','aria-label':who==='dealer'?'相手のエネルギー':'自分のエネルギー','aria-valuemin':0,'aria-valuemax':ENERGY_CFG.max,'aria-valuenow':Math.round(amount*100)/100,'aria-valuetext':ready+' / '+ENERGY_CFG.max},
     h('svg',{viewBox:'0 0 24 32','aria-hidden':true},h('path',{d:'M14 1 L2 18 H10 L8 31 L23 12 H14 Z'})),
     h('div',{className:'energy-cells','aria-hidden':true},Array.from({length:ENERGY_CFG.max},(_,i)=>h('span',{key:i,className:'energy-cell'},h('i',{style:{width:Math.max(0,Math.min(1,amount-i))*100+'%'}})))),
     h('b',null,ready+'/10'),reward&&h('span',{key:reward.id,className:'energy-gain',role:'status'},'+'+reward.amount));
@@ -3530,7 +3534,7 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v286'; // 通常対戦：数字コスト・役でエネルギー回復、相手手札を非表示
+const APP_VER='v287'; // 通常対戦：相手のエネルギーを場の上に表示（手札は非表示のまま）
 // const APP_VER='v284'; // サイコロ：AIを超弱体化（考える間隔 2.6〜4.2秒、賢い手は30%だけ・残りはでたらめ。数値は DICE_CFG の aiMinMs/aiJitterMs/aiSmartRate）
 // const APP_VER='v283'; // サイコロ試作モード追加（既存モードは変更なし）
 // v280(2026/09/18): 新モード「ひとりモード（仮）」。相手なし・タイマーなし。場の札に手札を足して10、完成（またはバースト）で右上の「次の札」の先頭が場に出る。次の札は先の先まで7枚見える。数値はSOLO_CFG
@@ -7376,6 +7380,7 @@ function App(){
       so.charge&&h(ChargeMeter,{value:charge.dealer,who:'dealer'})
     ),
     so.charge&&h(VictoryMeter,{difference:pPt-dPt}),
+    standardEnergy&&h(EnergyMeter,{value:energy.dealer,who:'dealer'}),
     srBanner&&h('div',{className:'sr-banner'},h('b',null,'STAR RING'),'星環 ── 完成'),
 
     // SPACER (dealer → field)

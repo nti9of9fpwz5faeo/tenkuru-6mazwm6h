@@ -2518,28 +2518,28 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 
 /* COLOR ROOM: isolated mode, no shared battle styles. */
 .cr-screen{position:fixed;inset:0;background:#efe1c8;color:#233952;font-family:'Noto Sans JP',sans-serif;display:flex;justify-content:center;touch-action:manipulation;user-select:none}
-.cr-shell{width:min(100%,540px);height:100%;display:flex;flex-direction:column;position:relative;background:#e9d8bc;overflow:hidden}
+.cr-shell{width:min(100%,540px);height:100%;display:flex;flex-direction:column;position:relative;background:linear-gradient(#e9d8bc,#e9e0d1);overflow:hidden;padding-bottom:calc(clamp(34px,6dvh,62px) + env(safe-area-inset-bottom))}
 .cr-hud{height:66px;flex-shrink:0;display:flex;align-items:center;gap:10px;padding:calc(8px + env(safe-area-inset-top)) 14px 8px;background:linear-gradient(#faf2e4,#e6d4b7);z-index:2}
-.cr-meter{flex:1;height:15px;background:#f28b25;border:2px solid #fff9e9;border-radius:20px;overflow:hidden;box-shadow:0 2px 6px #60421b44;display:flex}
-.cr-meter i{display:block;background:linear-gradient(#46c4ff,#0879dc);transition:width .45s ease}
-.cr-pct{font-weight:900;font-size:13px;font-variant-numeric:tabular-nums;min-width:33px}.cr-blue{color:#0875bc}.cr-orange{color:#b65500}
+.cr-meter{flex:1;height:15px;background:#bf926b;border:2px solid #fff9e9;border-radius:20px;overflow:hidden;box-shadow:0 2px 6px #60421b44;display:flex}
+.cr-meter i{display:block;background:linear-gradient(#96b9c2,#638c9f);transition:width .45s ease}
+.cr-pct{font-weight:900;font-size:13px;font-variant-numeric:tabular-nums;min-width:33px}.cr-blue{color:#426b81}.cr-orange{color:#986b47}
 .cr-icon{border:1px solid #fff8;background:#fff9;border-radius:12px;min-width:38px;min-height:38px;color:#23445d;font-size:20px;cursor:pointer}
 .cr-room{position:relative;flex:1;min-height:150px;background:url('assets/color-room/room.webp') center/100% 100% no-repeat;isolation:isolate}
-.cr-paint{position:absolute;inset:14% 7% 7%;width:86%;height:79%;border-radius:8px;box-shadow:inset 0 0 12px #48210044;opacity:.95}
+.cr-paint{position:absolute;inset:14% 7% 7%;width:86%;height:79%;border-radius:8px;box-shadow:inset 0 0 12px #48210044;opacity:.88;mix-blend-mode:multiply}
 .cr-played{position:absolute;left:10%;right:10%;display:flex;justify-content:center;align-items:center;gap:6px;z-index:2;min-height:55px}
 .cr-played.dealer{top:17%;transform:scale(.83);transform-origin:top center}.cr-played.player{bottom:9%}
-.cr-slot{width:clamp(35px,12vw,63px);height:clamp(45px,15vw,78px);background:linear-gradient(145deg,#fffdf6,#efe5d6);border:2px solid #d4bb98;border-bottom:5px solid #29a9ef;border-radius:8px;color:#193955;box-shadow:0 3px 7px #16334538;font:bold clamp(24px,7vw,38px) Georgia,serif;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.dealer .cr-slot{border-bottom-color:#f59a37}.cr-slot:disabled{opacity:1;cursor:default}.cr-slot.empty{background:#fffc;border:1px dashed #c7bda8;opacity:.32;box-shadow:none}
-.cr-sum{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(100% + 8px);padding:4px 15px;border-radius:25px;border:1px solid #ffffffa0;background:#174d77d9;color:white;font-weight:800;white-space:nowrap;font-size:16px;box-shadow:0 3px 12px #11293b33}
-.dealer .cr-sum{bottom:auto;top:calc(100% + 7px);font-size:14px;background:#93450ccf}
+.cr-slot{width:clamp(44px,14vw,72px);height:clamp(59px,18vw,92px);background:linear-gradient(145deg,#fffdf6,#efe5d6);border:2px solid #d4bb98;border-bottom:5px solid #6b99ab;border-radius:8px;color:#193955;box-shadow:0 3px 7px #16334538;font:bold clamp(24px,7vw,38px) Georgia,serif;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.dealer .cr-slot{border-bottom-color:#c29368}.cr-slot:disabled{opacity:1;cursor:default}.cr-slot.empty{background:#fffc;border:1px dashed #c7bda8;opacity:.32;box-shadow:none}
+.cr-sum{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(100% + 8px);padding:4px 15px;border-radius:25px;border:1px solid #ffffffa0;background:#426477e6;color:white;font-weight:800;white-space:nowrap;font-size:16px;box-shadow:0 3px 12px #11293b33}
+.dealer .cr-sum{bottom:auto;top:calc(100% + 7px);font-size:14px;background:#8a684bd9}
 .cr-combo{position:absolute;inset:40% 5% auto;text-align:center;font-size:clamp(22px,6vw,32px);font-weight:900;color:#fff;text-shadow:0 2px 5px #113258,0 0 15px #1389bf;pointer-events:none;animation:cr-pop .45s ease both;z-index:3}
 .cr-combo.dealer{color:#fff5df;text-shadow:0 2px 5px #7d3b00}.cr-combo small{display:block;font-size:15px;margin-top:4px;letter-spacing:1px}
-.cr-tray{flex-shrink:0;background:linear-gradient(145deg,#294d6d,#102a45);border-top:4px solid #c8b290;border-radius:18px 18px 0 0;padding:10px 16px calc(12px + env(safe-area-inset-bottom));box-shadow:0 -4px 18px #19364d33;z-index:3}
-.cr-tray-head{display:flex;justify-content:space-between;align-items:center;color:#deedfb;font-size:11px;margin-bottom:8px;min-height:27px;gap:8px}
-.cr-tray-head button{border:1px solid #c1d6e04d;color:#f3f8ff;background:#ffffff10;border-radius:8px;padding:5px 10px;font:inherit;cursor:pointer}.cr-tray-head button:disabled{opacity:.4}
-.cr-hand{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
-.cr-card{height:clamp(49px,8.5dvh,83px);min-width:0;border:2px solid #d6c5a8;border-bottom:5px solid #2ea9e3;border-radius:9px;background:linear-gradient(135deg,#fffdf6,#e9dfcf);box-shadow:0 4px 0 #071d32, inset 0 1px 0 white;font:bold clamp(27px,8vw,43px) Georgia,serif;color:#153a5b;cursor:pointer;transition:transform .1s,opacity .1s}
-.cr-card:active:not(:disabled){transform:translateY(3px)}.cr-card:disabled{opacity:.38;cursor:default}.cr-card.blank{background:#0d233b;border-color:#55728a33;color:transparent;box-shadow:inset 0 2px 4px #0003}
+.cr-tray{flex-shrink:0;background:linear-gradient(145deg,#f4eddf,#ddd6c8);border:1px solid #c5b69b;border-radius:22px;padding:10px 8px 13px;box-shadow:0 -5px 22px #5e564b20, inset 0 1px 0 #fff9;z-index:3}
+.cr-tray-head{display:flex;justify-content:space-between;align-items:center;color:#567182;font-size:11px;margin-bottom:8px;min-height:27px;gap:8px}
+.cr-tray-head button{border:1px solid #c1d6e04d;color:#4d697c;background:#ffffff66;border-radius:8px;padding:5px 10px;font:inherit;cursor:pointer}.cr-tray-head button:disabled{opacity:.4}
+.cr-hand{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.cr-card{height:clamp(72px,12dvh,116px);min-width:0;border:2px solid #d6c5a8;border-bottom:5px solid #6a98ab;border-radius:9px;background:linear-gradient(135deg,#fffdf6,#e9dfcf);box-shadow:0 3px 0 #8d9da1, inset 0 1px 0 white;font:bold clamp(34px,10vw,49px) Georgia,serif;color:#153a5b;cursor:pointer;transition:transform .1s,opacity .1s}
+.cr-card:active:not(:disabled){transform:translateY(3px)}.cr-card:disabled{opacity:.5;cursor:default}.cr-card.blank{background:#c7c5bc66;border:1px dashed #a9aea5;color:transparent;box-shadow:inset 0 2px 4px #726b5712}
 .cr-card.finish{outline:2px solid #c9f4ff;box-shadow:0 0 12px #57cdff66}.cr-screen button:focus-visible{outline:3px solid #04bfff;outline-offset:3px}
 .cr-overlay{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;background:#16334f66;backdrop-filter:blur(6px);padding:18px}
 .cr-dialog{width:min(100%,390px);max-height:95dvh;overflow:auto;touch-action:pan-y;background:linear-gradient(150deg,#fffdf8,#f0e6d5);border:2px solid #fff8;border-radius:25px;padding:27px 22px;text-align:center;box-shadow:0 16px 70px #0b273b55}
@@ -2548,7 +2548,7 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .cr-dialog .cr-primary,.cr-dialog .cr-secondary{width:100%;border:0;border-radius:13px;margin-top:12px;padding:14px;font:800 14px 'Noto Sans JP',sans-serif;cursor:pointer}.cr-dialog .cr-primary{background:linear-gradient(120deg,#24a9e4,#0876b8);color:white;box-shadow:0 5px 12px #1a89ba33}.cr-dialog .cr-secondary{background:#e0e8ea;color:#49677a}
 .cr-dialog details{text-align:left;margin:12px 0 0;font-size:12px;color:#587083;line-height:1.9}.cr-dialog summary{cursor:pointer}.cr-role-table{display:grid;grid-template-columns:1fr auto;gap:4px 15px;margin:9px 0}.cr-result-number{font-size:50px;font-weight:900;color:#087ebd;margin:12px 0}
 @keyframes cr-pop{from{opacity:0;transform:scale(.7) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
-@media(max-height:640px){.cr-hud{height:48px}.cr-tray{padding-top:6px;padding-bottom:7px}.cr-card{height:46px}.cr-tray-head{margin-bottom:4px}.cr-played .cr-slot{height:46px;width:37px;font-size:25px}.cr-dialog{padding:17px}.cr-dialog h1{font-size:23px}}
+@media(max-height:640px){.cr-hud{height:48px}.cr-tray{padding-top:6px;padding-bottom:7px}.cr-card{height:70px}.cr-tray-head{margin-bottom:4px}.cr-played .cr-slot{height:55px;width:42px;font-size:29px}.cr-dialog{padding:17px}.cr-dialog h1{font-size:23px}}
 @media(prefers-reduced-motion:reduce){.cr-combo{animation:none}.cr-meter i,.cr-card{transition:none}}
 
 </style>
@@ -3696,7 +3696,7 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v300'; // カラールーム：色塗り対戦・3段階AI・生成SE
+const APP_VER='v301'; // カラールーム：落ち着いた色・大きな手札・使い切り補充・完成不能時リセット
 // const APP_VER='v299'; // テンフォール：新デザイン素材（背景・盤面・札・マス・ボタン・合計/点数の枠・10完成/💥の演出・説明パネル）を組み込み。ルールは変更なし
 // const APP_VER='v298'; // テンフォール：手札10枚をやめて1〜5の数字ボタン5つに（何回でも押せる・押した数字が下のマスの左から入る）。入れ替えスワイプと案内文は削除。落ち札・💥・点数はそのまま
 // const APP_VER='v297'; // セパレート（試作）：場を2人で分ける。自分の札は自分の場だけ、ぴったり10で役の点、10こえははじき返す、相手が10を作ると自分の場はリセット（札は捨て）、先に15点で勝ち。出せる札がなければその場をリセット。数値は SEP_CFG
@@ -5570,15 +5570,16 @@ function crRefill(hand,random=Math.random){
  return next;
 }
 function crCreate(level='normal',random=Math.random){
- const side=()=>({hand:crRefill(Array(10).fill(null),random),field:[],readyAt:0,nextTap:0,combo:null,ten:0,best:0});
+ const side=()=>({hand:crRefill(Array(10).fill(null),random),field:[],readyAt:0,nextTap:0,combo:null,ten:0,best:0,deals:1});
  return{level:CR_CFG.levels[level]?level:'normal',phase:'ready',paused:false,now:0,blue:50,player:side(),dealer:side(),aiAt:0,events:[],serial:0,winner:null};
 }
 function crStart(s){s.phase='active';s.aiAt=CR_CFG.levels[s.level].step;}
 function crEvent(s,kind,who,extra={}){s.events.push({id:++s.serial,at:s.now,kind,who,...extra});if(s.events.length>24)s.events.shift();}
-function crPlay(s,who,index){
+function crRefillEmpty(a,random=Math.random){if(a.hand.some(Boolean))return false;a.hand=crRefill(Array(10).fill(null),random);a.deals++;return true;}
+function crPlay(s,who,index,random=Math.random){
  const a=s[who];if(!a||s.phase!=='active'||s.paused||a.readyAt||s.now<a.nextTap||!Number.isInteger(index)||index<0||index>=10||!a.hand[index])return false;
  const value=a.hand[index],sum=a.field.reduce((n,c)=>n+c.value,0)+value;
- if(sum>10||a.field.length>=4||(a.field.length===3&&sum!==10))return false;
+ if(a.field.length>=4)return false;
  a.field.push({index,value});a.hand[index]=null;a.nextTap=s.now+CR_CFG.tapMs;
  if(sum===10){
   const role=calcPts(a.field.map(c=>c.value)),gain=CR_CFG.paint[role.total];
@@ -5586,6 +5587,9 @@ function crPlay(s,who,index){
   s.blue=Math.max(0,Math.min(100,s.blue+(who==='player'?gain:-gain)));
   crEvent(s,'paint',who,{gain,role:role.total,blue:s.blue,label:role.voice});
   if(s.blue===0||s.blue===100){s.phase='ended';s.winner=s.blue===100?'player':'dealer';crEvent(s,'end',s.winner);}
+ }else if(!crCombinations(a.hand,a.field).length){
+  // A tap always lands. Discard only the field once no remaining-card combination can reach 10.
+  crEvent(s,'reset',who,{sum});a.field=[];crRefillEmpty(a,random);
  }else crEvent(s,'tap',who);
  return true;
 }
@@ -5596,7 +5600,8 @@ function crUndo(s,index){
 }
 function crAiChoice(s,random=Math.random){
  // Deliberately reads only its own hand/field; the player's hand is private.
- const choices=crCombinations(s.dealer.hand,s.dealer.field);if(!choices.length)return null;
+ const choices=crCombinations(s.dealer.hand,s.dealer.field);
+ if(!choices.length){const left=s.dealer.hand.map((v,i)=>v?i:-1).filter(i=>i>=0);return left.length?left[Math.min(left.length-1,Math.floor(random()*left.length))]:null;}
  const cfg=CR_CFG.levels[s.level];
  if(random()>=cfg.smart)return choices[Math.min(choices.length-1,Math.floor(random()*choices.length))].indices[0];
  choices.sort((a,b)=>(CR_CFG.paint[b.role.total]/(b.indices.length*cfg.step+CR_CFG.settleMs))-(CR_CFG.paint[a.role.total]/(a.indices.length*cfg.step+CR_CFG.settleMs))||b.role.total-a.role.total);
@@ -5607,9 +5612,9 @@ function crAdvance(s,ms,random=Math.random,withAi=true){
  const end=s.now+Math.max(0,ms),cfg=CR_CFG.levels[s.level];
  while(s.now<end&&s.phase==='active'){
   const next=Math.min(end,...['player','dealer'].map(w=>s[w].readyAt||Infinity),withAi?s.aiAt:Infinity);s.now=next;
-  for(const who of ['player','dealer']){const a=s[who];if(a.readyAt&&a.readyAt<=s.now){a.field=[];a.hand=crRefill(a.hand,random);a.readyAt=0;}}
+  for(const who of ['player','dealer']){const a=s[who];if(a.readyAt&&a.readyAt<=s.now){a.field=[];crRefillEmpty(a,random);a.readyAt=0;}}
   if(withAi&&s.now>=s.aiAt){
-   if(!s.dealer.readyAt){const index=crAiChoice(s,random);if(index!==null)crPlay(s,'dealer',index);}
+   if(!s.dealer.readyAt){const index=crAiChoice(s,random);if(index!==null)crPlay(s,'dealer',index,random);}
    s.aiAt=s.now+cfg.step+random()*cfg.jitter;
   }
  }
@@ -5619,7 +5624,7 @@ function crAudio(){
  try{master=AC.createGain();master.gain.value=.66;master.connect(AC.destination);}catch(e){}
  const loading=Promise.all(['splash','wave','win'].map(async key=>{try{const r=await fetch('assets/color-room/'+key+'.mp3');if(!r.ok)throw Error('audio');const b=await AC.decodeAudioData(await r.arrayBuffer());if(!disposed)buffers[key]=b;}catch(e){}}));
  function tone(f,d=.11,v=.065,delay=0){if(!master||!enabled||disposed)return;const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+delay;o.type='sine';o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(f*.65,t+d);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.006);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(master);sources.add(o);o.onended=()=>{sources.delete(o);o.disconnect();g.disconnect();};o.start(t);o.stop(t+d+.01);}
- function play(key,who='player'){if(!enabled||disposed||!master)return;try{resumeAC();if(key==='tap'){tone(who==='player'?510:350,.08,.045);return;}if(key==='lose'){tone(440,.22,.06);tone(294,.32,.06,.19);return;}if(!buffers[key]){tone(key==='win'?1047:190,.25,.07);return;}const src=AC.createBufferSource(),g=AC.createGain();src.buffer=buffers[key];g.gain.value=who==='dealer'?.55:.9;src.connect(g);g.connect(master);sources.add(src);src.onended=()=>{sources.delete(src);src.disconnect();g.disconnect();};src.start();}catch(e){}}
+ function play(key,who='player'){if(!enabled||disposed||!master)return;try{resumeAC();if(key==='tap'){tone(who==='player'?510:350,.08,.045);return;}if(key==='reset'){tone(235,.12,.035);return;}if(key==='lose'){tone(440,.22,.06);tone(294,.32,.06,.19);return;}if(!buffers[key]){tone(key==='win'?1047:190,.25,.07);return;}const src=AC.createBufferSource(),g=AC.createGain();src.buffer=buffers[key];g.gain.value=who==='dealer'?.55:.9;src.connect(g);g.connect(master);sources.add(src);src.onended=()=>{sources.delete(src);src.disconnect();g.disconnect();};src.start();}catch(e){}}
  function stop(){sources.forEach(s=>{try{s.stop();}catch(e){}});sources.clear();}
  return{play,stop,loading,setEnabled(v){enabled=v;if(!v)stop();},dispose(){disposed=true;stop();if(master)master.disconnect();}};
 }
@@ -5632,19 +5637,19 @@ function ColorRoomCanvas({game}){
    const s=game.current,rect=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2),w=rect.width,ht=rect.height;
    if(w&&ht){if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(ht*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(ht*dpr);}ctx.setTransform(dpr,0,0,dpr,0,0);
     if(!s.paused)visual+= (s.blue-visual)*(reduced?1:Math.min(1,(t-last)/180));
-    const boundary=ht*(1-visual/100),amp=Math.min(12,boundary*.22,(ht-boundary)*.22),time=s.now/800;
+    const boundary=ht*(1-visual/100),amp=Math.min(7,boundary*.22,(ht-boundary)*.22),time=s.now/800;
     const wave=x=>boundary+Math.sin(x/w*12+time)*amp+Math.sin(x/w*23-time*.7)*amp*.4;
-    let g=ctx.createLinearGradient(0,0,w,ht);g.addColorStop(0,'#ffb349');g.addColorStop(.7,'#ed8019');g.addColorStop(1,'#ffb048');ctx.fillStyle=g;ctx.fillRect(0,0,w,ht);
-    ctx.beginPath();ctx.moveTo(0,ht);ctx.lineTo(0,wave(0));for(let x=0;x<=w+4;x+=4)ctx.lineTo(x,wave(x));ctx.lineTo(w,ht);ctx.closePath();g=ctx.createLinearGradient(0,boundary,w,ht);g.addColorStop(0,'#42c8ff');g.addColorStop(.24,'#159eee');g.addColorStop(1,'#087ad7');ctx.fillStyle=g;ctx.fill();
+    let g=ctx.createLinearGradient(0,0,w,ht);g.addColorStop(0,'#d8ac80');g.addColorStop(.7,'#bc895e');g.addColorStop(1,'#cfa078');ctx.fillStyle=g;ctx.fillRect(0,0,w,ht);
+    ctx.beginPath();ctx.moveTo(0,ht);ctx.lineTo(0,wave(0));for(let x=0;x<=w+4;x+=4)ctx.lineTo(x,wave(x));ctx.lineTo(w,ht);ctx.closePath();g=ctx.createLinearGradient(0,boundary,w,ht);g.addColorStop(0,'#92b8c3');g.addColorStop(.24,'#74a1b4');g.addColorStop(1,'#608b9f');ctx.fillStyle=g;ctx.fill();
     if(visual>.15&&visual<99.85){
      // A shaded paint lip and soft reflected streaks give the advancing edge volume.
-     for(const [offset,width,color] of [[9,15,'#006aca22'],[4,8,'#0084d84a'],[1,4,'#cbf6ffd0'],[-1,1,'#ffffffb0']]){ctx.beginPath();for(let x=0;x<=w;x+=4){if(x===0)ctx.moveTo(x,wave(x)+offset);else ctx.lineTo(x,wave(x)+offset);}ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();}
+     for(const [offset,width,color] of [[5,9,'#3c64731a'],[2,4,'#63879725'],[0,2,'#e8e3cc88']]){ctx.beginPath();for(let x=0;x<=w;x+=4){if(x===0)ctx.moveTo(x,wave(x)+offset);else ctx.lineTo(x,wave(x)+offset);}ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();}
     }
     const light=ctx.createRadialGradient(w*.27,ht*.24,0,w*.27,ht*.24,w*.8);light.addColorStop(0,'#fffbd22e');light.addColorStop(1,'#ffffff00');ctx.fillStyle=light;ctx.fillRect(0,0,w,ht);
     // Light reflected on both pools; no expensive filters or per-frame DOM particles.
     ctx.fillStyle='#fff';for(let i=0;i<27;i++){const x=(Math.sin(i*91.7)*.5+.5)*w,y=(Math.cos(i*53.1)*.5+.5)*ht;ctx.globalAlpha=.06+Math.sin(time+i)*.02;ctx.beginPath();ctx.ellipse(x,y,3+i%5,1.4,0,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
     for(const ev of s.events){const age=(s.now-ev.at)/850;if(ev.kind!=='paint'||age<0||age>1||reduced)continue;const blue=ev.who==='player',origin=ht*(1-(ev.blue+(blue?-ev.gain:ev.gain))/100);ctx.globalAlpha=(1-age)*.9;
-     for(let i=0;i<12+ev.role*4;i++){const seed=Math.sin(i*13.7+ev.id)*.5+.5,x=seed*w+Math.sin(i*2.1)*age*35,y=origin+(blue?-1:1)*(Math.sin(age*Math.PI/2)*(25+seed*ev.gain*4))+age*age*20;ctx.fillStyle=i%3?'#f9fcff':blue?'#13a1f1':'#ffb13b';ctx.beginPath();ctx.ellipse(x,y,2+seed*4,(2+seed*4)*(1-age*.6),age*2,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
+     for(let i=0;i<12+ev.role*4;i++){const seed=Math.sin(i*13.7+ev.id)*.5+.5,x=seed*w+Math.sin(i*2.1)*age*35,y=origin+(blue?-1:1)*(Math.sin(age*Math.PI/2)*(25+seed*ev.gain*4))+age*age*20;ctx.fillStyle=i%3?'#f9fcff':blue?'#7dabb9':'#c6a075';ctx.beginPath();ctx.ellipse(x,y,2+seed*4,(2+seed*4)*(1-age*.6),age*2,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
     }
    }last=t;frame=requestAnimationFrame(draw);
   }frame=requestAnimationFrame(draw);return()=>cancelAnimationFrame(frame);
@@ -5656,7 +5661,7 @@ function ColorRoomMode({onBack}){
  const[,redraw]=useState(0),[level,setLevel]=useState('normal'),[muted,setMuted]=useState(false),last=useRef(performance.now()),sound=useRef(null),seen=useRef(0),dialog=useRef(null),pauseButton=useRef(null);
  const s=game.current,paint=()=>redraw(n=>n+1);
  function sync(){const now=performance.now();crAdvance(game.current,Math.min(250,Math.max(0,now-last.current)));last.current=now;
-  for(const ev of game.current.events)if(ev.id>seen.current){seen.current=ev.id;if(sound.current)sound.current.play(ev.kind==='end'?(ev.who==='player'?'win':'lose'):ev.kind==='tap'?'tap':ev.role>=4?'wave':'splash',ev.who);}}
+  for(const ev of game.current.events)if(ev.id>seen.current){seen.current=ev.id;if(sound.current)sound.current.play(ev.kind==='end'?(ev.who==='player'?'win':'lose'):ev.kind==='tap'?'tap':ev.kind==='reset'?'reset':ev.role>=4?'wave':'splash',ev.who);}}
  function start(){if(sound.current){sound.current.stop();sound.current.setEnabled(!muted);}resumeAC();game.current=crCreate(level);crStart(game.current);seen.current=0;last.current=performance.now();paint();}
  function pause(){sync();if(game.current.phase!=='active')return;game.current.paused=true;sound.current?.stop();paint();}
  function resume(){game.current.paused=false;last.current=performance.now();resumeAC();paint();requestAnimationFrame(()=>pauseButton.current?.focus());}
@@ -5674,13 +5679,13 @@ function ColorRoomMode({onBack}){
  useEffect(()=>{if(modal)dialog.current?.querySelector('button')?.focus();},[modal,s.phase]);
  function trap(e){if(e.key!=='Tab')return;const els=[...e.currentTarget.querySelectorAll('button,summary')].filter(el=>el.getClientRects().length),first=els[0],end=els[els.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();end.focus();}else if(!e.shiftKey&&document.activeElement===end){e.preventDefault();first.focus();}}
  const lastCombo=[...s.events].reverse().find(e=>e.kind==='paint'&&s.now-e.at<1100);
- function field(who){const a=s[who],sum=a.field.reduce((n,c)=>n+c.value,0);return h('div',{className:'cr-played '+who},h('span',{className:'cr-sum'},a.readyAt?'10':sum+' / 10'),Array.from({length:4},(_,i)=>{const c=a.field[i];return c?h('button',{className:'cr-slot',key:c.index,disabled:who==='dealer'||modal||!!a.readyAt,onClick:()=>undo(c.index),'aria-label':who==='player'?c.value+'を手札に戻す':'相手の場 '+c.value},c.value):h('span',{key:'empty'+i,className:'cr-slot empty','aria-hidden':true});}));}
+ function field(who){const a=s[who],sum=a.field.reduce((n,c)=>n+c.value,0);return h('div',{className:'cr-played '+who},h('span',{className:'cr-sum'},a.readyAt?'10':!a.field.length&&s.events.some(e=>e.kind==='reset'&&e.who===who&&s.now-e.at<550)?'リセット':sum+' / 10'),Array.from({length:4},(_,i)=>{const c=a.field[i];return c?h('button',{className:'cr-slot',key:c.index,disabled:who==='dealer'||modal||!!a.readyAt,onClick:()=>undo(c.index),'aria-label':who==='player'?c.value+'を手札に戻す':'相手の場 '+c.value},c.value):h('span',{key:'empty'+i,className:'cr-slot empty','aria-hidden':true});}));}
  const sum=s.player.field.reduce((n,c)=>n+c.value,0);
  return h('main',{className:'cr-screen'},h('div',{className:'cr-shell'},
   h('div',{className:'cr-hud',inert:modal?'':undefined},h('span',{className:'cr-pct cr-blue'},s.blue+'%'),h('div',{className:'cr-meter',role:'meter','aria-label':'青の占有率','aria-valuemin':0,'aria-valuemax':100,'aria-valuenow':s.blue},h('i',{style:{width:s.blue+'%'}})),h('span',{className:'cr-pct cr-orange'},100-s.blue+'%'),h('button',{className:'cr-icon',ref:pauseButton,onClick:pause,'aria-label':'一時停止'},'Ⅱ')),
   h('div',{className:'cr-room',inert:modal?'':undefined},h(ColorRoomCanvas,{game}),field('dealer'),lastCombo&&h('div',{key:lastCombo.id,className:'cr-combo '+lastCombo.who,role:'status'},lastCombo.label,h('small',null,(lastCombo.who==='player'?'青':'オレンジ')+' ＋'+lastCombo.gain+'%')),field('player')),
   h('div',{className:'cr-tray',inert:modal?'':undefined},h('div',{className:'cr-tray-head'},h('span',null,'● 青が自分 · '+CR_CFG.levels[s.level].label),h('button',{onClick:reset,disabled:modal||!s.player.field.length||!!s.player.readyAt},'場を戻す')),
-   h('div',{className:'cr-hand'},s.player.hand.map((v,i)=>h('button',{key:i,className:'cr-card'+(!v?' blank':sum+v===10?' finish':''),disabled:modal||!v||!!s.player.readyAt||sum+v>10||(s.player.field.length===3&&sum+v!==10),onClick:()=>play(i),'aria-label':v?'手札'+(i+1)+'、'+v:'使用中の手札'+(i+1)},v||'')))),
+   h('div',{className:'cr-hand'},s.player.hand.map((v,i)=>h('button',{key:i,className:'cr-card'+(!v?' blank':sum+v===10?' finish':''),disabled:modal||!v||!!s.player.readyAt,onClick:()=>play(i),'aria-label':v?'手札'+(i+1)+'、'+v:'使用中の手札'+(i+1)},v||'')))),
   modal&&h('div',{className:'cr-overlay'},h('section',{className:'cr-dialog',role:'dialog','aria-modal':true,'aria-labelledby':'cr-title',ref:dialog,onKeyDown:trap},
    h('p',{className:'cr-kicker'},'TEN-KURU'),h('h1',{id:'cr-title'},s.paused?'一時停止':s.phase==='ended'?(s.winner==='player'?'部屋を染めきった！':'オレンジの勝ち'):'カラールーム'),
    s.phase==='ready'&&h('p',null,'10をつくって、色を広げよう。',h('br'),'強い役ほど、一気に塗り返す。'),
@@ -5689,7 +5694,7 @@ function ColorRoomMode({onBack}){
    h('button',{className:'cr-primary',onClick:s.paused?resume:start},s.paused?'つづける':s.phase==='ended'?'もう一度':'はじめる'),
    h('button',{className:'cr-secondary',onClick:onBack},'ホームへ'),
    h('button',{className:'cr-secondary',onClick:toggleSound,'aria-pressed':!muted},muted?'効果音 OFF':'効果音 ON'),
-   h('details',null,h('summary',null,'あそびかた・役の強さ'),h('p',null,'1〜5の手札から、4枚以内でぴったり10。使った札は10の完成後に補充。場の札をタップすると戻せます。相手とは別々の場で同時に作ります。'),h('p',null,'青・オレンジ50%ずつで開始。先に100%を塗った側の勝ち。時間制限なし。'),h('div',{className:'cr-role-table'},['役なし','ワンペア','ツーペア','スリーカード','ストレート'].map((r,i)=>h(React.Fragment,{key:r},h('span',null,r),h('b',null,'＋'+CR_CFG.paint[i+1]+'%')))),h('p',null,'5＋5は役なし。ストレートは1＋2＋3＋4。'))))));
+   h('details',null,h('summary',null,'あそびかた・役の強さ'),h('p',null,'手札10枚を使い切ると新しい10枚を補充。数字の制限なく出せます。残りの手札と4枚の枠で10を作れないと判明したら、場の札だけ自動で消えます。場の札は消える前ならタップで戻せます。'),h('p',null,'青・オレンジ50%ずつで開始。先に100%を塗った側の勝ち。時間制限なし。'),h('div',{className:'cr-role-table'},['役なし','ワンペア','ツーペア','スリーカード','ストレート'].map((r,i)=>h(React.Fragment,{key:r},h('span',null,r),h('b',null,'＋'+CR_CFG.paint[i+1]+'%')))),h('p',null,'5＋5は役なし。ストレートは1＋2＋3＋4。'))))));
 }
 // ── END COLOR ROOM ──
 

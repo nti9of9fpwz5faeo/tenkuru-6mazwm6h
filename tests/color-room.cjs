@@ -12,13 +12,50 @@ for(const [values,gain] of [[[5,5],4],[[1,1,3,5],7],[[2,2,3,3],10],[[1,3,3,3],14
  a.crAdvance(s,800,random,false);assert.equal(s.player.field.length,0);assert.equal(s.player.hand.filter(Boolean).length,10);assert.ok(a.crCombinations(s.player.hand).length);
  assert.equal(s.events.filter(x=>x.kind==='paint').length,1);
 }
-// Invalid plays never consume a card; undo preserves the original slot and value.
+// Invalid indices never consume a card; undo preserves the original slot and value.
 {
  const s=game();cards(s,[5,4,3,1]);assert.ok(a.crPlay(s,'player',0));a.crAdvance(s,120,random,false);assert.ok(a.crPlay(s,'player',1));a.crAdvance(s,120,random,false);
- const before=JSON.stringify(s);assert.equal(a.crPlay(s,'player',2),false);assert.equal(JSON.stringify(s),before);
+ const before=JSON.stringify(s);assert.equal(a.crPlay(s,'player',99),false);assert.equal(JSON.stringify(s),before);
  assert.ok(a.crUndo(s,0));assert.equal(s.player.hand[0],5);assert.equal(s.player.field[0].value,4);assert.equal(a.crUndo(s,0),false);
  s.paused=true;const paused=JSON.stringify(s);a.crAdvance(s,60000,random);a.crPlay(s,'player',3);a.crUndo(s,1);assert.equal(JSON.stringify(s),paused);
 }
+// Completing a ten does not refill the used slots while any original cards remain.
+for(const who of ['player','dealer']){
+ const s=game(),side=s[who];side.hand=[1,2,3,4,5,5,4,3,2,1];
+ for(const i of [0,1,2,3]){assert.ok(a.crPlay(s,who,i,random));a.crAdvance(s,120,random,false);}
+ a.crAdvance(s,800,random,false);assert.equal(side.hand.filter(Boolean).length,6);assert.equal(side.deals,1);assert.equal(side.field.length,0);
+ assert.deepEqual(Array.from(side.hand.slice(4)),[5,5,4,3,2,1]);
+ // Spend the other six across two tens, then replenish exactly once.
+ for(const group of [[4,5],[6,7,8,9]]){for(const i of group){assert.ok(a.crPlay(s,who,i,random));a.crAdvance(s,120,random,false);}a.crAdvance(s,800,random,false);}
+ assert.equal(side.hand.filter(Boolean).length,10);assert.equal(side.deals,2);
+}
+// No old third/fourth-card restriction: the card is spent and a doomed field clears.
+for(const values of [[1,1,1,5,4,3,2,2,4,5],[1,1,2,5,4,3,2,3,4,5]]){
+ const s=game();cards(s,values);for(const i of [0,1,2]){assert.ok(a.crPlay(s,'player',i,random));a.crAdvance(s,120,random,false);}
+ assert.equal(s.player.field.length,0);assert.equal(s.player.hand.filter(Boolean).length,7);assert.equal(s.blue,50);assert.equal(s.events.at(-1).kind,'reset');
+}
+{
+ const s=game();cards(s,[1,1,3,4,5,4,3,2,2,5]);
+ for(const i of [0,1,2]){assert.ok(a.crPlay(s,'player',i,random));a.crAdvance(s,120,random,false);}assert.equal(s.player.field.length,3);
+ assert.ok(a.crPlay(s,'player',3,random));assert.equal(s.player.field.length,0);assert.equal(s.player.hand[3],null);assert.equal(s.events.at(-1).sum,9);
+}
+// Search actual remaining values, not just whether the numeric gap is 1–5.
+{
+ const s=game();cards(s,[4,4,4]);assert.ok(a.crPlay(s,'player',0,random));assert.equal(s.player.field.length,0);assert.equal(s.player.hand.filter(Boolean).length,2);
+ a.crAdvance(s,120,random,false);assert.ok(a.crPlay(s,'player',1,random));a.crAdvance(s,120,random,false);assert.ok(a.crPlay(s,'player',2,random));
+ assert.equal(s.player.hand.filter(Boolean).length,10);assert.equal(s.player.deals,2);assert.equal(s.player.field.length,0);assert.equal(s.blue,50);
+}
+// Over-ten taps also land, then reset; no points or hidden refunds.
+{
+ const s=game();cards(s,[5,4,3,1]);for(const i of [0,1]){assert.ok(a.crPlay(s,'player',i,random));a.crAdvance(s,120,random,false);}
+ assert.ok(a.crPlay(s,'player',2,random));assert.equal(s.player.field.length,0);assert.equal(s.player.hand.filter(Boolean).length,1);assert.equal(s.blue,50);
+}
+// AI consumes impossible leftovers rather than stalling; both sides use the same rule.
+{
+ const s=game('hard');s.dealer.hand=[2,null,null,null,null,null,null,null,null,null];
+ a.crAdvance(s,3000,random);assert.ok(s.dealer.deals>=2);assert.ok(s.dealer.hand.some(Boolean));
+}
+
 // Independent fields, fair AI and immediate terminal state; no post-win simulation.
 {
  const s=game('hard');s.dealer.field=[{index:0,value:3}];s.dealer.hand[0]=null;

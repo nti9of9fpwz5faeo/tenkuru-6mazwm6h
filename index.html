@@ -2180,7 +2180,43 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .fall-hand{display:grid;grid-template-columns:repeat(5,auto);gap:6px 8px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.6);box-shadow:0 4px 16px rgba(70,100,150,.12);}
 .fall-hand.shuf .fall-hcard{animation:fallShuf .4s ease;}
 @keyframes fallShuf{0%{transform:translateX(-8px);opacity:.3}100%{transform:none;opacity:1}}
-.fall-play .fall-hand{margin-top:14px;} /* v298 手札（数字ボタン）と場の間を少しだけ空ける */
+.fall-play .fall-hand{margin-top:14px;}
+/* v299 テンフォール新デザイン（星が降る魔法工房）。素材は img/tenfall/ */
+.fall-screen.fall-play{background:#bfe3e6 url('img/tenfall/bg.webp') center/cover no-repeat;}
+.fall-play .fall-lanes{background:url('img/tenfall/board.webp') center/100% 100% no-repeat;border-radius:10px;}
+.fall-play .fall-lane{border-left:none;}
+.fall-play .fall-slot{border:none;background:url('img/tenfall/slot-idle.webp') center/100% 100% no-repeat;}
+.fall-play .fall-slot.next{background:none;}
+.fall-play .fall-slot.next:before{content:'';position:absolute;inset:-9% -12%;background:url('img/tenfall/slot-active.webp') center/100% 100% no-repeat;pointer-events:none;}
+.fall-play .fall-slot>.fall-in{inset:0;}
+.tf-card{position:relative;display:flex;align-items:center;justify-content:center;background:center/100% 100% no-repeat;filter:drop-shadow(0 3px 5px rgba(20,60,70,.28));}
+.tf-card.tf-fall{background-image:url('img/tenfall/card-fall.webp');}
+.tf-card.tf-player{background-image:url('img/tenfall/card-player.webp');}
+.tf-card img,.tf-btn img{height:52%;width:auto;pointer-events:none;user-select:none;}
+.fall-play .fall-hand{background:none;box-shadow:none;padding:0;gap:6px;}
+.tf-btn{display:flex;align-items:center;justify-content:center;background:url('img/tenfall/btn.webp') center/100% 100% no-repeat!important;filter:drop-shadow(0 3px 5px rgba(20,60,70,.3));}
+.tf-btn img{height:50%;}
+.tf-btn:active{transform:scale(.9);}
+.tf-badge{background:url('img/tenfall/badge.webp') center/100% 100% no-repeat;color:#1d4a52;padding:6px 26px;min-width:0;}
+.fall-sum.tf-badge{color:#2c6a72;}
+.fall-sum.tf-badge b{color:#7fa8ad;}.fall-sum.tf-badge b.on{color:#123a43;}
+.fall-score.tf-badge{color:#2c6a72;}.fall-score.tf-badge b{color:#123a43;}
+.fall-play .fall-back{background:#fffaf0e6;border:1.5px solid #d6b56a;color:#1d4a52;}
+.fall-play .fall-count{color:#c9482f;text-shadow:0 1px 3px #fff;}
+.fall-play .fall-count i{background:#c9482f;}
+.tf-fx{position:absolute;transform:translateX(-50%);pointer-events:none;animation:tfFx .7s ease-out forwards;z-index:3;}
+@keyframes tfFx{0%{opacity:1;transform:translateX(-50%) scale(.6);}35%{opacity:1;}100%{opacity:0;transform:translateX(-50%) scale(1.35);}}
+.fall-play .fall-flash{z-index:4;}
+.fall-play .fall-flash b{color:#123a43;}.fall-play .fall-flash.boom b{color:#c9482f;}
+.rush-screen.tf-menu{background:#bfe3e6 url('img/tenfall/bg.webp') center/cover no-repeat;}
+.rush-screen.tf-menu .tf-panel{background:url('img/tenfall/panel.webp') center/100% 100% no-repeat;border:none;box-shadow:none;padding:58px 30px 36px;}
+.rush-screen.tf-menu .rush-eyebrow{color:#2c6a72;}
+.rush-screen.tf-menu .tf-panel h1{color:#123a43;}
+.rush-screen.tf-menu .rush-rules{color:#1d4a52;}
+.rush-screen.tf-menu .rush-primary{background:linear-gradient(180deg,#2c8a93,#1d6870);border:2px solid #d6b56a;color:#fffaf0;}
+.rush-screen.tf-menu .rush-secondary{background:#fffaf0;border:1.5px solid #d6b56a;color:#1d4a52;}
+.rush-screen.tf-menu .fall-result b{color:#123a43;}.rush-screen.tf-menu .fall-result p,.rush-screen.tf-menu .fall-result span{color:#2c6a72;}
+ /* v298 手札（数字ボタン）と場の間を少しだけ空ける */
 .fall-hcard{background:none;border:none;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .fall-hcard:active{transform:scale(.94);}
 .fall-hcard.shake{animation:fallShake .32s ease;}
@@ -3625,7 +3661,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v298'; // テンフォール：手札10枚をやめて1〜5の数字ボタン5つに（何回でも押せる・押した数字が下のマスの左から入る）。入れ替えスワイプと案内文は削除。落ち札・💥・点数はそのまま
+const APP_VER='v299'; // テンフォール：新デザイン素材（背景・盤面・札・マス・ボタン・合計/点数の枠・10完成/💥の演出・説明パネル）を組み込み。ルールは変更なし
+// const APP_VER='v298'; // テンフォール：手札10枚をやめて1〜5の数字ボタン5つに（何回でも押せる・押した数字が下のマスの左から入る）。入れ替えスワイプと案内文は削除。落ち札・💥・点数はそのまま
 // const APP_VER='v297'; // セパレート（試作）：場を2人で分ける。自分の札は自分の場だけ、ぴったり10で役の点、10こえははじき返す、相手が10を作ると自分の場はリセット（札は捨て）、先に15点で勝ち。出せる札がなければその場をリセット。数値は SEP_CFG
 // const APP_VER='v296'; // 通常ステージ・チャレンジを十字キー前の元の対戦に戻した：元のラウンド制（点数先取・バーストあり）、札を直接タップ、元の画面レイアウト。エネルギーゲージ（v286/v287）は停止（ENERGY_CFG.enabled）。ラッシュのバーストなし・チャージ/サバイバルの十字キーはそのまま
 // const APP_VER='v295'; // 10秒ラッシュ・通常ステージの対戦画面を v281 以前の見た目に戻した（cursor-playing の固定グリッドを外す）。チャージ・サバイバル・チャレンジはそのまま
@@ -5050,9 +5087,10 @@ function FallMode({onBack}){
   const s=S.current,now=performance.now();
   const u='min(calc(100vw / 360),calc(100dvh / 640))',U=n=>'calc('+u+' * '+n+')';
   const laneW=80,cardW=60,laneH=300,cardH=cardW*7/5;
-  const card=(v,by,extra)=>h('div',{style:{'--card-w':U(cardW),...(extra||{})}},h(FieldCard,{value:v,by}));
+  // v299 テンフォール専用の札（落ち札＝金縁、自分の札＝青緑縁）。数字はSVG
+  const card=(v,by,extra)=>h('div',{className:'tf-card '+(by==='dealer'?'tf-fall':'tf-player'),style:{width:U(cardW),height:U(cardH),...(extra||{})}},h('img',{src:'img/tenfall/d'+v+'.svg',alt:String(v),draggable:false}));
   if(s.phase==='ready'||s.phase==='end'){
-    return h('main',{className:'rush-screen fall-screen'},h('section',{className:'rush-card'},
+    return h('main',{className:'rush-screen fall-screen tf-menu'},h('section',{className:'rush-card tf-panel'},
       h('p',{className:'rush-eyebrow'},'TEN-KURU · お試し'),h('h1',null,s.phase==='end'?'しゅうりょう':'テンフォール'),
       s.phase==='end'?h('div',{className:'fall-result'},h('b',null,s.score),h('span',null,'pt'),h('p',null,'10完成 '+s.tens+'回　💥 '+s.booms+'回　落ち札 '+s.fallUsed+'枚'),s.best>0&&h('p',null,'ベスト '+s.best+'pt'))
         :h('ul',{className:'rush-rules'},h('li',null,'4つのレーンに札がゆっくり落ちてくる。時間制限なし、やめるまで続く。'),h('li',null,'下の4マスを左から順に埋めて、合計10を作る（何枚でもOK）。役もいつも通り。'),h('li',null,'着地した札は'+FALL_CFG.countMs/1000+'秒カウント。すぐ右に数字を出せば止まる。'),h('li',null,'空いたマスを飛ばして着地・カウント切れ・10を超えると💥　札が確定したレーンの落ち札は止まる。'),h('li',null,'落ちてきた札を使うほど高得点。下の1〜5のボタンで好きな数字を何回でも出せる。')),
@@ -5065,7 +5103,7 @@ function FallMode({onBack}){
     h('div',{className:'fall-top'},
       h('button',{className:'fall-back',onClick:quit},'やめる'),
       h('div',{style:{width:60}}),
-      h('div',{className:'fall-score'},h('b',null,s.score),'pt')),
+      h('div',{className:'fall-score tf-badge'},h('b',null,s.score),'pt')),
     h('div',{className:'fall-lanes',style:{width:U(laneW*4),height:U(laneH+cardH+8)}},
       [0,1,2,3].map(l=>h('div',{key:'ln'+l,className:'fall-lane',style:{left:U(laneW*l),width:U(laneW)}})),
       [0,1,2,3].map(l=>{const c=s.row[l],cnt=s.count&&s.count.lane===l?s.count:null,cl=!!s.clearUntil;
@@ -5075,10 +5113,11 @@ function FallMode({onBack}){
             h('i',{style:{width:(Math.max(0,cnt.until-now)/FALL_CFG.countMs*100)+'%'}})));}),
       s.falls.map(f=>{const p=f.p,y=-cardH+(laneH+cardH)*p;
         return h('div',{key:'f'+f.id,className:'fall-card'+(s.row[f.lane]?' frz':''),style:{left:U(f.lane*laneW+(laneW-cardW)/2),top:U(y)}},card(f.v,'dealer'));}),
+      fl&&h('img',{key:'fx'+fl.at,className:'tf-fx',src:'img/tenfall/'+(fl.kind==='boom'?'fx-burst':'fx-success')+'.webp',alt:'',style:{top:U(laneH+cardH/2-130),left:'50%',width:U(260),height:U(260)}}),
       fl&&h('div',{key:'fl'+fl.at,className:'fall-flash '+fl.kind,style:{top:U(laneH-70)}},h('b',null,fl.text),fl.sub&&h('span',null,fl.sub))),
-    h('div',{className:'fall-sum'},'合計 ',h('b',{className:sum>0?'on':''},sum),' / 10'),
+    h('div',{className:'fall-sum tf-badge'},'合計 ',h('b',{className:sum>0?'on':''},sum),' / 10'),
     h('div',{className:'fall-hand'}, // v298 1〜5の数字ボタン（入れ替えスワイプは廃止）
-      s.hand.map((v,i)=>h('button',{key:'h'+i,className:'fall-hcard'+(s.shake===i&&now<s.shakeUntil?' shake':''),onClick:()=>tap(i),'aria-label':v+'を出す'},card(v,'player',{'--card-w':U(58)})))));
+      s.hand.map((v,i)=>h('button',{key:'h'+i,className:'fall-hcard tf-btn'+(s.shake===i&&now<s.shakeUntil?' shake':''),onClick:()=>tap(i),'aria-label':v+'を出す',style:{width:U(58),height:U(58)}},h('img',{src:'img/tenfall/d'+v+'.svg',alt:'',draggable:false})))));
 }
 // ── v280 ひとりモード（仮）：相手なし。場の札に手札を足して10。完成したら右上の「次の札」が場に出る（先の先まで見えている） ──
 const SOLO_CFG={

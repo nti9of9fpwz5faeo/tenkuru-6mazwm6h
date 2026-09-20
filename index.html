@@ -3585,7 +3585,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v293'; // 10秒ラッシュ：カーソル（十字キー）をやめて手札を直接タップに戻した。バーストを削除し、10をこえる札ははじき返す（相手も10こえは出さない）。他のモードは変更なし
+const APP_VER='v294'; // 通常ステージ（エリア1、チャレンジ以外）も10秒ラッシュの遊び方に：10秒×5ラウンド先取、手札は直接タップ、バーストなし（10こえははじき返す）。相手の強さはステージのまま
+// const APP_VER='v293'; // 10秒ラッシュ：カーソル（十字キー）をやめて手札を直接タップに戻した。バーストを削除し、10をこえる札ははじき返す（相手も10こえは出さない）。他のモードは変更なし
 // const APP_VER='v292'; // エナジー：押した札が手札から場へ移る（手札のその場所は空く）。10完成で空いた所に補充。10をこえたら場の札は手札に戻る。場の札を押しても手札に戻る
 // const APP_VER='v291'; // エナジー：v290の「3回行動」を取り消して10秒制に戻した（v289と同じ遊び方）
 // const APP_VER='v290'; // エナジー：10秒制をやめて「10を3回つくったら放出」に（取り消し済み）
@@ -6247,7 +6248,9 @@ function App(){
     if(!st||st.comingSoon){goMap();return;} // v54: 準備中は開始しない
     if(phaseR.current==='playing')return;      // v54: 二重開始防止
     stageR.current={ar:arIdx,st:stIdx};setStageCtx({ar:arIdx,st:stIdx});
-    winPtR.current=st.winPt||WIN_PT;setWinPt(st.winPt||WIN_PT);
+    const rushify=arIdx===0&&!st.challenge&&!st.survival&&!st.charge&&!st.rush; // v294 通常ステージも10秒ラッシュの遊び方（10秒×5ラウンド先取・直接タップ・バーストなし）。チャレンジは対象外
+    const stWin=rushify?RUSH_CFG.target:(st.winPt||WIN_PT);
+    winPtR.current=stWin;setWinPt(stWin);
     const hook=RULE_HOOKS[st.rule];if(hook&&typeof hook.onStart==='function')hook.onStart(st); // ギミック差し込み口（未実装）
     // v56: ステージ固有オプション
     const firstChrono=ar.stages.find(x=>x.chrono);
@@ -6256,7 +6259,7 @@ function App(){
       if(CHRONO_CONFIG.guaranteeFirstUnlock&&firstChrono&&st.no===firstChrono.no&&!saveR.current.chronoIntro){chrono=true;updSave(s=>{s.chronoIntro=true;return s;});}
       else chrono=Math.random()<CHRONO_CONFIG.appearRate;
     }
-    stageOptsR.current={chrono,survival:!!st.survival,rush:!!st.rush,charge:!!st.charge,noBoost:!!st.noBoost,cardSpeed:st.cardSpeed||null,winMsAbs:st.winMsAbs||null,nineStop:!!st.nineStop,frzBoth:st.frzBoth||null,blind:!!st.blind,firstMs:st.firstMs||null,firstJit:st.firstJit||0,curStepFirst:st.curStepFirst||null,curArrFirst:st.curArrFirst||null,curHoldFirst:st.curHoldFirst||null,flyMsFirst:st.flyMsFirst||null,winMs:st.winMs||null,winJit:st.winJit||0,timeLimit:st.timeLimit||10,ability:st.ability||null,champion:st.champion||null,challenge:!!st.challenge,ch8:!!st.ch8,ch9:!!st.ch9,ch10:!!st.ch10,smart:!!st.smart,deny:!!st.deny,playerRing:!!st.playerRing,speed:st.speed||1,curStep:st.curStep||null,curArr:st.curArr||null,curHold:st.curHold||null,flyMs:st.flyMs||null,rivalName:st.rivalName||null,form2Name:st.form2Name||null,shiftPt:st.shiftPt||null,bgm:st.bgm||null};
+    stageOptsR.current={chrono,survival:!!st.survival,rush:!!st.rush||rushify,charge:!!st.charge,noBoost:!!st.noBoost,cardSpeed:st.cardSpeed||null,winMsAbs:st.winMsAbs||null,nineStop:!!st.nineStop,frzBoth:st.frzBoth||null,blind:!!st.blind,firstMs:st.firstMs||null,firstJit:st.firstJit||0,curStepFirst:st.curStepFirst||null,curArrFirst:st.curArrFirst||null,curHoldFirst:st.curHoldFirst||null,flyMsFirst:st.flyMsFirst||null,winMs:st.winMs||null,winJit:st.winJit||0,timeLimit:st.timeLimit||10,ability:st.ability||null,champion:st.champion||null,challenge:!!st.challenge,ch8:!!st.ch8,ch9:!!st.ch9,ch10:!!st.ch10,smart:!!st.smart,deny:!!st.deny,playerRing:!!st.playerRing,speed:st.speed||1,curStep:st.curStep||null,curArr:st.curArr||null,curHold:st.curHold||null,flyMs:st.flyMs||null,rivalName:st.rivalName||null,form2Name:st.form2Name||null,shiftPt:st.shiftPt||null,bgm:st.bgm||null};
     if(st.challenge&&typeof SHIFT_VIDEO!=='undefined'){try{[SHIFT_VIDEO.v1,SHIFT_VIDEO.v2].forEach(u=>fetch(u,{mode:'no-cors',cache:'force-cache'}).catch(()=>{}));}catch(e){}} // v78: 変身動画を先読み
     if(quick===2){clearTimers();roundTokR.current++;setPendingDiff(st.diff||null);startGame(st.diff);return;} // v234 パズルクス：説明も飛ばして即開始
     if(quick){goBrief(st.diff);return;} // v195 パズルモードはチャレンジの登場ムービーも飛ばす（テンポ優先）
@@ -7453,7 +7456,7 @@ function App(){
       ),
       !so.survival&&h('div',{className:'gp-round-pill '+difficulty},
         h('span',{className:'r'},so.charge?'60秒':'R'+rNum),
-        h('span',{className:'lvl'},so.charge?'CHARGE':so.rush?'RUSH':curStage?(curStage.boss?'BOSS':'ST '+curStage.no):(difficulty==='easy'?'EASY':difficulty==='hard'?'HARD':difficulty==='master'?'MASTER':'NORMAL'))
+        h('span',{className:'lvl'},so.charge?'CHARGE':so.rush&&(!stageCtx||stageCtx.ar!==0)?'RUSH':curStage?(curStage.boss?'BOSS':'ST '+curStage.no):(difficulty==='easy'?'EASY':difficulty==='hard'?'HARD':difficulty==='master'?'MASTER':'NORMAL'))
       ),
       !so.charge&&h('div',{className:'gp-score dealer'},
         h('div',{className:'lbl'},(so.rush||so.charge)?'相手 得点':rival),

@@ -2376,7 +2376,7 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 @keyframes enDead{to{opacity:0;transform:scale(.8) translateY(20px);filter:brightness(3) blur(4px);}}
 .en-dmg{position:absolute;top:30%;font:800 42px 'Inter',sans-serif;color:#fff;text-shadow:0 0 12px #f39a4a,0 3px 0 #8e2218;animation:enDmg 1s ease forwards;pointer-events:none;}
 @keyframes enDmg{0%{opacity:0;transform:translateY(10px) scale(.6);}20%{opacity:1;transform:translateY(0) scale(1.15);}100%{opacity:0;transform:translateY(-40px) scale(1);}}
-.en-orbs{display:flex;justify-content:center;align-items:flex-end;gap:18px;height:128px;}
+.en-orbs{display:flex;justify-content:center;align-items:flex-end;gap:18px;height:118px;}
 .en-orb-slot{width:100px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;}
 .en-orb{object-fit:contain;transition:width .25s ease,height .25s ease,filter .25s ease,opacity .25s ease;}
 .en-orb-go{animation:enGo .65s ease-in forwards;}
@@ -2394,6 +2394,11 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .en-card{position:relative;aspect-ratio:3/4;border-radius:10px;border:2.5px solid;font:800 30px 'Inter',sans-serif;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px #0006;transition:transform .1s ease,box-shadow .1s ease;padding:0;}
 .en-card:active{transform:scale(.95);}
 .en-sel{transform:translateY(-8px);box-shadow:0 0 0 3px #fff,0 8px 16px #000a;}
+.en-field{display:flex;justify-content:center;gap:8px;height:74px;padding:0 12px;margin-bottom:6px;}
+.en-card-field{width:52px;flex:0 0 auto;font-size:26px;animation:enPlace .16s ease;}
+@keyframes enPlace{from{transform:translateY(24px) scale(.9);opacity:.4;}to{transform:none;opacity:1;}}
+.en-field-slot{width:52px;aspect-ratio:3/4;box-sizing:border-box;border:1.5px dashed #ffffff33;border-radius:10px;}
+.en-hand-slot{aspect-ratio:3/4;box-sizing:border-box;border:1.5px dashed #ffffff26;border-radius:10px;}
 .en-card-dot{position:absolute;top:6px;left:6px;width:9px;height:9px;border-radius:50%;}
 .en-overlay{position:absolute;inset:0;background:#000a;display:flex;align-items:center;justify-content:center;}
 .en-dialog{display:flex;flex-direction:column;gap:12px;align-items:center;padding:28px 36px;border-radius:18px;background:#1b2238;border:1px solid #ffffff33;}
@@ -3573,7 +3578,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v291'; // エナジー：v290の「3回行動」を取り消して10秒制に戻した（v289と同じ遊び方）
+const APP_VER='v292'; // エナジー：押した札が手札から場へ移る（手札のその場所は空く）。10完成で空いた所に補充。10をこえたら場の札は手札に戻る。場の札を押しても手札に戻る
+// const APP_VER='v291'; // エナジー：v290の「3回行動」を取り消して10秒制に戻した（v289と同じ遊び方）
 // const APP_VER='v290'; // エナジー：10秒制をやめて「10を3回つくったら放出」に（取り消し済み）
 // const APP_VER='v289'; // エナジー：札を1〜5（同じ数字は3枚まで）に修正。いつもの役（ワンペア〜ストレート）のボーナスエネルギーを追加（使った色それぞれに。量は EN_CFG.roleBonus）
 // const APP_VER='v288'; // エナジー（試作）：手札10枚（数字＋光/緑/赤）。最初の札で10秒→合計10で使った札の色にエネルギー（同色2枚以上ボーナス、全部同色で強ボーナス）→10秒後に放出してモンスターにダメージ。弱点なし。数値は EN_CFG
@@ -5305,7 +5311,8 @@ function EnergyMode({onBack}){
    phase==='idle'?h('span',{className:'en-hint'},'札を押すと10秒スタート'):phase==='rush'?h('span',{className:'en-time'+(left<3000?' en-time-low':'')},(left/1000).toFixed(1)):phase==='release'?h('span',{className:'en-time'},'放出！'):null,
    phase==='rush'&&h('span',{className:'en-sum'},'合計 '+sum),
    flash&&h('span',{key:flash.k,className:'en-flash en-flash-'+flash.type},flash.type==='over'?'10をこえた':((flash.role&&flash.role!=='役なし'?flash.role:'10！')+(flash.type==='all'?' ＋ 全部同じ色！':flash.type==='pair'?' ＋ 同じ色':'')))),
-  h('div',{className:'en-mat'},hand.map(c=>h('button',{key:c.id,className:'en-card'+(sel.includes(c.id)?' en-sel':''),onClick:()=>tap(c),style:{background:EN_COLOR[c.c].bg,borderColor:EN_COLOR[c.c].main,color:EN_COLOR[c.c].deep}},h('span',{className:'en-card-dot',style:{background:EN_COLOR[c.c].main}}),c.n))),
+  h('div',{className:'en-field','aria-label':'場'},sel.map(id=>hand.find(c=>c.id===id)).filter(Boolean).map(c=>h('button',{key:c.id,className:'en-card en-card-field',onClick:()=>tap(c),style:{background:EN_COLOR[c.c].bg,borderColor:EN_COLOR[c.c].main,color:EN_COLOR[c.c].deep}},h('span',{className:'en-card-dot',style:{background:EN_COLOR[c.c].main}}),c.n)),Array.from({length:Math.max(0,4-sel.length)},(_,i)=>h('div',{key:'e'+i,className:'en-field-slot'}))),
+  h('div',{className:'en-mat'},hand.map(c=>sel.includes(c.id)?h('div',{key:c.id,className:'en-hand-slot'}):h('button',{key:c.id,className:'en-card',onClick:()=>tap(c),style:{background:EN_COLOR[c.c].bg,borderColor:EN_COLOR[c.c].main,color:EN_COLOR[c.c].deep}},h('span',{className:'en-card-dot',style:{background:EN_COLOR[c.c].main}}),c.n))),
   phase==='win'&&h('div',{className:'en-overlay'},h('div',{className:'en-dialog'},h('h1',null,'撃破！'),h('button',{onClick:restart},'もう一度'),h('button',{className:'en-sub',onClick:onBack},'ホームへ'))));
 }
 function DiceMode({onBack}){

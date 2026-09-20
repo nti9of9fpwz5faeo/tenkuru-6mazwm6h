@@ -1,13 +1,13 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
-const html=fs.readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8'),source=html.split('// ── BILLIARDS ENGINE v307 ──')[1].split('// ── END BILLIARDS ENGINE ──')[0],ctx={Math,performance};vm.createContext(ctx);
+const html=fs.readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8'),source=html.split('// ── BILLIARDS ENGINE v308 ──')[1].split('// ── END BILLIARDS ENGINE ──')[0],ctx={Math,performance};vm.createContext(ctx);
 vm.runInContext(html.slice(html.indexOf('function calcPts(cards){'),html.indexOf('// v286: normal battles'))+source+';this.api={BB_CFG,bbRole,bbBody,bbPoints,bbCreate,bbStart,bbShoot,bbPhysics,bbStep,bbJoin,bbBreak,bbOutcome,bbFollowingPlayer,bbPlace,bbValidPlacement,bbPlacementOptions,bbPlacementBatch,bbChoosePlacement,bbCandidates,bbEvaluate,bbRay};',ctx);
 const {BB_CFG,bbRole,bbBody,bbPoints,bbCreate,bbStart,bbShoot,bbPhysics,bbStep,bbJoin,bbBreak,bbOutcome,bbFollowingPlayer,bbPlace,bbValidPlacement,bbPlacementOptions,bbPlacementBatch,bbChoosePlacement,bbCandidates,bbEvaluate,bbRay}=ctx.api;
 function game(parts){const s=bbCreate('normal',()=>.5);s.bodies=parts.map((b,i)=>bbBody(i+1,b[0],b[1],b[2].map((n,j)=>({x:j*40,y:0,n}))));s.nextId=100;bbStart(s);return s;}
 function settle(s){for(let i=0;i<1300&&s.moving;i++)bbStep(s);assert.equal(s.moving,false);}
-function placeAll(s){let count=0;while(s.placing){assert(++count<=10);const p=bbChoosePlacement(s,()=>.5);assert(p);assert(bbPlace(s,s.placer,p.x,p.y));}}
+function placeAll(s){let count=0;while(s.placing){assert(++count<=12);const p=bbChoosePlacement(s,()=>.5);assert(p);assert(bbPlace(s,s.placer,p.x,p.y));}}
 function numbers(s){return [...s.bodies.flatMap(b=>b.parts.filter(p=>p.n).map(p=>p.n)),...s.returnBalls].sort((a,b)=>a-b);}
-const inventory=[1,1,2,2,3,3,4,4,5,5];
-for(let seed=1;seed<=20;seed++){let x=seed;const rng=()=>((x=(x*1664525+1013904223)>>>0)/4294967296),s=bbCreate('normal',rng);assert.equal(s.bodies.length,11);assert(s.bodies.every(b=>b.parts.length===1));assert.equal(s.bodies.filter(b=>b.sum===0).length,1);assert.deepEqual(numbers(s),inventory);for(let i=0;i<11;i++)for(let j=i+1;j<11;j++)assert(Math.hypot(s.bodies[i].x-s.bodies[j].x,s.bodies[i].y-s.bodies[j].y)>46);}
+const inventory=[1,1,2,2,2,3,3,3,4,4,5,5];
+for(let seed=1;seed<=20;seed++){let x=seed;const rng=()=>((x=(x*1664525+1013904223)>>>0)/4294967296),s=bbCreate('normal',rng);assert.equal(s.bodies.length,13);assert(s.bodies.every(b=>b.parts.length===1));assert.equal(s.bodies.filter(b=>b.sum===0).length,1);assert.deepEqual(numbers(s),inventory);for(let i=0;i<13;i++)for(let j=i+1;j<13;j++)assert(Math.hypot(s.bodies[i].x-s.bodies[j].x,s.bodies[i].y-s.bodies[j].y)>46);}
 // White contact splits the entire cluster without treating it as a burst.
 let s=game([[220,530,[0]],[180,380,[3,2,4]]]);const original=numbers(s);assert(bbShoot(s,-Math.PI/2,.55));for(let i=0;i<500&&!s.events.some(e=>e.kind==='break');i++)bbStep(s);assert(s.events.some(e=>e.kind==='break'));assert.equal(s.bodies.length,4);assert(s.bodies.every(b=>b.parts.length===1));assert.deepEqual(numbers(s),original);assert(!s.shotBurst);for(let i=0;i<35;i++)bbStep(s);assert(s.bodies.every(b=>b.parts.length===1),'immediate rejoin after breaking');settle(s);assert.deepEqual(numbers(s),original);
 s=game([[50,600,[0]],[180,260,[1,2,3]]]);s.bodies[1].a=.7;const before=bbPoints(s.bodies[1]);const pieces=bbBreak(s,s.bodies[1]);for(let i=0;i<3;i++){assert.equal(pieces[i].x,before[i].x);assert.equal(pieces[i].y,before[i].y);assert.equal(pieces[i].parts[0].n,before[i].n);}
@@ -16,8 +16,8 @@ s=game([[220,530,[0]],[220,390,[1]],[180,260,[3,2,4]]]);s.turn=1;assert(bbShoot(
 // Placement guards and pause retain inventory and turn.
 let p=bbPlacementOptions(s)[0],snapshot=JSON.stringify(s);assert(!bbPlace(s,1,p.x,p.y));assert(!bbPlace(s,0,-2,p.y));assert(!bbPlace(s,0,NaN,p.y));assert(!bbPlace(s,0,s.bodies[0].x,s.bodies[0].y));assert.equal(JSON.stringify(s),snapshot);s.paused=true;assert(!bbPlace(s,0,p.x,p.y));const frozen=JSON.stringify(s);for(let i=0;i<100;i++)bbStep(s);assert.equal(JSON.stringify(s),frozen);s.paused=false;
 const retained=numbers(s);assert(bbPlace(s,0,p.x,p.y));assert(!bbPlace(s,0,p.x,p.y));assert.equal(s.returnBalls.length,3);placeAll(s);assert.deepEqual(numbers(s),retained);assert.equal(s.turn,1);assert.equal(s.shots,1);
-// Every reachable four-ball hand scores the existing rank; inventory excludes triples.
-for(const [values,points,label]of [[[1,1,3,5],2,'ワンペア'],[[1,2,2,5],2,'ワンペア'],[[1,1,4,4],3,'ツーペア'],[[2,2,3,3],3,'ツーペア'],[[1,2,3,4],5,'ストレート']]){assert.equal(bbRole(values).points,points);assert.equal(bbRole(values).label,label);for(const who of [0,1]){
+// Every reachable four-ball hand scores the existing rank; including both three-card hands.
+for(const [values,points,label]of [[[1,1,3,5],2,'ワンペア'],[[1,2,2,5],2,'ワンペア'],[[1,1,4,4],3,'ツーペア'],[[2,2,3,3],3,'ツーペア'],[[2,2,2,4],4,'スリーカード'],[[1,3,3,3],4,'スリーカード'],[[1,2,3,4],5,'ストレート']]){assert.equal(bbRole(values).points,points);assert.equal(bbRole(values).label,label);for(const who of [0,1]){
  s=game([[220,600,[0]],[80,100,[values[0]]],[180,100,values.slice(1)]]);s.turn=who;const all=numbers(s);assert(bbShoot(s,Math.PI/2,.08));bbJoin(s,s.bodies[1],s.bodies[2]);settle(s);assert.equal(s.placer,1-who);assert.equal(s.nextShooter,who);assert.equal(s.returnBalls.length,4);assert.equal(s.scores[who],points);placeAll(s);assert.equal(s.turn,who);assert.equal(s.shots,1);assert.deepEqual(numbers(s),all);
 }}
 // Seven consecutive pair finishes (14 points) have no turn cap; a miss hands over.
@@ -38,6 +38,6 @@ s=game([[220,600,[0]],[80,100,[1]],[180,100,[2,3,4]]]);s.scores[0]=10;bbShoot(s,
 // AI evaluates the same four-ball/burst physics without changing live state.
 s=game([[220,530,[0]],[220,390,[1]],[180,260,[3,2,4]]]);s.turn=1;snapshot=JSON.stringify(s);let best=-Infinity;for(const c of bbCandidates(s).slice(0,60))best=Math.max(best,bbEvaluate(s,c));assert(best>=1000);assert.equal(JSON.stringify(s),snapshot);assert(bbRay(s,-Math.PI/2)<140);
 s=game([[220,530,[0]],[220,390,[5]],[220,260,[5]]]);assert(bbEvaluate(s,{angle:-Math.PI/2,power:.8})<0);
-// Full games retain precisely the same ten digits through bursts, placements and joins.
+// Full games retain precisely the same twelve digits through bursts, placements and joins.
 for(const level of ['easy','normal','hard']){s=bbCreate(level,()=>.5);bbStart(s);for(let shot=0;shot<35;shot++){assert(bbShoot(s,shot*2.399,.6+(shot%3)*.2));settle(s);assert.deepEqual(numbers(s),inventory);assert.equal(s.returnBalls.length,s.returnKinds.length);if(s.phase==='ended')break;placeAll(s);for(const b of s.bodies){assert(b.parts.length<=3);for(const p of bbPoints(b)){assert(Number.isFinite(p.x)&&Number.isFinite(p.y));assert(p.x>=19&&p.x<=421,JSON.stringify(p));assert(p.y>=19&&p.y<=s.h-19,JSON.stringify(p));}}assert.deepEqual(numbers(s),inventory);}}
-console.log('PASS: exactly ten digits, four-only finishes, reachable ranks, unlimited successful turns, all burst boundaries, physics bursts, mixed placement ownership, pause/invalid input, cue breakup, win, AI, 105-shot inventory and stability.');
+console.log('PASS: exactly twelve digits, four-only finishes, reachable ranks, unlimited successful turns, all burst boundaries, physics bursts, mixed placement ownership, pause/invalid input, cue breakup, win, AI, 105-shot inventory and stability.');

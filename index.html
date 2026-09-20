@@ -3746,7 +3746,7 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v307'; // ビリヤード：4球で10・数字10球・バースト再配置・ボタンなしキャンセル
+const APP_VER='v308'; // ビリヤード：2と3を各1球追加・数字12球・スリーカード対応
 // const APP_VER='v299'; // テンフォール：新デザイン素材（背景・盤面・札・マス・ボタン・合計/点数の枠・10完成/💥の演出・説明パネル）を組み込み。ルールは変更なし
 // const APP_VER='v298'; // テンフォール：手札10枚をやめて1〜5の数字ボタン5つに（何回でも押せる・押した数字が下のマスの左から入る）。入れ替えスワイプと案内文は削除。落ち札・💥・点数はそのまま
 // const APP_VER='v297'; // セパレート（試作）：場を2人で分ける。自分の札は自分の場だけ、ぴったり10で役の点、10こえははじき返す、相手が10を作ると自分の場はリセット（札は捨て）、先に15点で勝ち。出せる札がなければその場をリセット。数値は SEP_CFG
@@ -5754,19 +5754,19 @@ function tapFieldPlaces(field,places=[]){
  const used=new Set();return field.map((_,i)=>{let slot=places[i];if(!Number.isInteger(slot)||slot<0||slot>3||used.has(slot))slot=[0,1,2,3].find(n=>!used.has(n));used.add(slot);return slot;});
 }
 
-// ── BILLIARDS ENGINE v307 ──
+// ── BILLIARDS ENGINE v308 ──
 // Shared, pocketless compound-ball billiards. Fixed 120 Hz; rendering and AI use the same engine.
-const BB_CFG={w:440,h:706,r:20,target:15,initialBalls:10,step:1/120,friction:125,maxSpeed:1120,levels:{easy:{label:'やさしい',samples:18,error:.075},normal:{label:'ふつう',samples:60,error:.012},hard:{label:'つよい',samples:130,error:.001}}};
+const BB_CFG={w:440,h:706,r:20,target:15,initialBalls:12,step:1/120,friction:125,maxSpeed:1120,levels:{easy:{label:'やさしい',samples:18,error:.075},normal:{label:'ふつう',samples:60,error:.012},hard:{label:'つよい',samples:130,error:.001}}};
 function bbBody(id,x,y,parts){const b={id,x,y,vx:0,vy:0,a:0,w:0,parts:parts.map(p=>({...p})),sum:parts.reduce((s,p)=>s+p.n,0)};b.mass=parts.length;b.inertia=parts.reduce((s,p)=>s+p.x*p.x+p.y*p.y+BB_CFG.r**2/2,0);return b;}
 function bbPoints(b){const c=Math.cos(b.a),s=Math.sin(b.a);return b.parts.map(p=>({x:b.x+p.x*c-p.y*s,y:b.y+p.x*s+p.y*c,n:p.n}));}
 function bbRole(values){const r=calcPts(values);return{points:r.total,label:r.voice};}
 function bbCreate(level='normal',rng=Math.random){
  const s={h:BB_CFG.h,bodies:[],nextId:1,turn:0,scores:[0,0],phase:'ready',paused:false,level:BB_CFG.levels[level]?level:'normal',moving:false,elapsed:0,quiet:0,now:0,turnNo:0,shots:0,shotTen:false,shotBurst:false,returnBalls:[],returnKinds:[],placing:false,placer:null,nextShooter:null,placeSeq:0,events:[],eventId:0,merged:0,winner:null,aiWait:0};
  s.bodies.push(bbBody(s.nextId++,220,588,[{x:0,y:0,n:0}]));
- // Ten separate numbers: two of each value 1–5. The white cue is extra.
- const values=[1,1,2,2,3,3,4,4,5,5];
+ // Twelve numbers: three each of 2 and 3, two each of 1, 4 and 5. The cue is extra.
+ const values=[1,1,2,2,2,3,3,3,4,4,5,5];
  for(let i=values.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[values[i],values[j]]=[values[j],values[i]];}
- const spots=[[66,68],[213,92],[362,65],[100,199],[280,207],[57,333],[191,310],[333,323],[110,443],[310,463]];
+ const spots=[[66,68],[213,92],[362,65],[100,199],[245,207],[373,181],[57,333],[191,310],[333,323],[110,443],[257,431],[372,473]];
  spots.forEach(([x,y],i)=>s.bodies.push(bbBody(s.nextId++,x+(rng()-.5)*14,y+(rng()-.5)*14,[{x:0,y:0,n:values[i]}])));return s;
 }
 function bbEvent(s,kind,data={}){s.events.push({id:++s.eventId,kind,at:s.now,...data});if(s.events.length>80)s.events.splice(0,s.events.length-80);}
@@ -5992,7 +5992,7 @@ function BilliardsMode({onBack}){
    s.phase==='ready'&&h('p',{className:'bb-instructions'},'4個で10を作ると、もう1打。10を超えるとバースト。'),
    !s.paused&&h('div',{className:'bb-levels','aria-label':'AIの強さ'},Object.entries(BB_CFG.levels).map(([id,c])=>h('button',{key:id,'aria-pressed':level===id,onClick:()=>setLevel(id)},c.label))),
    h('button',{className:'bb-primary',onClick:s.paused?resume:start},s.paused?'つづける':s.phase==='ended'?'もう一度':'はじめる'),h('button',{className:'bb-secondary',onClick:onBack},'ホームへ'),h('button',{className:'bb-secondary',onClick:toggleSound,'aria-pressed':!muted},muted?'効果音 OFF':'効果音 ON'),
-   h('details',null,h('summary',null,'あそびかた'),h('p',null,'数字の玉どうしがぶつかると結合。数字はそのまま残り、塊になって転がります。白い玉が塊に当たると全解除。4個で合計10になったときだけ得点。10を超えたら、その組み合わせはバーストします。'),h('p',null,'数字は1〜5を2個ずつ、計10個。白い玉は別に1個。全部バラバラで開始。相手が作った塊も使えます。15点先取で勝ち。'),h('p',null,'ワンペア2点、ツーペア3点、ストレート5点。ストレートは1・2・3・4です。各数字が2個ずつなので、スリーカードはありません。'),h('p',null,'4個で10を完成させるたびに手番が続きます。連続回数に上限はありません。10を作れなかったときやバーストしたときに交代します。'),h('p',null,'完成した4個は、次に打つ人の相手が配置。バーストした玉は、次に打つ人自身が配置します。4個未満で10になった場合、4個で10にならなかった場合、塊どうしで5個以上になる場合もバースト。同じ一打で完成とバーストが起きたら、得点は入り、手番は交代します。'),h('p',null,'引っぱる長さで強さを調節。引っぱり始めた位置の近くへ指を戻して離すと取り消せます。白い玉が壁際でも、盤面のどこからでも操作できます。'))))));
+   h('details',null,h('summary',null,'あそびかた'),h('p',null,'数字の玉どうしがぶつかると結合。数字はそのまま残り、塊になって転がります。白い玉が塊に当たると全解除。4個で合計10になったときだけ得点。10を超えたら、その組み合わせはバーストします。'),h('p',null,'数字は1・4・5が各2個、2・3が各3個の計12個。白い玉は別に1個。全部バラバラで開始。相手が作った塊も使えます。15点先取で勝ち。'),h('p',null,'ワンペア2点、ツーペア3点、スリーカード4点、ストレート5点。2・2・2・4や1・3・3・3でスリーカード。ストレートは1・2・3・4です。'),h('p',null,'4個で10を完成させるたびに手番が続きます。連続回数に上限はありません。10を作れなかったときやバーストしたときに交代します。'),h('p',null,'完成した4個は、次に打つ人の相手が配置。バーストした玉は、次に打つ人自身が配置します。4個未満で10になった場合、4個で10にならなかった場合、塊どうしで5個以上になる場合もバースト。同じ一打で完成とバーストが起きたら、得点は入り、手番は交代します。'),h('p',null,'引っぱる長さで強さを調節。引っぱり始めた位置の近くへ指を戻して離すと取り消せます。白い玉が壁際でも、盤面のどこからでも操作できます。'))))));
 }
 // ── END BILLIARDS UI ──
 

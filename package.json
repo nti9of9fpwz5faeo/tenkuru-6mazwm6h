@@ -4,7 +4,8 @@
   "scripts": {
     "test": "node tests/puzzlux-ui.cjs && node tests/rush-mode.cjs && node tests/charge-mode.cjs && node tests/survival-mode.cjs",
     "test:controls": "node tests/cursor-controls.cjs",
-    "test:shared": "node tests/shared-board.cjs"
+    "test:shared": "node tests/shared-board.cjs",
+    "test:energy": "node tests/standard-energy.cjs"
   },
   "devDependencies": {
     "css-tree": "2.3.1",

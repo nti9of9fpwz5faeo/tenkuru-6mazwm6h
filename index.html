@@ -2141,7 +2141,8 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .skip-veil{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(4,6,20,.62);cursor:pointer;-webkit-tap-highlight-color:transparent;animation:fadeUp .25s ease both;border-radius:inherit;}
 .skip-veil.light{background:rgba(4,6,20,.35);}
 /* v312 詰みスキップ（場の中） */
-.stuck-skip{display:flex;flex-direction:column;align-items:center;gap:calc(4 * var(--u));animation:fadeUp .25s ease both;}
+.stuck-skip{position:absolute;left:50%;top:calc(6 * var(--u));transform:translateX(-50%);z-index:6;display:flex;flex-direction:column;align-items:center;gap:calc(3 * var(--u));animation:fadeUp .25s ease both;pointer-events:none;} /* v315 場の中に重ねる（高さを取らない＝手札マットを押し下げない） */
+.stuck-skip-btn{pointer-events:auto;}
 .stuck-skip-btn{font-family:'Noto Serif JP',serif;font-size:calc(15 * var(--u));letter-spacing:.2em;color:#e8ecff;padding:calc(8 * var(--u)) calc(22 * var(--u));border:1px solid rgba(200,210,255,.55);border-radius:999px;background:rgba(10,14,40,.7);box-shadow:0 0 12px rgba(140,180,255,.5);animation:skipPulse 1.4s ease-in-out infinite;cursor:pointer;}
 .stuck-skip-btn.pressed{opacity:.55;animation:none;}
 .stuck-skip-note{font-size:calc(10 * var(--u));color:#9fb0e0;letter-spacing:.08em;}
@@ -3751,7 +3752,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v314'; // 相手の札：カーソル移動中・降下中にこちらが場を変えてバーストになる場合は出さない／手札へ返す（相手の理不尽バーストをなくす）
+const APP_VER='v315'; // 詰みスキップのボタンを場の中に重ねる配置に（レイアウトの高さを取らず、手札マットが下がらない）
+// const APP_VER='v314'; // 相手の札：カーソル移動中・降下中にこちらが場を変えてバーストになる場合は出さない／手札へ返す（相手の理不尽バーストをなくす）
 // const APP_VER='v313'; // 衝突セーフの対象を「相手の着地」だけでなく「場の合計が自分以外の理由で変わった直後」全部に拡大（0.4秒）
 // const APP_VER='v312'; // 場の4枠（2段階タップ）廃止・毎ラウンド5からカウント・カウント/役完成のスキップ廃止・詰みスキップ（両者が押すと残り0秒）
 // const APP_VER='v311'; // 通常対戦・チャレンジの手札を8枚に（HAND_CFG.n、4列×2段）

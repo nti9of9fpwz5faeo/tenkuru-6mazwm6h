@@ -2156,87 +2156,6 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 
 /* v253 10秒ラッシュ */
 
-/* v280 ひとりモード（仮） */
-.solo-screen .gp-dealer-card.solo-first{outline:calc(2.5 * var(--u)) solid #f5912a;outline-offset:calc(3 * var(--u));border-radius:calc(4 * var(--u));margin-right:calc(8 * var(--u));transform:scale(1.12);}
-.solo-screen .gp-dealer-cards{justify-content:flex-start;padding-left:calc(14 * var(--u));}
-.solo-screen .gp-dealer-area{margin-top:calc(20 * var(--u)) !important;}
-/* v276 テンフォール（仮） */
-.fall-screen.fall-play{position:fixed;inset:0;z-index:100;background:linear-gradient(155deg,#edf4fc,#f3eefb);display:flex;flex-direction:column;align-items:center;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;padding-top:max(8px,env(safe-area-inset-top));}
-.fall-top{width:min(100vw,calc(100dvh * 360 / 640));display:flex;align-items:center;justify-content:space-between;padding:6px 14px;color:#263650;}
-.fall-back{height:34px;padding:0 12px;border-radius:17px;font-weight:700;border:1.5px solid rgba(120,150,190,.4);background:rgba(255,255,255,.75);color:#5a80ab;font-size:14px;}
-.fall-score{font:700 13px 'Inter',sans-serif;color:#5a6f90;min-width:60px;text-align:right;}
-.fall-score b{font-size:22px;color:#263650;margin-right:2px;}
-.fall-lanes{position:relative;flex-shrink:0;overflow:hidden;}
-.fall-lane{position:absolute;top:0;bottom:0;border-left:1px dashed rgba(120,150,190,.25);}
-.fall-lane:first-child{border-left:none;}
-.fall-slot{position:absolute;border-radius:8px;border:2px dashed rgba(120,150,190,.35);box-sizing:border-box;}
-.fall-slot.next{border-color:rgba(46,127,232,.7);background:rgba(46,127,232,.07);}
-.fall-slot>.fall-in{position:absolute;inset:-2px;}
-.fall-in.done{animation:fallDone .55s ease forwards;}
-.fall-in.boom{animation:fallBoom .55s ease forwards;}
-@keyframes fallDone{0%{transform:scale(1)}30%{transform:scale(1.12);filter:brightness(1.3)}100%{transform:translateY(-30px) scale(.9);opacity:0}}
-@keyframes fallBoom{0%{transform:none}20%{transform:translateX(-5px) rotate(-4deg)}40%{transform:translateX(5px) rotate(4deg)}100%{transform:scale(.6) rotate(12deg);opacity:0;filter:grayscale(1)}}
-.fall-card{position:absolute;pointer-events:none;transition:filter .2s;}
-.fall-card.frz{filter:saturate(.35) brightness(1.05) drop-shadow(0 0 6px rgba(140,190,255,.8));}
-.fall-count{position:absolute;left:50%;top:-30px;transform:translateX(-50%);font:800 18px 'Inter',sans-serif;color:#e0584a;text-align:center;width:100%;}
-.fall-count i{display:block;height:4px;border-radius:2px;background:#e0584a;margin:2px auto 0;transition:none;}
-.fall-flash{position:absolute;left:0;right:0;text-align:center;pointer-events:none;animation:fallFlash .9s ease forwards;}
-.fall-flash b{display:block;font:900 40px 'Inter',sans-serif;color:#2e7fe8;text-shadow:0 2px 10px rgba(255,255,255,.9);}
-.fall-flash.boom b{color:#e0584a;}
-.fall-flash span{font-size:13px;font-weight:800;color:#3c5a80;background:rgba(255,255,255,.85);border-radius:10px;padding:2px 10px;}
-@keyframes fallFlash{0%{opacity:0;transform:scale(.7)}15%{opacity:1;transform:scale(1.05)}70%{opacity:1}100%{opacity:0;transform:translateY(-20px)}}
-.fall-sum{font:700 14px 'Inter',sans-serif;color:#7a90ae;margin:4px 0 6px;}
-.fall-sum b{font-size:22px;color:#9aaccc;margin:0 2px;}
-.fall-sum b.on{color:#263650;}
-.fall-hand{display:grid;grid-template-columns:repeat(5,auto);gap:6px 8px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.6);box-shadow:0 4px 16px rgba(70,100,150,.12);}
-.fall-hand.shuf .fall-hcard{animation:fallShuf .4s ease;}
-@keyframes fallShuf{0%{transform:translateX(-8px);opacity:.3}100%{transform:none;opacity:1}}
-.fall-play .fall-hand{margin-top:14px;}
-/* v299 テンフォール新デザイン（星が降る魔法工房）。素材は img/tenfall/ */
-.fall-screen.fall-play{background:#bfe3e6 url('img/tenfall/bg.webp') center/cover no-repeat;}
-.fall-play .fall-lanes{background:url('img/tenfall/board.webp') center/100% 100% no-repeat;border-radius:10px;}
-.fall-play .fall-lane{border-left:none;}
-.fall-play .fall-slot{border:none;background:url('img/tenfall/slot-idle.webp') center/100% 100% no-repeat;}
-.fall-play .fall-slot.next{background:none;}
-.fall-play .fall-slot.next:before{content:'';position:absolute;inset:-9% -12%;background:url('img/tenfall/slot-active.webp') center/100% 100% no-repeat;pointer-events:none;}
-.fall-play .fall-slot>.fall-in{inset:0;}
-.tf-card{position:relative;display:flex;align-items:center;justify-content:center;background:center/100% 100% no-repeat;filter:drop-shadow(0 3px 5px rgba(20,60,70,.28));}
-.tf-card.tf-fall{background-image:url('img/tenfall/card-fall.webp');}
-.tf-card.tf-player{background-image:url('img/tenfall/card-player.webp');}
-.tf-card img,.tf-btn img{height:52%;width:auto;pointer-events:none;user-select:none;}
-.fall-play .fall-hand{background:none;box-shadow:none;padding:0;gap:6px;}
-.tf-btn{display:flex;align-items:center;justify-content:center;background:url('img/tenfall/btn.webp') center/100% 100% no-repeat!important;filter:drop-shadow(0 3px 5px rgba(20,60,70,.3));}
-.tf-btn img{height:50%;}
-.tf-btn:active{transform:scale(.9);}
-.tf-badge{background:url('img/tenfall/badge.webp') center/100% 100% no-repeat;color:#1d4a52;padding:6px 26px;min-width:0;}
-.fall-sum.tf-badge{color:#2c6a72;}
-.fall-sum.tf-badge b{color:#7fa8ad;}.fall-sum.tf-badge b.on{color:#123a43;}
-.fall-score.tf-badge{color:#2c6a72;}.fall-score.tf-badge b{color:#123a43;}
-.fall-play .fall-back{background:#fffaf0e6;border:1.5px solid #d6b56a;color:#1d4a52;}
-.fall-play .fall-count{color:#c9482f;text-shadow:0 1px 3px #fff;}
-.fall-play .fall-count i{background:#c9482f;}
-.tf-fx{position:absolute;transform:translateX(-50%);pointer-events:none;animation:tfFx .7s ease-out forwards;z-index:3;}
-@keyframes tfFx{0%{opacity:1;transform:translateX(-50%) scale(.6);}35%{opacity:1;}100%{opacity:0;transform:translateX(-50%) scale(1.35);}}
-.fall-play .fall-flash{z-index:4;}
-.fall-play .fall-flash b{color:#123a43;}.fall-play .fall-flash.boom b{color:#c9482f;}
-.rush-screen.tf-menu{background:#bfe3e6 url('img/tenfall/bg.webp') center/cover no-repeat;}
-.rush-screen.tf-menu .tf-panel{background:url('img/tenfall/panel.webp') center/100% 100% no-repeat;border:none;box-shadow:none;padding:58px 30px 36px;}
-.rush-screen.tf-menu .rush-eyebrow{color:#2c6a72;}
-.rush-screen.tf-menu .tf-panel h1{color:#123a43;}
-.rush-screen.tf-menu .rush-rules{color:#1d4a52;}
-.rush-screen.tf-menu .rush-primary{background:linear-gradient(180deg,#2c8a93,#1d6870);border:2px solid #d6b56a;color:#fffaf0;}
-.rush-screen.tf-menu .rush-secondary{background:#fffaf0;border:1.5px solid #d6b56a;color:#1d4a52;}
-.rush-screen.tf-menu .fall-result b{color:#123a43;}.rush-screen.tf-menu .fall-result p,.rush-screen.tf-menu .fall-result span{color:#2c6a72;}
- /* v298 手札（数字ボタン）と場の間を少しだけ空ける */
-.fall-hcard{background:none;border:none;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.fall-hcard:active{transform:scale(.94);}
-.fall-hcard.shake{animation:fallShake .32s ease;}
-@keyframes fallShake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
-.fall-hint{font-size:11px;color:#8aa0be;margin-top:6px;letter-spacing:1px;}
-.fall-result{text-align:center;margin:14px 0;}
-.fall-result b{font:900 48px 'Inter',sans-serif;color:#2e7fe8;}
-.fall-result span{font-weight:800;margin-left:4px;color:#5a6f90;}
-.fall-result p{font-size:13px;color:#5a6f90;margin:6px 0;}
 .rush-screen{position:fixed;inset:0;z-index:100;overflow-y:auto;touch-action:pan-y;background:linear-gradient(155deg,#edf4fc,#f3eefb);color:#263650;padding:max(24px,env(safe-area-inset-top)) 18px max(24px,env(safe-area-inset-bottom));}
 .rush-card{width:min(100%,440px);margin:0 auto;background:#ffffffed;border:1px solid #d7dff0;border-radius:22px;padding:24px;box-shadow:0 12px 40px #35467413;text-align:center;}
 .rush-card h1{font-size:30px;margin:8px 0 12px;color:#534181;}.rush-eyebrow{font-size:12px;letter-spacing:3px;color:#6b7290;margin:0;}.rush-lead{font-size:16px;line-height:1.6;}
@@ -2417,88 +2336,6 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 @keyframes energyGain{0%{opacity:0;transform:translateY(8px) scale(.85);}20%{opacity:1;transform:translateY(-4px) scale(1.1);}75%{opacity:1;}100%{opacity:0;transform:translateY(-22px);}}
 @media(prefers-reduced-motion:reduce){.energy-gain{animation:none;}}
 
-/* DICE MODE v283 — all selectors are scoped; existing fields/backgrounds are untouched. */
-/* v288 エナジーモード */
-.en-screen{position:relative;height:100dvh;overflow:hidden;display:flex;flex-direction:column;background:radial-gradient(ellipse at 50% 28%,#2a3350 0%,#141a2c 55%,#080b14 100%);color:#f2ecd8;font-family:'Noto Sans JP',sans-serif;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);box-sizing:border-box;touch-action:manipulation;user-select:none;-webkit-user-select:none;}
-.en-top{display:flex;align-items:center;gap:10px;padding:10px 14px 0;}
-.en-back{width:34px;height:34px;border-radius:50%;border:1px solid #ffffff33;background:#ffffff12;color:#f2ecd8;font-size:22px;line-height:1;}
-.en-hp{position:relative;flex:1;height:16px;border-radius:9px;background:#00000066;border:1px solid #ffffff2a;overflow:hidden;}
-.en-hp-fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,#e0503c,#f39a4a);transition:width .5s ease;}
-.en-hp span{position:relative;display:block;text-align:center;font-size:11px;line-height:16px;font-weight:700;text-shadow:0 1px 2px #000;}
-.en-monster-wrap{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;}
-.en-monster{max-height:92%;max-width:70%;object-fit:contain;filter:drop-shadow(0 12px 18px #000a);}
-.en-hit{animation:enHit .45s ease;}
-.en-dead{animation:enDead .8s ease forwards;}
-@keyframes enHit{0%,100%{transform:none;filter:drop-shadow(0 12px 18px #000a);}20%{transform:translateX(-10px);filter:brightness(2.2) drop-shadow(0 0 20px #fff);}45%{transform:translateX(8px);}70%{transform:translateX(-4px);}}
-@keyframes enDead{to{opacity:0;transform:scale(.8) translateY(20px);filter:brightness(3) blur(4px);}}
-.en-dmg{position:absolute;top:30%;font:800 42px 'Inter',sans-serif;color:#fff;text-shadow:0 0 12px #f39a4a,0 3px 0 #8e2218;animation:enDmg 1s ease forwards;pointer-events:none;}
-@keyframes enDmg{0%{opacity:0;transform:translateY(10px) scale(.6);}20%{opacity:1;transform:translateY(0) scale(1.15);}100%{opacity:0;transform:translateY(-40px) scale(1);}}
-.en-orbs{display:flex;justify-content:center;align-items:flex-end;gap:18px;height:118px;}
-.en-orb-slot{width:100px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;}
-.en-orb{object-fit:contain;transition:width .25s ease,height .25s ease,filter .25s ease,opacity .25s ease;}
-.en-orb-go{animation:enGo .65s ease-in forwards;}
-@keyframes enGo{0%{transform:none;}35%{transform:scale(1.25);}100%{transform:translateY(-230px) scale(.4);opacity:0;}}
-.en-orb-num{font:800 14px 'Inter',sans-serif;text-shadow:0 1px 3px #000;}
-.en-status{position:relative;height:40px;display:flex;align-items:center;justify-content:center;gap:16px;}
-.en-hint{font-size:13px;letter-spacing:2px;color:#f2ecd8b0;}
-.en-time{font:800 26px 'Inter',sans-serif;}
-.en-time-low{color:#ff8a6a;}
-.en-sum{font-size:13px;color:#f2ecd8cc;}
-.en-flash{position:absolute;top:-26px;font-weight:800;font-size:18px;animation:enFlash .8s ease forwards;pointer-events:none;text-shadow:0 2px 6px #000;}
-.en-flash-all{color:#ffe07a;font-size:22px;}.en-flash-pair{color:#9ff0b8;}.en-flash-over{color:#ff8a6a;font-size:14px;}.en-flash-ten{color:#fff;}
-@keyframes enFlash{0%{opacity:0;transform:translateY(8px) scale(.8);}25%{opacity:1;transform:none;}100%{opacity:0;transform:translateY(-14px);}}
-.en-mat{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:12px 12px 18px;margin:0 8px 8px;border-radius:16px;background:#00000055;border:1px solid #ffffff1c;}
-.en-card{position:relative;aspect-ratio:3/4;border-radius:10px;border:2.5px solid;font:800 30px 'Inter',sans-serif;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px #0006;transition:transform .1s ease,box-shadow .1s ease;padding:0;}
-.en-card:active{transform:scale(.95);}
-.en-sel{transform:translateY(-8px);box-shadow:0 0 0 3px #fff,0 8px 16px #000a;}
-.en-field{display:flex;justify-content:center;gap:8px;height:74px;padding:0 12px;margin-bottom:6px;}
-.en-card-field{width:52px;flex:0 0 auto;font-size:26px;animation:enPlace .16s ease;}
-@keyframes enPlace{from{transform:translateY(24px) scale(.9);opacity:.4;}to{transform:none;opacity:1;}}
-.en-field-slot{width:52px;aspect-ratio:3/4;box-sizing:border-box;border:1.5px dashed #ffffff33;border-radius:10px;}
-.en-hand-slot{aspect-ratio:3/4;box-sizing:border-box;border:1.5px dashed #ffffff26;border-radius:10px;}
-.en-card-dot{position:absolute;top:6px;left:6px;width:9px;height:9px;border-radius:50%;}
-.en-overlay{position:absolute;inset:0;background:#000a;display:flex;align-items:center;justify-content:center;}
-.en-dialog{display:flex;flex-direction:column;gap:12px;align-items:center;padding:28px 36px;border-radius:18px;background:#1b2238;border:1px solid #ffffff33;}
-.en-dialog h1{margin:0 0 6px;font-size:30px;color:#ffe07a;}
-.en-dialog button{width:180px;padding:12px 0;border-radius:12px;border:none;font-weight:700;font-size:15px;background:#f3cf63;color:#3a2a00;}
-.en-dialog .en-sub{background:#ffffff1a;color:#f2ecd8;}
-/* v297 セパレート */
-.sp-screen{position:relative;height:100dvh;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:8px;background:linear-gradient(180deg,#eef3f8,#dde6ef);color:#2a3446;font-family:'Noto Sans JP',sans-serif;padding:calc(env(safe-area-inset-top,0px) + 10px) 12px calc(env(safe-area-inset-bottom,0px) + 12px);box-sizing:border-box;user-select:none;-webkit-user-select:none;touch-action:manipulation;}
-.sp-top{width:100%;display:flex;align-items:center;justify-content:space-between;}
-.sp-back{width:36px;height:36px;border-radius:50%;border:1px solid #9aaec0;background:#fff;color:#2a3446;font-size:22px;line-height:1;}
-.sp-score{display:flex;align-items:baseline;gap:6px;padding:4px 14px;border-radius:12px;background:#fff;box-shadow:0 2px 6px #0001;}
-.sp-score b{font:800 26px 'Inter',sans-serif;}.sp-score small{font-size:11px;color:#6a7a8e;}
-.sp-score-d b{color:#e07020;}.sp-score-p b{color:#1a6ad0;}
-.sp-hand-d{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;width:100%;max-width:420px;}
-.sp-mini{height:30px;border-radius:5px;background:#fff;border-bottom:2px solid #f08a3a;display:flex;align-items:center;justify-content:center;font:700 15px 'Inter',sans-serif;box-shadow:0 1px 3px #0002;}
-.sp-mini-empty{background:transparent;border:1px dashed #9aaec066;box-shadow:none;}
-.sp-label{font-size:11px;letter-spacing:3px;color:#6a7a8e;}
-.sp-field{position:relative;display:flex;align-items:center;gap:8px;}
-.sp-slot,.sp-fcard{width:54px;height:74px;border-radius:8px;box-sizing:border-box;}
-.sp-slot{border:1.5px dashed #9aaec0aa;background:#ffffff66;}
-.sp-sum{position:absolute;right:-58px;font:800 22px 'Inter',sans-serif;}.sp-sum small{font-size:12px;color:#6a7a8e;}
-.sp-divider{width:100%;height:2px;background:linear-gradient(90deg,transparent,#9aaec0,transparent);margin:4px 0;}
-.sp-card{display:flex;align-items:center;justify-content:center;font:800 30px 'Inter',sans-serif;background:#fff;border-radius:8px;color:#2a3446;box-shadow:0 3px 8px #0002;}
-.sp-fcard{animation:spIn .16s ease;}.sp-fcard.sp-d{border-bottom:3px solid #f08a3a;}.sp-fcard.sp-p{border-bottom:3px solid #2a8ae0;}
-@keyframes spIn{from{transform:scale(.8);opacity:.3;}to{transform:none;opacity:1;}}
-.sp-hand-p{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;width:100%;max-width:420px;margin-top:auto;padding:12px;border-radius:16px;background:#ffffff80;box-sizing:border-box;}
-.sp-hand-p .sp-card{aspect-ratio:3/4;border:0;border-bottom:3px solid #2a8ae0;padding:0;}
-.sp-hand-p .sp-card:active{transform:scale(.95);}
-.sp-empty{background:transparent!important;box-shadow:none!important;border:1.5px dashed #9aaec066!important;}
-.sp-bounce{animation:spBounce .32s ease;}
-@keyframes spBounce{25%{transform:translateY(-16px);}55%{transform:translateY(4px);}75%{transform:translateX(-4px);}}
-.sp-shake{animation:spShake .4s ease;}
-@keyframes spShake{20%{transform:translateX(-8px);}45%{transform:translateX(7px);}70%{transform:translateX(-4px);}}
-.sp-tag{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:4px 12px;border-radius:10px;font-weight:800;font-size:15px;white-space:nowrap;animation:spTag .9s ease forwards;pointer-events:none;}
-.sp-tag-ten{background:#1a6ad0;color:#fff;}.sp-field-d .sp-tag-ten{background:#e07020;}
-.sp-tag-reset{background:#d33;color:#fff;}
-@keyframes spTag{0%{opacity:0;transform:translate(-50%,-30%) scale(.8);}20%{opacity:1;transform:translate(-50%,-50%) scale(1.05);}100%{opacity:0;transform:translate(-50%,-80%);}}
-.sp-overlay{position:absolute;inset:0;background:#1a2433aa;display:flex;align-items:center;justify-content:center;}
-.sp-dialog{display:flex;flex-direction:column;align-items:center;gap:10px;padding:24px 26px;border-radius:18px;background:#fff;max-width:320px;}
-.sp-dialog h1{margin:0;font-size:26px;}.sp-dialog ul{margin:0 0 6px;padding-left:18px;font-size:13px;line-height:1.8;}
-.sp-dialog p{margin:0;font:800 20px 'Inter',sans-serif;}.sp-win{color:#1a6ad0;}.sp-lose{color:#e07020;}
-.sp-dialog button{width:200px;padding:12px 0;border-radius:12px;border:0;background:#1a6ad0;color:#fff;font-weight:700;font-size:15px;}
-.sp-dialog .sp-sub{background:#eef3f8;color:#2a3446;}
 /* v319 NEXT: generated courtyard and numerals; all dimensions share one stage. */
 .nx-screen{height:100dvh;width:100%;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);background:#e5cda8;color:#102b57;overflow:hidden;user-select:none;touch-action:manipulation;}
 .nx-stage{position:relative;width:100%;max-width:560px;height:100%;margin:auto;background:url('img/next-v319/court.webp') center/100% 100% no-repeat;--nx-card-w:17.3%;--nx-card-h:13.1%;}
@@ -2567,34 +2404,6 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 @keyframes nx-score-flight{0%{transform:translate(-50%,-50%) scale(.7);opacity:0}12%,30%{opacity:1}100%{left:var(--score-x);top:12.5%;transform:translate(-50%,-50%) scale(.3);opacity:0}}
 @keyframes nx-score-impact{0%{transform:scale(1)}28%{transform:scale(1.24);filter:drop-shadow(0 0 10px #ffe081)}100%{transform:scale(1)}}
 @media(prefers-reduced-motion:reduce){.nx-celebration *,.nx-completed .nx-field-card,.nx-score.nx-earned{animation:none!important;}.nx-particles,.nx-point-flight,.nx-burst-ring{display:none;}}
-.dc-screen{--du:min(.25641vw,.135dvh,1.28px);--dice-edge:calc(92 * var(--du));--dice-half:calc(46 * var(--du));position:relative;width:100%;height:100dvh;overflow:hidden;--dc-felt:url("data:image/webp;base64,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");background-color:#043c2b;background-image:radial-gradient(ellipse at 50% 48%,#0b866326,transparent 65%),var(--dc-felt);background-size:cover;background-position:center;color:#f6e9ba;font-family:'Noto Sans JP',sans-serif;touch-action:none;}
-.dc-screen:after{content:'';position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 100px #001b1970;}
-.dc-shell{height:100%;max-width:550px;margin:auto;position:relative;}
-.dc-quiet-hud{position:absolute;z-index:6;top:max(14px,env(safe-area-inset-top));right:18px;display:flex;align-items:center;gap:16px;color:#e5d4a9b3;font:500 16px 'Inter',sans-serif;}.dc-quiet-hud button{width:42px;height:42px;border-radius:50%;border:1px solid #cbb97759;background:#002d2166;color:#e6d4a4;font-size:20px;cursor:pointer;}
-.dc-arena{position:absolute;left:0;right:0;top:25%;height:46%;display:grid;grid-template:repeat(2,minmax(0,1fr))/repeat(2,minmax(0,1fr));isolation:isolate;}
-.dc-divider{position:absolute;left:calc((min(100vw,550px) - 100vw) / 2);width:100vw;height:2px;top:50%;background:linear-gradient(90deg,#8b6b32,#fff0ae 30%,#cdb875 60%,#a27b39);box-shadow:0 0 8px #e8c76d28;z-index:0;}
-.dc-slot{position:relative;display:flex;justify-content:center;align-items:center;perspective:calc(650 * var(--du));--dc-base:#074b9d;--dc-deep:#001b47;--dc-edge:#83c6ff;--dc-sheen:#a8e1ff;}
-.dc-slot.dc-red{--dc-base:#960f1f;--dc-deep:#37030e;--dc-edge:#ff9188;--dc-sheen:#ffc1aa;}
-.dc-frame{position:absolute;width:calc(142 * var(--du));height:calc(142 * var(--du));border:1.5px solid #d5bc73;box-shadow:inset 0 0 0 1px #fff3bd2b,0 0 0 1px #2d261758;}
-.dc-shadow{position:absolute;left:50%;top:50%;width:calc(134 * var(--du));height:calc(75 * var(--du));background:radial-gradient(ellipse,#00130ee6,transparent 72%);transform:translate(-45%,-5%);filter:blur(4px);pointer-events:none;}
-.dc-drop,.dc-view,.dc-roll,.dc-cube{width:var(--dice-edge);height:var(--dice-edge);transform-style:preserve-3d;position:relative;}
-.dc-view{transform:rotateX(18deg) rotateY(-18deg);}.dc-roll{transform-origin:50% 50% 0;}.dc-cube{will-change:transform;}
-.dc-face{position:absolute;inset:0;border-radius:calc(6 * var(--du));border:calc(2 * var(--du)) solid var(--dc-edge);background:linear-gradient(148deg,#ffffff5c 0%,transparent 17%,#00000036 56%,#ffffff12 70%,#ffffff7a 100%),linear-gradient(145deg,var(--dc-base),var(--dc-deep) 74%,var(--dc-base));box-shadow:inset 0 0 0 calc(4 * var(--du)) #ffffff17,inset 0 0 calc(21 * var(--du)) var(--dc-base),inset 0 0 0 calc(7 * var(--du)) #00000020;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;color:#fff0c7;}
-.dc-face:after{content:'';position:absolute;inset:calc(6 * var(--du));border-top:1px solid #ffffff75;border-left:1px solid #ffffff25;border-right:1px solid #ffffff20;border-radius:3px;pointer-events:none;}.dc-face span{font:600 calc(68 * var(--du))/1 Georgia,'Times New Roman',serif;text-shadow:0 1px 0 #fffad0,0 3px 2px #0008;}
-.dc-dropping{animation:dc-drop-in var(--dc-drop-ms) cubic-bezier(.3,.05,.7,1) var(--dc-delay) both;}
-.dc-roll-right{animation:dc-turn-right var(--dc-roll-ms) cubic-bezier(.25,.1,.25,1) both;}.dc-roll-left{animation:dc-turn-left var(--dc-roll-ms) cubic-bezier(.25,.1,.25,1) both;}.dc-roll-up{animation:dc-turn-up var(--dc-roll-ms) cubic-bezier(.25,.1,.25,1) both;}.dc-roll-down{animation:dc-turn-down var(--dc-roll-ms) cubic-bezier(.25,.1,.25,1) both;}
-@keyframes dc-turn-right{0%{transform:translateX(0) rotateY(0)}50%{transform:translateX(7%) translateY(-8%) rotateY(45deg)}100%{transform:translateX(0) rotateY(90deg)}}
-@keyframes dc-turn-left{0%{transform:translateX(0) rotateY(0)}50%{transform:translateX(-7%) translateY(-8%) rotateY(-45deg)}100%{transform:translateX(0) rotateY(-90deg)}}
-@keyframes dc-turn-up{0%{transform:translateY(0) rotateX(0)}50%{transform:translateY(-12%) rotateX(45deg)}100%{transform:translateY(0) rotateX(90deg)}}
-@keyframes dc-turn-down{0%{transform:translateY(0) rotateX(0)}50%{transform:translateY(7%) rotateX(-45deg)}100%{transform:translateY(0) rotateX(-90deg)}}
-@keyframes dc-drop-in{0%{transform:translateY(-90vh) rotateZ(-38deg) rotateY(-90deg) scale(1.25);opacity:0}12%{opacity:1}72%{transform:translateY(0) rotateZ(2deg) rotateY(0) scale(.96,1.03)}86%{transform:translateY(-14px) rotateZ(-2deg) scale(1)}100%{transform:none;opacity:1}}
-.dc-paused .dc-drop,.dc-paused .dc-roll{animation-play-state:paused!important;}
-.dc-total{position:absolute;z-index:4;left:50%;top:50%;transform:translate(-50%,-50%);width:46px;height:36px;display:flex;align-items:center;justify-content:center;background:#053d2e;border:1px solid #c6ac65;border-radius:50%;color:#f4df9d;font:600 23px/1 Georgia,serif;box-shadow:0 3px 14px #001b1480;}.dc-total.dc-ten{background:#edda95;color:#184633;box-shadow:0 0 30px #edd67c99;}
-.dc-score{position:absolute;z-index:4;right:calc(9 * var(--du));font:700 calc(14 * var(--du))/1 'Inter',sans-serif;}.dc-dealer-score{top:calc(50% - 24px);color:#ffbab0;}.dc-player-score{top:calc(50% + 12px);color:#a3d9ff;}.dc-point{position:absolute;z-index:7;top:50%;left:50%;transform:translate(-50%,-50%);padding:12px 20px;border-radius:12px;background:#062e24eb;border:1px solid #ebd48c;color:#f9e4a2;font:bold 22px 'Inter',sans-serif;box-shadow:0 6px 40px #0007;pointer-events:none;}.dc-point-player{margin-top:48px;}.dc-point-dealer{margin-top:-48px;}
-.dc-pads{position:absolute;left:0;right:0;bottom:env(safe-area-inset-bottom,0px);height:23%;display:flex;border-top:1.5px solid #c8ad62;}.dc-pad{width:50%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;}.dc-pad+ .dc-pad{border-left:1.5px solid #c8ad62;}.dc-pad:active{background:radial-gradient(ellipse,#d3bd6d18,transparent 70%);}.dc-pad-arrows{width:calc(126 * var(--du));height:calc(126 * var(--du));display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);}.dc-arrow{border:0;background:none;color:#d7bc73;font:400 calc(38 * var(--du))/1 Georgia,serif;padding:0;touch-action:none;cursor:grab;text-shadow:0 1px 3px #051a0f;}.dc-arrow.dc-up{grid-area:1/2;}.dc-arrow.dc-down{grid-area:3/2;}.dc-arrow.dc-left{grid-area:2/1;}.dc-arrow.dc-right{grid-area:2/3;}.dc-pad-dot{grid-area:2/2;align-self:center;justify-self:center;border:2px solid #d7bc73;border-radius:50%;width:calc(18 * var(--du));height:calc(18 * var(--du));}.dc-pad-disabled{opacity:.55;}.dc-pad-label{position:absolute;bottom:10px;font:600 9px 'Inter',sans-serif;letter-spacing:3px;color:#d7bc7366;}.dc-screen button:focus-visible{outline:2px solid #ffe6a0;outline-offset:3px;}
-.dc-overlay{position:absolute;inset:0;z-index:20;background:#001e17b5;backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:20px;touch-action:pan-y;}.dc-dialog{width:min(355px,100%);max-height:calc(100dvh - 40px);overflow:auto;padding:26px;border:1px solid #b9a468;border-radius:20px;background:linear-gradient(145deg,#103f33,#062a22);box-shadow:0 20px 60px #0008;color:#f1e8c8;}.dc-eyebrow{font:600 9px 'Inter',sans-serif;letter-spacing:3px;color:#c8b77d;}.dc-dialog h1{font-size:28px;margin:12px 0 18px;}.dc-dialog p:not(.dc-eyebrow){font-size:14px;line-height:1.9;margin:12px 0;}.dc-dialog .dc-lead{font-size:16px!important;font-weight:700;}.dc-dialog .dc-note{font-size:12px!important;color:#d4c58e;}.dc-dialog small{display:block;font-size:11px;color:#a8bcb0;}.dc-dialog button{display:block;width:100%;padding:13px;border-radius:10px;font-size:16px;font-weight:700;margin-top:12px;cursor:pointer;}.dc-primary{border:1px solid #f5e4ad;background:linear-gradient(135deg,#ebd69b,#b99a51);color:#183f30;}.dc-secondary{border:1px solid #ac995c80;background:transparent;color:#e4d6ab;}.dc-dialog .dc-result{font-size:25px!important;font-weight:700;}
-/* END DICE MODE CSS */
-
 /* v302: normal battle, select a hand card then choose an empty shared slot. */
 .tap-place-playing .tp-field-cell{position:relative;flex:0 0 var(--card-w);width:var(--card-w);height:calc(var(--card-w) * 1.4);}
 .tap-place-playing .tp-field-cell>.card-stage{width:100%;height:100%;}
@@ -2606,41 +2415,6 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .tap-place-playing .player-hand-slot:disabled{cursor:default;}
 .tap-place-playing .tp-empty:focus-visible,.tap-place-playing .player-hand-slot:focus-visible{outline:3px solid #008bd0;outline-offset:3px;}
 .tap-place-playing .tp-hint{text-align:center;min-height:calc(18 * var(--u));margin-top:calc(7 * var(--u));font-size:calc(11 * var(--u));font-weight:700;color:#4a728e;letter-spacing:.04em;}
-
-/* COLOR ROOM: isolated mode, no shared battle styles. */
-.cr-screen{position:fixed;inset:0;background:#efe1c8;color:#233952;font-family:'Noto Sans JP',sans-serif;display:flex;justify-content:center;touch-action:manipulation;user-select:none}
-.cr-shell{width:min(100%,540px);height:100%;display:flex;flex-direction:column;position:relative;background:linear-gradient(#e9d8bc,#e9e0d1);overflow:hidden;padding-bottom:calc(clamp(34px,6dvh,62px) + env(safe-area-inset-bottom))}
-.cr-hud{height:66px;flex-shrink:0;display:flex;align-items:center;gap:10px;padding:calc(8px + env(safe-area-inset-top)) 14px 8px;background:linear-gradient(#faf2e4,#e6d4b7);z-index:2}
-.cr-meter{flex:1;height:15px;background:#bf926b;border:2px solid #fff9e9;border-radius:20px;overflow:hidden;box-shadow:0 2px 6px #60421b44;display:flex}
-.cr-meter i{display:block;background:linear-gradient(#96b9c2,#638c9f);transition:width .45s ease}
-.cr-pct{font-weight:900;font-size:13px;font-variant-numeric:tabular-nums;min-width:33px}.cr-blue{color:#426b81}.cr-orange{color:#986b47}
-.cr-icon{border:1px solid #fff8;background:#fff9;border-radius:12px;min-width:38px;min-height:38px;color:#23445d;font-size:20px;cursor:pointer}
-.cr-room{position:relative;flex:1;min-height:150px;background:url('assets/color-room/room.webp') center/100% 100% no-repeat;isolation:isolate}
-.cr-paint{position:absolute;inset:14% 7% 7%;width:86%;height:79%;border-radius:8px;box-shadow:inset 0 0 12px #48210044;opacity:.88;mix-blend-mode:multiply}
-.cr-played{position:absolute;left:10%;right:10%;display:flex;justify-content:center;align-items:center;gap:6px;z-index:2;min-height:55px}
-.cr-played.dealer{top:17%;transform:scale(.83);transform-origin:top center}.cr-played.player{bottom:9%}
-.cr-slot{width:clamp(44px,14vw,72px);height:clamp(59px,18vw,92px);background:linear-gradient(145deg,#fffdf6,#efe5d6);border:2px solid #d4bb98;border-bottom:5px solid #6b99ab;border-radius:8px;color:#193955;box-shadow:0 3px 7px #16334538;font:bold clamp(24px,7vw,38px) Georgia,serif;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.dealer .cr-slot{border-bottom-color:#c29368}.cr-slot:disabled{opacity:1;cursor:default}.cr-slot.empty{background:#fffc;border:1px dashed #c7bda8;opacity:.32;box-shadow:none}
-.cr-sum{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(100% + 8px);padding:4px 15px;border-radius:25px;border:1px solid #ffffffa0;background:#426477e6;color:white;font-weight:800;white-space:nowrap;font-size:16px;box-shadow:0 3px 12px #11293b33}
-.dealer .cr-sum{bottom:auto;top:calc(100% + 7px);font-size:14px;background:#8a684bd9}
-.cr-combo{position:absolute;inset:40% 5% auto;text-align:center;font-size:clamp(22px,6vw,32px);font-weight:900;color:#fff;text-shadow:0 2px 5px #113258,0 0 15px #1389bf;pointer-events:none;animation:cr-pop .45s ease both;z-index:3}
-.cr-combo.dealer{color:#fff5df;text-shadow:0 2px 5px #7d3b00}.cr-combo small{display:block;font-size:15px;margin-top:4px;letter-spacing:1px}
-.cr-tray{flex-shrink:0;background:linear-gradient(145deg,#f4eddf,#ddd6c8);border:1px solid #c5b69b;border-radius:22px;padding:10px 8px 13px;box-shadow:0 -5px 22px #5e564b20, inset 0 1px 0 #fff9;z-index:3}
-.cr-tray-head{display:flex;justify-content:space-between;align-items:center;color:#567182;font-size:11px;margin-bottom:8px;min-height:27px;gap:8px}
-.cr-tray-head button{border:1px solid #c1d6e04d;color:#4d697c;background:#ffffff66;border-radius:8px;padding:5px 10px;font:inherit;cursor:pointer}.cr-tray-head button:disabled{opacity:.4}
-.cr-hand{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
-.cr-card{height:clamp(72px,12dvh,116px);min-width:0;border:2px solid #d6c5a8;border-bottom:5px solid #6a98ab;border-radius:9px;background:linear-gradient(135deg,#fffdf6,#e9dfcf);box-shadow:0 3px 0 #8d9da1, inset 0 1px 0 white;font:bold clamp(34px,10vw,49px) Georgia,serif;color:#153a5b;cursor:pointer;transition:transform .1s,opacity .1s}
-.cr-card:active:not(:disabled){transform:translateY(3px)}.cr-card:disabled{opacity:.5;cursor:default}.cr-card.blank{background:#c7c5bc66;border:1px dashed #a9aea5;color:transparent;box-shadow:inset 0 2px 4px #726b5712}
-.cr-card.finish{outline:2px solid #c9f4ff;box-shadow:0 0 12px #57cdff66}.cr-screen button:focus-visible{outline:3px solid #04bfff;outline-offset:3px}
-.cr-overlay{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;background:#16334f66;backdrop-filter:blur(6px);padding:18px}
-.cr-dialog{width:min(100%,390px);max-height:95dvh;overflow:auto;touch-action:pan-y;background:linear-gradient(150deg,#fffdf8,#f0e6d5);border:2px solid #fff8;border-radius:25px;padding:27px 22px;text-align:center;box-shadow:0 16px 70px #0b273b55}
-.cr-dialog h1{font-size:28px;color:#1a466a;margin-bottom:10px}.cr-dialog p{font-size:13px;line-height:1.9;color:#587083}.cr-dialog .cr-kicker{font-size:11px;letter-spacing:3px;color:#858779;margin-bottom:8px}
-.cr-difficulties{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:22px 0 12px}.cr-difficulties button{border:1px solid #aabccb;border-radius:11px;padding:13px 2px;background:#fff8;color:#47677d;font:700 12px 'Noto Sans JP',sans-serif;cursor:pointer}.cr-difficulties button[aria-pressed=true]{background:#227eb3;border-color:#227eb3;color:white;box-shadow:0 4px 12px #24759e35}
-.cr-dialog .cr-primary,.cr-dialog .cr-secondary{width:100%;border:0;border-radius:13px;margin-top:12px;padding:14px;font:800 14px 'Noto Sans JP',sans-serif;cursor:pointer}.cr-dialog .cr-primary{background:linear-gradient(120deg,#24a9e4,#0876b8);color:white;box-shadow:0 5px 12px #1a89ba33}.cr-dialog .cr-secondary{background:#e0e8ea;color:#49677a}
-.cr-dialog details{text-align:left;margin:12px 0 0;font-size:12px;color:#587083;line-height:1.9}.cr-dialog summary{cursor:pointer}.cr-role-table{display:grid;grid-template-columns:1fr auto;gap:4px 15px;margin:9px 0}.cr-result-number{font-size:50px;font-weight:900;color:#087ebd;margin:12px 0}
-@keyframes cr-pop{from{opacity:0;transform:scale(.7) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
-@media(max-height:640px){.cr-hud{height:48px}.cr-tray{padding-top:6px;padding-bottom:7px}.cr-card{height:70px}.cr-tray-head{margin-bottom:4px}.cr-played .cr-slot{height:55px;width:42px;font-size:29px}.cr-dialog{padding:17px}.cr-dialog h1{font-size:23px}}
-@media(prefers-reduced-motion:reduce){.cr-combo{animation:none}.cr-meter i,.cr-card{transition:none}}
 
 /* v303 — Billiards: generated felt / walnut table and ivory compound balls. */
 .bb-screen{height:100dvh;width:100%;background:#221e19;color:#f5ebcb;font-family:'Noto Sans JP',sans-serif;display:flex;justify-content:center;isolation:isolate}
@@ -2681,7 +2455,6 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 
 
 </style>
-<link rel="stylesheet" href="shared-board.css">
 </head>
 <body>
 <svg style="position:absolute;width:0;height:0;" aria-hidden="true">
@@ -2693,7 +2466,6 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 </defs>
 </svg>
 <div id="root"></div>
-<script src="shared-board.js"></script>
 <script>
 const h=React.createElement;
 const{useState,useEffect,useRef,useCallback,useMemo}=React;
@@ -3825,7 +3597,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v323'; // NEXT：背景をホーム表示後に先読み
+const APP_VER='v324'; // 軽量化①：カラールーム・セパレート・エナジー・サイコロ・4×4対戦・ひとりモード・テンフォールをコードごと削除（画像・shared-board.js/css も）
+// const APP_VER='v323'; // NEXT：背景をホーム表示後に先読み
 // const APP_VER='v322'; // NEXT：赤青の手札マットを消してみる（NX_CFG.mat で戻せる）
 // const APP_VER='v321'; // NEXT：3枚以下でも役の点が入るよう修正（3-3-4→ワンペア+2）
 // const APP_VER='v320'; // NEXT：新規生成SEと役完成・得点吸い込み演出
@@ -4392,7 +4165,7 @@ function SkillPanel(){
     )
   );
 }
-function TitleScreen({onNext,onBilliards,onColorRoom,onSeparate,onEnergy,onDice,onShared,onPlay,onPuzzlux,onRush,onCharge,onSurvival,onFall,onSolo,onTune,onTutorial,onSettings,musicOn,toggleMusic}){
+function TitleScreen({onNext,onBilliards,onPlay,onPuzzlux,onRush,onCharge,onSurvival,onTune,onTutorial,onSettings,musicOn,toggleMusic}){
   const btnBase={borderRadius:14,padding:'15px 0',fontSize:13,fontWeight:800,letterSpacing:2,cursor:'pointer',fontFamily:"'Inter',sans-serif",background:'rgba(255,255,255,.78)',boxShadow:'0 4px 16px rgba(70,100,150,.16), inset 0 1px 0 #fff',width:'100%'};
   return h('div',{style:{height:'100dvh',overflowY:'auto',touchAction:'pan-y',flexDirection:'column',background:"url('img/title-bg.jpg') center/cover no-repeat, #eef2f8",display:'flex',alignItems:'center',justifyContent:'flex-start',padding:16,position:'relative'}},
     h('div',{style:{margin:'auto',flexShrink:0,textAlign:'center',display:'flex',flexDirection:'column',alignItems:'center',gap:18,width:'100%',maxWidth:340,animation:'fadeUp 0.5s ease'}},
@@ -4401,15 +4174,8 @@ function TitleScreen({onNext,onBilliards,onColorRoom,onSeparate,onEnergy,onDice,
       h('div',{style:{display:'flex',flexDirection:'column',gap:12,width:'100%',marginTop:6}},
         h('button',{onClick:onNext,style:{...btnBase,fontSize:16,border:'1.5px solid #2e7fe8',background:'linear-gradient(135deg,#f4f9ff,#dbeaff)',color:'#1a5fc0'}},'ネクスト',h('span',{style:{display:'block',fontSize:12,marginTop:5}},'お試し · 次の札3枚だけ、出すか捨てるか')), // v318
         h('button',{onClick:onBilliards,style:{...btnBase,fontSize:16,border:'1.5px solid #c6aa73',background:'linear-gradient(135deg,#2a5643,#102e25)',color:'#f3e2b7'}},'ビリヤード'),
-        h('button',{onClick:onColorRoom,style:{...btnBase,fontSize:16,border:'1.5px solid #c5b38e',background:'linear-gradient(110deg,#e4f5ff 55%,#fff0d9)',color:'#196b9c'}},'カラールーム'),
-        h('button',{onClick:onSeparate,style:{...btnBase,fontSize:16,border:'1.5px solid #2a8ae0',background:'#fff',color:'#1a6ad0'}},'セパレート'),
-        h('button',{onClick:onEnergy,style:{...btnBase,fontSize:16,border:'1.5px solid #f3cf63',background:'linear-gradient(135deg,#2a3350,#141a2c)',color:'#f3e1aa'}},'エナジー'),
-        h('button',{onClick:onDice,style:{...btnBase,fontSize:16,border:'1.5px solid #bba268',background:'linear-gradient(135deg,#205745,#093b2d)',color:'#f3e1aa'}},'サイコロ'),
-        h('button',{onClick:onShared,style:{...btnBase,padding:'17px 0',fontSize:17,border:'1.5px solid #19a9cb',background:'linear-gradient(135deg,#fff,#d8f3fa)',color:'#076e9c'}},'4×4対戦',h('span',{style:{display:'block',fontSize:12,marginTop:5,letterSpacing:1}},'お試し · 同じ16枚を取り合う')),
         h('button',{onClick:onPlay,style:{...btnBase,padding:'17px 0',fontSize:16,letterSpacing:6,border:'1.5px solid rgba(46,127,232,.55)',color:'#2e7fe8',boxShadow:'0 6px 20px rgba(46,127,232,.22), inset 0 1px 0 #fff'}},'遊ぶ'),
         h('button',{onClick:onPuzzlux,style:{...btnBase,padding:'13px 0',fontSize:13,letterSpacing:4,border:'1.5px solid rgba(80,160,230,.5)',color:'#2b7fb8',boxShadow:'0 5px 18px rgba(80,160,230,.2), inset 0 1px 0 #fff'}},'パズルクス'), // v214
-        h('button',{onClick:onSolo,style:{...btnBase,fontSize:16,border:'1.5px solid rgba(46,127,232,.55)',color:'#2e7fe8'}},'ひとりモード',h('span',{style:{display:'block',fontSize:12,marginTop:5}},'お試し · 次に出る札が見える')), // v280
-        h('button',{onClick:onFall,style:{...btnBase,fontSize:16,border:'1.5px solid #e08a3a',color:'#b8621a'}},'テンフォール',h('span',{style:{display:'block',fontSize:12,marginTop:5}},'お試し · 落ちてくる札で10を作る')), // v276
         h('button',{onClick:onSurvival,style:{...btnBase,fontSize:16,border:'1.5px solid #2189bc',color:'#096598'}},'役サバイバル',h('span',{style:{display:'block',fontSize:12,marginTop:5}},'お試し · 役を作って手札を補充')),
         h('button',{onClick:onCharge,style:{...btnBase,fontSize:15,border:'1.5px solid #328a89',color:'#236e70'}},'60秒チャージ',h('span',{style:{display:'block',fontSize:11,letterSpacing:1,marginTop:5}},'貯めて、読んで、一気に出す')),
         h('button',{onClick:onRush,style:{...btnBase,fontSize:15,border:'1.5px solid #b29ade',color:'#60499a'}},'10秒ラッシュ',h('span',{style:{display:'block',fontSize:11,letterSpacing:1,marginTop:5}},'10秒間、何度でも取り返せる')),
@@ -5210,160 +4976,6 @@ const DEFAULT_LAYOUT={handW:53,handY:0,fieldW:64,sumSize:30,sumX:1,sumY:-8,gapDF
 // 参考: 4枚+隙間の合計 = fieldW*4+15u、画面幅は360u
 
 // ── App ──
-// ── v276 テンフォール（仮）：4レーンに札がゆっくり落ちてくる。落ちてきた札と手札で下の4マスを左から埋めて10を作る ──
-// 数字の調整はここだけ
-const FALL_CFG={
-  fallMs:6000,      // 札が上から着地するまでの時間（ゆっくり、なめらかに）
-  spawnMs:[1600,2800], // 次の札が落ち始めるまでの間隔（最小〜最大）
-  maxFalling:2,     // 同時に落ちている札の最大数
-  countMs:5000,     // 着地してからのカウントダウン（隣に出せば止まる）
-  bonusPerFall:2,   // 落ちてきた札を1枚使うごとの上乗せpt
-  boomPenalty:3,    // 💥のときに減るpt（0未満にはならない）
-  clearMs:550,      // 10完成・💥のあと場が空くまで
-};
-function fallRand(){return Math.floor(Math.random()*5)+1;}
-function fallOk(sum,filled){const r=4-filled,need=10-sum;return need>=r&&need<=r*5;} // 残りのマスで10ちょうどにできるか
-function FallMode({onBack}){
-  const S=useRef(null);
-  const[,setTick]=useState(0);
-  const swipeR=useRef(null),swipedR=useRef(false);
-  function fresh(){return{phase:'ready',row:[null,null,null,null],falls:[],hand:[1,2,3,4,5],score:0,nextSpawn:0,count:null,clearUntil:0,flash:null,shake:-1,shakeUntil:0,id:1,best:0,tens:0,booms:0,fallUsed:0};}
-  if(!S.current)S.current=fresh();
-  function start(){const best=S.current.best;S.current=fresh();const s=S.current;s.best=best;const now=performance.now();s.phase='play';s.nextSpawn=now+600;s.last=now;try{playGoSE();}catch(e){}setTick(t=>t+1);}
-  function flash(kind,text,sub){S.current.flash={kind,text,sub,at:performance.now()};}
-  function resolve(kind){const s=S.current,now=performance.now();
-    if(kind==='ten'){const used=s.row.filter(Boolean),vals=used.map(c=>c.v),fell=used.filter(c=>c.from==='fall').length,p=calcPts(vals),pts=p.total+fell*FALL_CFG.bonusPerFall;
-      s.score+=pts;s.tens++;s.fallUsed+=fell;flash('ten','+'+pts,p.voice+(fell?'　落ち札×'+fell+' +'+fell*FALL_CFG.bonusPerFall:''));try{playComboSfx(p.voice);}catch(e){try{playWinSE(false);}catch(_){}}}
-    else{s.score=Math.max(0,s.score-FALL_CFG.boomPenalty);s.booms++;flash('boom','💥','-'+FALL_CFG.boomPenalty);try{playBurstSE();}catch(e){}}
-    s.count=null;s.clearUntil=now+FALL_CFG.clearMs;s.resolved=kind;}
-  function land(f){const s=S.current,L=f.lane;
-    for(let i=0;i<L;i++)if(!s.row[i]){s.row[L]={v:f.v,from:'fall'};resolve('boom');return;} // 空白を飛ばして着地→💥
-    const vals=s.row.map(c=>c?c.v:null),before=vals.reduce((a,v)=>a+(v||0),0);
-    s.row[L]={v:f.v,from:'fall'};try{playPlaceSE(false);}catch(e){}
-    const sum=before+f.v;
-    if(sum===10){resolve('ten');return;}                    // v277 何枚でも10になったら完成
-    if(sum>10||!canPlay(f.v,before,vals)){resolve('boom');return;} // 10を超えた／いつものルールで出せない形
-    s.count={until:performance.now()+FALL_CFG.countMs,lane:L};}
-  function tap(i){const s=S.current,now=performance.now();
-    if(swipedR.current||s.phase!=='play'||now<s.clearUntil)return;
-    const k=s.row.findIndex(c=>!c);if(k<0)return;
-    const v=s.hand[i],vals=s.row.map(c=>c?c.v:null),before=vals.reduce((a,x)=>a+(x||0),0),sum=before+v;
-    if(sum>10||!canPlay(v,before,vals)){s.shake=i;s.shakeUntil=now+320;try{playMissSE();}catch(e){}setTick(t=>t+1);return;}
-    s.row[k]={v,from:'me'};s.count=null;try{playPlaceSE(true);}catch(e){} // v298 手札は1〜5のボタン固定（使っても変わらない） / v277 落ちてる札は消さない（フリーズするだけ）
-    if(sum===10)resolve('ten');setTick(t=>t+1);}
-  function quit(){const s=S.current;if(s.phase!=='play')return;s.phase='end';s.best=Math.max(s.best,s.score);try{playWinSE(false);}catch(e){}setTick(t=>t+1);}
-  function shuffle(){const s=S.current;if(s.phase!=='play')return;s.hand=createDeck();s.shufAt=performance.now();try{fxAir();}catch(e){}setTick(t=>t+1);}
-  useEffect(()=>{let raf=0;const loop=()=>{const s=S.current,now=performance.now();
-      const dt=Math.min(100,now-(s.last||now));s.last=now;
-      if(s.phase==='play'){ // v279 拍刻みはやめて、なめらかに落ちる形に戻した（タイマーなしはそのまま）
-        s.falls.forEach(f=>{if(!s.row[f.lane]&&!(s.clearUntil&&f.p>=0.99))f.p=Math.min(1,f.p+dt/FALL_CFG.fallMs);}); // 確定した札のレーンはフリーズ
-        if(s.clearUntil&&now>=s.clearUntil){s.clearUntil=0;s.row=[null,null,null,null];s.resolved=null;}
-        if(!s.clearUntil){
-          if(now>=s.nextSpawn){const busy=new Set(s.falls.map(f=>f.lane)),free=[0,1,2,3].filter(l=>!s.row[l]&&!busy.has(l));
-            if(s.falls.length<FALL_CFG.maxFalling&&free.length){const lane=free[Math.floor(Math.random()*free.length)];s.falls.push({id:s.id++,lane,v:fallRand(),p:0});}
-            const[x,y]=FALL_CFG.spawnMs;s.nextSpawn=now+x+Math.random()*(y-x);}
-          const landed=s.falls.filter(f=>f.p>=1);
-          if(landed.length){s.falls=s.falls.filter(f=>f.p<1);landed.sort((x,y)=>x.lane-y.lane).forEach(f=>{if(!S.current.clearUntil)land(f);else s.falls.push(f);});}
-          if(s.count&&now>=s.count.until)resolve('boom');
-        }
-      }
-      setTick(t=>(t+1)%1e6);raf=requestAnimationFrame(loop);};
-    raf=requestAnimationFrame(loop);return()=>cancelAnimationFrame(raf);},[]);
-  const s=S.current,now=performance.now();
-  const u='min(calc(100vw / 360),calc(100dvh / 640))',U=n=>'calc('+u+' * '+n+')';
-  const laneW=80,cardW=60,laneH=300,cardH=cardW*7/5;
-  // v299 テンフォール専用の札（落ち札＝金縁、自分の札＝青緑縁）。数字はSVG
-  const card=(v,by,extra)=>h('div',{className:'tf-card '+(by==='dealer'?'tf-fall':'tf-player'),style:{width:U(cardW),height:U(cardH),...(extra||{})}},h('img',{src:'img/tenfall/d'+v+'.svg',alt:String(v),draggable:false}));
-  if(s.phase==='ready'||s.phase==='end'){
-    return h('main',{className:'rush-screen fall-screen tf-menu'},h('section',{className:'rush-card tf-panel'},
-      h('p',{className:'rush-eyebrow'},'TEN-KURU · お試し'),h('h1',null,s.phase==='end'?'しゅうりょう':'テンフォール'),
-      s.phase==='end'?h('div',{className:'fall-result'},h('b',null,s.score),h('span',null,'pt'),h('p',null,'10完成 '+s.tens+'回　💥 '+s.booms+'回　落ち札 '+s.fallUsed+'枚'),s.best>0&&h('p',null,'ベスト '+s.best+'pt'))
-        :h('ul',{className:'rush-rules'},h('li',null,'4つのレーンに札がゆっくり落ちてくる。時間制限なし、やめるまで続く。'),h('li',null,'下の4マスを左から順に埋めて、合計10を作る（何枚でもOK）。役もいつも通り。'),h('li',null,'着地した札は'+FALL_CFG.countMs/1000+'秒カウント。すぐ右に数字を出せば止まる。'),h('li',null,'空いたマスを飛ばして着地・カウント切れ・10を超えると💥　札が確定したレーンの落ち札は止まる。'),h('li',null,'落ちてきた札を使うほど高得点。下の1〜5のボタンで好きな数字を何回でも出せる。')),
-      h('button',{className:'rush-primary',onClick:start},s.phase==='end'?'もう一度':'はじめる'),h('button',{className:'rush-secondary',onClick:onBack},'ホームへ')));
-  }
-  const sum=s.row.reduce((a,c)=>a+(c?c.v:0),0);
-  const next=s.row.findIndex(c=>!c);
-  const fl=s.flash&&now-s.flash.at<900?s.flash:null;
-  return h('main',{className:'fall-screen fall-play'},
-    h('div',{className:'fall-top'},
-      h('button',{className:'fall-back',onClick:quit},'やめる'),
-      h('div',{style:{width:60}}),
-      h('div',{className:'fall-score tf-badge'},h('b',null,s.score),'pt')),
-    h('div',{className:'fall-lanes',style:{width:U(laneW*4),height:U(laneH+cardH+8)}},
-      [0,1,2,3].map(l=>h('div',{key:'ln'+l,className:'fall-lane',style:{left:U(laneW*l),width:U(laneW)}})),
-      [0,1,2,3].map(l=>{const c=s.row[l],cnt=s.count&&s.count.lane===l?s.count:null,cl=!!s.clearUntil;
-        return h('div',{key:'sl'+l,className:'fall-slot'+(l===next&&!cl?' next':''),style:{left:U(laneW*l+(laneW-cardW)/2),top:U(laneH),width:U(cardW),height:U(cardH)}},
-          c&&h('div',{key:'c'+l,className:'fall-in'+(cl?(s.resolved==='boom'?' boom':' done'):'')},card(c.v,c.from==='fall'?'dealer':'player')),
-          cnt&&h('div',{className:'fall-count'},Math.max(0,Math.ceil((cnt.until-now)/1000)),
-            h('i',{style:{width:(Math.max(0,cnt.until-now)/FALL_CFG.countMs*100)+'%'}})));}),
-      s.falls.map(f=>{const p=f.p,y=-cardH+(laneH+cardH)*p;
-        return h('div',{key:'f'+f.id,className:'fall-card'+(s.row[f.lane]?' frz':''),style:{left:U(f.lane*laneW+(laneW-cardW)/2),top:U(y)}},card(f.v,'dealer'));}),
-      fl&&h('img',{key:'fx'+fl.at,className:'tf-fx',src:'img/tenfall/'+(fl.kind==='boom'?'fx-burst':'fx-success')+'.webp',alt:'',style:{top:U(laneH+cardH/2-130),left:'50%',width:U(260),height:U(260)}}),
-      fl&&h('div',{key:'fl'+fl.at,className:'fall-flash '+fl.kind,style:{top:U(laneH-70)}},h('b',null,fl.text),fl.sub&&h('span',null,fl.sub))),
-    h('div',{className:'fall-sum tf-badge'},'合計 ',h('b',{className:sum>0?'on':''},sum),' / 10'),
-    h('div',{className:'fall-hand'}, // v298 1〜5の数字ボタン（入れ替えスワイプは廃止）
-      s.hand.map((v,i)=>h('button',{key:'h'+i,className:'fall-hcard tf-btn'+(s.shake===i&&now<s.shakeUntil?' shake':''),onClick:()=>tap(i),'aria-label':v+'を出す',style:{width:U(58),height:U(58)}},h('img',{src:'img/tenfall/d'+v+'.svg',alt:'',draggable:false})))));
-}
-// ── v280 ひとりモード（仮）：相手なし。場の札に手札を足して10。完成したら右上の「次の札」が場に出る（先の先まで見えている） ──
-const SOLO_CFG={
-  show:7,           // 右上に見せる「次の札」の枚数
-  burstPenalty:2,   // バーストで減るpt（0未満にはならない）
-  nextMs:1100,      // 完成・バーストのあと、次の札が場に出るまで
-};
-function SoloMode({onBack}){
-  const S=useRef(null);
-  const[,setTick]=useState(0);const re=()=>setTick(t=>t+1);
-  const[combo,setCombo]=useState(null);
-  const tmR=useRef([]);
-  function fill(q){while(q.length<SOLO_CFG.show+2)q.push(...createDeck());return q;}
-  if(!S.current){const q=fill([]);S.current={queue:q,field:[q.shift()],colors:['dealer'],hand:createDeck(),score:0,busy:false,tens:0,cid:0};fill(S.current.queue);}
-  useEffect(()=>()=>tmR.current.forEach(clearTimeout),[]);
-  const later=(fn,ms)=>tmR.current.push(setTimeout(fn,ms));
-  function nextCard(){const s=S.current;s.field=[s.queue.shift()];s.colors=['dealer'];fill(s.queue);s.busy=false;s.cid++;try{playPlaceSE(false);}catch(e){}setCombo(null);re();checkStuck();}
-  function checkStuck(){const s=S.current,sum=s.field.reduce((a,b)=>a+b,0);
-    if(s.hand.every(v=>handCardState(v,sum,s.field)==='locked')){s.busy=true;fxLockHint('出せる札がないので、次の札へ');later(nextCard,900);}}
-  function tap(i){const s=S.current;if(s.busy)return;
-    const v=s.hand[i],sum=s.field.reduce((a,b)=>a+b,0),st=handCardState(v,sum,s.field);
-    if(st==='locked'){fxLockHint(lockReason(v,sum,s.field));return;}
-    s.field=[...s.field,v];s.colors=[...s.colors,'player'];s.hand=[...s.hand];s.hand[i]=Math.floor(Math.random()*5)+1;
-    try{playPlaceSE(true);}catch(e){}
-    const ns=sum+v;
-    if(ns===10){s.busy=true;const p=calcPts(s.field);s.score+=p.total;s.tens++;
-      later(()=>{try{playComboSfx(p.voice);}catch(e){}setCombo({text:p.voice,pts:p.total,color:'#2e7fe8',who:'player'});},250);
-      later(nextCard,SOLO_CFG.nextMs);}
-    else if(ns>10){s.busy=true;s.score=Math.max(0,s.score-SOLO_CFG.burstPenalty);s.burst=true;
-      later(()=>{try{playBurstSE();}catch(e){}setCombo({text:'BURST',pts:-SOLO_CFG.burstPenalty,color:'#ff3b3b',who:'player',burst:true});},250);
-      later(()=>{S.current.burst=false;nextCard();},SOLO_CFG.nextMs);}
-    else checkStuck();
-    re();}
-  const s=S.current,sum=s.field.reduce((a,b)=>a+b,0),fieldCls=sum===10?' complete':sum>10?' over':'';
-  const cardEl=(v,i)=>h(SlideCard,{key:'s'+i+'_'+v+'_'+s.cid,value:v,onPlay:()=>tap(i),disabled:s.busy,cardState:handCardState(v,sum,s.field),onLocked:()=>fxLockHint(lockReason(v,sum,s.field)),cardRole:'player'});
-  const q=s.queue.slice(0,SOLO_CFG.show);
-  return h('div',{className:'gp-screen solo-screen'},
-    combo&&h(CyberComboDisplay,{key:'sc_'+s.tens+'_'+combo.text+s.score,combo}),
-    h('div',{className:'gp-top-bar'},
-      h('div',{className:'gp-score you'},h('div',{className:'lbl'},'YOU'),h('div',{className:'val'},s.score),h('div',{className:'sub'},'10完成 ',h('b',null,s.tens),'回')),
-      h('div',{className:'gp-round-pill'},h('span',{className:'lvl',style:{color:'#2e7fe8',fontWeight:900}},'ひとり')),
-      h('div',{className:'gp-icon-btn',onClick:onBack,title:'ホームに戻る'},h('span',null,'⌂'))),
-    h('div',{className:'gp-dealer-area solo-next'},
-      h('div',{className:'gp-area-label'},'✦ NEXT — 次に場に出る札'),
-      h('div',{className:'gp-dealer-cards'},q.map((v,i)=>h('div',{key:'q'+(s.cid+i),className:'gp-dealer-card'+(i===0?' solo-first':'')},h('span',{className:'dv'},v))))),
-    h('div',{className:'gp-spacer'}),
-    h('div',{className:'gp-field-area field-card-area'+fieldCls,style:{animation:s.burst?'burst 0.5s ease':'none'}},
-      h('div',{className:'field-planet'}),
-      h('div',{className:'gp-field-cards'},s.field.map((v,i)=>h(FieldCard,{key:'f'+s.cid+'_'+i,value:v,by:s.colors[i],isComplete:sum===10&&i===s.field.length-1}))),
-      h('div',{className:'gp-field-sum gp-field-sum-strong'},
-        h('div',{className:'main'},h('span',{className:'num'+fieldCls},sum),h('span',{className:'sep'},'/ 10')),
-        h('div',{className:'ato'},'あと ',h('b',null,Math.max(0,10-sum))))),
-    h('div',{className:'gp-spacer'}),
-    h('div',{className:'gp-hand-area hand-card-area'},
-      h('div',{className:'gp-area-label'},'YOU — 10枚'),
-      h('div',{className:'gp-hand-rows'},
-        h('div',{className:'gp-hand-row'},s.hand.slice(0,5).map((v,i)=>cardEl(v,i))),
-        h('div',{className:'gp-hand-row'},s.hand.slice(5).map((v,i)=>cardEl(v,i+5))))),
-    h('div',{className:'gp-spacer'}));
-}
-// v281: both players navigate the same fixed 5 x 2 hand at the same step speed.
 const HAND_NAV={cols:5,slots:10,stepMs:160,start:2};
 const CONTROL_SIDE_KEY='tenkuru.controlSide.v1';
 function loadControlSide(){try{return localStorage.getItem(CONTROL_SIDE_KEY)==='right'?'right':'left';}catch(e){return 'left';}}
@@ -5424,240 +5036,6 @@ function HandControls({side,onMove,onPlay,canMove,canPlay,playLabel='出す'}){
       h('svg',{viewBox:'0 0 48 48','aria-hidden':true},h('rect',{x:12,y:5,width:24,height:37,rx:4,fill:'none',stroke:'currentColor',strokeWidth:3}),h('path',{d:'M24 33V15m-7 7 7-7 7 7',fill:'none',stroke:'currentColor',strokeWidth:3,strokeLinecap:'round',strokeLinejoin:'round'})),h('span',null,playLabel)));
 }
 
-// ── DICE MODE v283: isolated prototype; every gameplay timing lives here. ──
-const DICE_CFG={matchMs:60000,rollMs:280,dropMs:720,dropStaggerMs:65,pointMs:700,aiMinMs:2600,aiJitterMs:1600,aiSmartRate:0.3,turnBased:true,aiTurnMs:900,swipePx:20,axisRatio:1.15,frameMs:16,points:1};
-const DICE_DIRS=['up','down','left','right'];
-// Local x=right, y=screen-down, z=top (toward the viewer). Opposites: 1/blank, 2/5, 3/4.
-const DICE_FACES=[{value:1,n:[0,0,1],css:'translateZ(var(--dice-half))'},{value:0,n:[0,0,-1],css:'rotateY(180deg) translateZ(var(--dice-half))'},
- {value:2,n:[-1,0,0],css:'rotateY(-90deg) translateZ(var(--dice-half))'},{value:5,n:[1,0,0],css:'rotateY(90deg) translateZ(var(--dice-half))'},
- {value:3,n:[0,-1,0],css:'rotateX(90deg) translateZ(var(--dice-half))'},{value:4,n:[0,1,0],css:'rotateX(-90deg) translateZ(var(--dice-half))'}];
-const DICE_IDENTITY=[1,0,0,0,1,0,0,0,1];
-const DICE_ROTATIONS={right:[0,0,1,0,1,0,-1,0,0],left:[0,0,-1,0,1,0,1,0,0],up:[1,0,0,0,0,-1,0,1,0],down:[1,0,0,0,0,1,0,-1,0]};
-function diceMultiply(a,b){return a.map((_,i)=>{const r=Math.floor(i/3),c=i%3;return a[r*3]*b[c]+a[r*3+1]*b[c+3]+a[r*3+2]*b[c+6];});}
-function diceRotate(pose,dir){return diceMultiply(DICE_ROTATIONS[dir],pose);}
-function diceFaceAt(pose,n){return DICE_FACES.find(f=>[0,1,2].every(r=>pose[r*3]*f.n[0]+pose[r*3+1]*f.n[1]+pose[r*3+2]*f.n[2]===n[r])).value;}
-function diceTop(pose){return diceFaceAt(pose,[0,0,1]);}
-function diceMatrix(p){return 'matrix3d('+[p[0],p[3],p[6],0,p[1],p[4],p[7],0,p[2],p[5],p[8],0,0,0,0,1].join(',')+')';}
-const DICE_ORIENTATIONS=(()=>{const out=[DICE_IDENTITY];for(let i=0;i<out.length;i++)for(const dir of DICE_DIRS){const next=diceRotate(out[i],dir);if(!out.some(p=>p.every((v,j)=>v===next[j])))out.push(next);}return out;})();
-function diceNewDice(random=Math.random){
- const dice=Array.from({length:4},()=>({pose:[...DICE_ORIENTATIONS[Math.floor(random()*DICE_ORIENTATIONS.length)]],motion:null}));
- // A random throw must never award a point without a player's roll.
- if(dice.reduce((sum,d)=>sum+diceTop(d.pose),0)===10)dice[0].pose=diceRotate(dice[0].pose,'right');
- return dice;
-}
-function diceCreate(random=Math.random){return {dice:diceNewDice(random),phase:'ready',paused:false,now:0,left:DICE_CFG.matchMs,score:{player:0,dealer:0},round:0,epoch:0,serial:0,aiAt:0,turn:'player',scorer:null,winner:null,event:0};}
-function diceSum(s){return s.dice.reduce((sum,d)=>sum+diceTop(d.pose),0);}
-function diceThrow(s,random=Math.random){s.turn=s.scorer==='player'?'dealer':'player';s.dice=diceNewDice(random);s.phase='dropping';s.round++;s.epoch++;s.dropEnd=s.now+DICE_CFG.dropMs+3*DICE_CFG.dropStaggerMs;s.scorer=null;}
-function diceRoll(s,index,dir,epoch=s.epoch){
- if(s.phase!=='active'||s.paused||epoch!==s.epoch||!DICE_DIRS.includes(dir)||!Number.isInteger(index)||index<0||index>3||s.dice[index].motion||s.left<=DICE_CFG.rollMs)return false;
- if(DICE_CFG.turnBased&&((index<2?'dealer':'player')!==s.turn||s.dice.some(d=>d.motion)))return false;
- const die=s.dice[index];die.motion={dir,to:diceRotate(die.pose,dir),at:s.now+DICE_CFG.rollMs,id:++s.serial,epoch:s.epoch};return true;
-}
-function diceFinish(s){s.phase='ended';s.left=0;s.winner=s.score.player===s.score.dealer?'draw':s.score.player>s.score.dealer?'player':'dealer';s.dice.forEach(d=>d.motion=null);s.epoch++;}
-function diceChoices(poses,indices){const out=[];for(const index of indices)for(const dir of DICE_DIRS){const pose=diceRotate(poses[index],dir),sum=poses.reduce((n,p,j)=>n+diceTop(j===index?pose:p),0);out.push({index,dir,pose,sum});}return out;}
-function diceAiChoice(s,random=Math.random){
- const poses=s.dice.map(d=>d.pose),choices=diceChoices(poses,[0,1]);let best=null,bestScore=-Infinity;
- if(random()>=DICE_CFG.aiSmartRate)return choices[Math.floor(random()*choices.length)];
- for(const c of choices){
-  const next=poses.map((p,i)=>i===c.index?c.pose:p);
-  const follow=diceChoices(next,[0,1]),threats=diceChoices(next,[2,3]).filter(v=>v.sum===10).length;
-  const score=c.sum===10?10000:((follow.some(v=>v.sum===10)?100:0)-threats*30-Math.abs(10-c.sum)*5+random()*8);
-  if(score>bestScore){bestScore=score;best=c;}
- }
- return best;
-}
-function diceAdvance(s,ms,random=Math.random,withAi=true){
- if(s.paused||s.phase==='ready'||s.phase==='ended')return;
- // Process landings/deadlines chronologically, even after a slow animation frame.
- const until=s.now+Math.max(0,ms);
- while(s.now<until&&s.phase!=='ended'){
-  const timed=s.round>1||s.phase!=='dropping';
-  const deadline=timed?s.now+s.left:Infinity;
-  const phaseEnd=s.phase==='dropping'?s.dropEnd:s.phase==='point'?s.pointEnd:Infinity;
-  const landing=s.phase==='active'?Math.min(...s.dice.filter(d=>d.motion).map(d=>d.motion.at),Infinity):Infinity;
-  const next=Math.min(until,deadline,phaseEnd,landing),elapsed=next-s.now;
-  if(timed)s.left=Math.max(0,s.left-elapsed);s.now=next;
-  if(timed&&s.left<=0){diceFinish(s);break;}
-  if(s.phase==='dropping'&&s.now>=s.dropEnd){s.phase='active';s.aiAt=s.now+(DICE_CFG.turnBased?DICE_CFG.aiTurnMs:DICE_CFG.aiMinMs+random()*DICE_CFG.aiJitterMs);continue;}
-  if(s.phase==='point'&&s.now>=s.pointEnd){diceThrow(s,random);continue;}
-  if(s.phase==='active'){
-   const landed=s.dice.map((d,index)=>({d,index})).filter(x=>x.d.motion&&x.d.motion.at<=s.now).sort((a,b)=>a.d.motion.at-b.d.motion.at||a.d.motion.id-b.d.motion.id);
-   for(const {d,index} of landed){
-    if(s.phase!=='active')break;d.pose=d.motion.to;d.motion=null;s.event++;
-    if(diceSum(s)===10){
-     s.scorer=index<2?'dealer':'player';s.score[s.scorer]+=DICE_CFG.points;s.phase='point';s.pointEnd=s.now+DICE_CFG.pointMs;s.epoch++;
-     // Later in-flight rolls belong to the completed round and cannot score again.
-     s.dice.forEach(die=>die.motion=null);break;
-    }
-    if(DICE_CFG.turnBased){s.turn=index<2?'player':'dealer';if(s.turn==='dealer')s.aiAt=s.now+DICE_CFG.aiTurnMs;}
-   }
-  }
- }
- if(withAi&&s.phase==='active'&&s.now>=s.aiAt&&!s.dice[0].motion&&!s.dice[1].motion&&(!DICE_CFG.turnBased||(s.turn==='dealer'&&!s.dice.some(d=>d.motion)))){
-  const choice=diceAiChoice(s,random);if(choice)diceRoll(s,choice.index,choice.dir);
-  s.aiAt=s.now+DICE_CFG.aiMinMs+random()*DICE_CFG.aiJitterMs;
- }
-}
-function DiceCube({die,index,phase,round}){
- return h('div',{className:'dc-slot '+(index<2?'dc-red':'dc-blue'),'data-die':index,'data-top':diceTop(die.pose),'aria-label':(index<2?'相手':'自分')+'の'+(index%2?'右':'左')+'のサイコロ、上の面は'+(diceTop(die.pose)||'空白')},
-  h('div',{className:'dc-frame'}),h('div',{className:'dc-shadow'}),
-  h('div',{key:round,className:'dc-drop'+(phase==='dropping'?' dc-dropping':''),style:{'--dc-delay':index*DICE_CFG.dropStaggerMs+'ms'}},
-   h('div',{className:'dc-view'},h('div',{key:die.motion?die.motion.id:'rest',className:'dc-roll'+(die.motion?' dc-roll-'+die.motion.dir:'')},
-    h('div',{className:'dc-cube',style:{transform:diceMatrix(die.pose)}},DICE_FACES.map(f=>h('div',{className:'dc-face',key:f.value,style:{transform:f.css}},h('span',null,f.value||''))))))));
-}
-function DicePad({index,enabled,onRoll}){
- const held=useRef(null),latest=useRef({enabled,onRoll});latest.current={enabled,onRoll};
- useEffect(()=>{if(!enabled)held.current=null;},[enabled]);
- function check(e){
-  const p=held.current;if(!p||p.id!==e.pointerId||p.used)return;
-  const dx=e.clientX-p.x,dy=e.clientY-p.y,ax=Math.abs(dx),ay=Math.abs(dy);
-  if(Math.max(ax,ay)<DICE_CFG.swipePx||Math.max(ax,ay)<Math.min(ax,ay)*DICE_CFG.axisRatio)return;
-  p.used=true;if(latest.current.enabled)latest.current.onRoll(index,ax>ay?(dx>0?'right':'left'):(dy>0?'down':'up'));
- }
- function stop(e){if(held.current&&held.current.id===e.pointerId)held.current=null;}
- return h('div',{className:'dc-pad'+(!enabled?' dc-pad-disabled':''),role:'group','aria-label':index===2?'左のサイコロ操作':'右のサイコロ操作',
-  onPointerDown:e=>{if(e.button!==0||held.current||!latest.current.enabled)return;e.preventDefault();held.current={id:e.pointerId,x:e.clientX,y:e.clientY,used:false};e.currentTarget.setPointerCapture(e.pointerId);},
-  onPointerMove:check,onPointerUp:e=>{check(e);stop(e);},onPointerCancel:stop,onLostPointerCapture:stop},
-  h('div',{className:'dc-pad-arrows'},DICE_DIRS.map(dir=>h('button',{key:dir,type:'button',className:'dc-arrow dc-'+dir,disabled:!enabled,'aria-label':(index===2?'左':'右')+'のサイコロを'+({up:'上',down:'下',left:'左',right:'右'}[dir])+'へ転がす',onClick:e=>{if(e.detail===0&&latest.current.enabled)latest.current.onRoll(index,dir);}},h('span',{'aria-hidden':true},{up:'↑',down:'↓',left:'←',right:'→'}[dir]))),h('span',{className:'dc-pad-dot','aria-hidden':true})),
-  h('span',{className:'dc-pad-label'},index===2?'LEFT':'RIGHT'));
-}
-// v288: エナジーモード（試作）。手札10枚（数字＋光/緑/赤）→最初の札で10秒スタート→合計10でエネルギー→10秒後に放出してモンスターにダメージ。数値は EN_CFG
-const EN_CFG={roundMs:10000,monsterHp:120,dmgPerEnergy:1,perCard:1,pairBonus:2,allBonus:5,roleBonus:{'役なし':0,'ワンペア':2,'ツーペア':4,'スリーカード':6,'ストレート':8},releaseMs:1400,hitAtMs:650,maxVisual:24,colors:['light','green','red']};
-const EN_COLOR={light:{name:'光',main:'#f3cf63',deep:'#a57b12',bg:'linear-gradient(160deg,#fffbe8,#f7e3a0)',img:'img/energy-light.webp'},green:{name:'緑',main:'#39b964',deep:'#17693a',bg:'linear-gradient(160deg,#f0fff4,#b5ebc6)',img:'img/energy-green.webp'},red:{name:'赤',main:'#e4513e',deep:'#8e2218',bg:'linear-gradient(160deg,#fff3f0,#f6bcb2)',img:'img/energy-red.webp'}};
-let enSerial=0;
-// 札はいつものテンクルと同じ1〜5、手札の中で同じ数字は3枚まで（createDeck と同じ決まり）
-function enCard(rest=[],random=Math.random){const ok=[1,2,3,4,5].filter(v=>rest.filter(c=>c.n===v).length<3);return{id:++enSerial,n:ok[Math.floor(random()*ok.length)],c:EN_CFG.colors[Math.floor(random()*EN_CFG.colors.length)]};}
-function enDeal(random=Math.random){const hd=[];while(hd.length<10)hd.push(enCard(hd,random));return hd;}
-function enGain(cards){
- // ①使った札の色にそれぞれ平等に1ずつ ②役（いつもの calcPts）のボーナスを使った色それぞれに ③同じ色が2枚以上ならその色にボーナス、全部同じ色ならもっと強いボーナス
- const g={light:0,green:0,red:0},cnt={light:0,green:0,red:0};
- cards.forEach(c=>{g[c.c]+=EN_CFG.perCard;cnt[c.c]++;});
- const used=Object.keys(cnt).filter(k=>cnt[k]>0),role=calcPts(cards.map(c=>c.n)).voice,rb=EN_CFG.roleBonus[role]||0;
- used.forEach(k=>{g[k]+=rb;});
- if(used.length===1)g[used[0]]+=EN_CFG.allBonus;
- else used.forEach(k=>{if(cnt[k]>=2)g[k]+=EN_CFG.pairBonus;});
- return{g,role,bonus:used.length===1?'all':used.some(k=>cnt[k]>=2)?'pair':null};
-}
-function EnergyMode({onBack}){
- const[hand,setHand]=useState(()=>enDeal());
- const[sel,setSel]=useState([]);
- const[en,setEn]=useState({light:0,green:0,red:0});
- const[phase,setPhase]=useState('idle'); // idle→rush→release→idle / win
- const[left,setLeft]=useState(EN_CFG.roundMs);
- const[hp,setHp]=useState(EN_CFG.monsterHp);
- const[pop,setPop]=useState(null),[flash,setFlash]=useState(null),[hit,setHit]=useState(0);
- const endAt=useRef(0),enRef=useRef(en),hpRef=useRef(hp);enRef.current=en;hpRef.current=hp;
- useEffect(()=>{if(phase!=='rush')return;const t=setInterval(()=>{const l=Math.max(0,endAt.current-performance.now());setLeft(l);if(l<=0){clearInterval(t);release();}},50);return()=>clearInterval(t);},[phase]);
- function release(){
-  setSel([]);setPhase('release');
-  const total=enRef.current.light+enRef.current.green+enRef.current.red,dmg=total*EN_CFG.dmgPerEnergy;
-  setTimeout(()=>{const nh=Math.max(0,hpRef.current-dmg);setHp(nh);setHit(x=>x+1);setPop({dmg,k:Date.now()});try{fxBell({f:392,v:.12,d:.6});}catch(e){}setEn({light:0,green:0,red:0});},EN_CFG.hitAtMs);
-  setTimeout(()=>{setPhase(hpRef.current<=0?'win':'idle');setLeft(EN_CFG.roundMs);},EN_CFG.releaseMs);
- }
- function tap(card){
-  if(phase==='release'||phase==='win')return;
-  if(phase==='idle'){endAt.current=performance.now()+EN_CFG.roundMs;setPhase('rush');}
-  if(sel.includes(card.id)){setSel(sel.filter(x=>x!==card.id));return;}
-  const next=[...sel,card.id],cards=hand.filter(c=>next.includes(c.id)),sum=cards.reduce((a,c)=>a+c.n,0);
-  try{playPlaceSE(true);}catch(e){}
-  if(sum<10){setSel(next);return;}
-  if(sum>10){setSel([]);setFlash({type:'over',k:Date.now()});return;}
-  const {g,role,bonus}=enGain(cards);
-  setEn(e=>({light:e.light+g.light,green:e.green+g.green,red:e.red+g.red}));
-  setHand(hd=>{const rest=hd.filter(c=>!next.includes(c.id)),out=[];hd.forEach(c=>{if(next.includes(c.id)){const nc=enCard([...rest,...out]);out.push(nc);}});let i=0;return hd.map(c=>next.includes(c.id)?out[i++]:c);});setSel([]);
-  setFlash({type:bonus||'ten',role,k:Date.now()});try{fxBell({f:bonus==='all'?1318:bonus==='pair'?1175:1046,v:.08,d:.35});}catch(e){}
- }
- function restart(){setHp(EN_CFG.monsterHp);setEn({light:0,green:0,red:0});setHand(enDeal());setSel([]);setPhase('idle');setLeft(EN_CFG.roundMs);setPop(null);}
- const sum=hand.filter(c=>sel.includes(c.id)).reduce((a,c)=>a+c.n,0);
- const orb=(k)=>{const v=en[k],r=Math.min(v,EN_CFG.maxVisual)/EN_CFG.maxVisual,size=46+r*54,glow=4+r*26,rel=phase==='release';
-  return h('div',{key:k,className:'en-orb-slot'},
-   h('img',{src:EN_COLOR[k].img,alt:EN_COLOR[k].name+'のエネルギー',className:'en-orb'+(rel?' en-orb-go':''),style:{width:size,height:size,filter:'drop-shadow(0 0 '+glow+'px '+EN_COLOR[k].main+') brightness('+(0.75+r*0.6)+')',opacity:v>0||rel?1:.45}}),
-   h('span',{className:'en-orb-num',style:{color:EN_COLOR[k].main}},v));};
- return h('main',{className:'en-screen'},
-  h('div',{className:'en-top'},
-   h('button',{className:'en-back',onClick:onBack,'aria-label':'ホームへ'},'‹'),
-   h('div',{className:'en-hp'},h('div',{className:'en-hp-fill',style:{width:(hp/EN_CFG.monsterHp*100)+'%'}}),h('span',null,hp+' / '+EN_CFG.monsterHp))),
-  h('div',{className:'en-monster-wrap'},
-   h('img',{key:'m'+hit,src:'img/monster-trial.webp',alt:'モンスター',className:'en-monster'+(hit?' en-hit':'')+(phase==='win'?' en-dead':'')}),
-   pop&&h('div',{key:pop.k,className:'en-dmg'},'-'+pop.dmg)),
-  h('div',{className:'en-orbs'},EN_CFG.colors.map(orb)),
-  h('div',{className:'en-status'},
-   phase==='idle'?h('span',{className:'en-hint'},'札を押すと10秒スタート'):phase==='rush'?h('span',{className:'en-time'+(left<3000?' en-time-low':'')},(left/1000).toFixed(1)):phase==='release'?h('span',{className:'en-time'},'放出！'):null,
-   phase==='rush'&&h('span',{className:'en-sum'},'合計 '+sum),
-   flash&&h('span',{key:flash.k,className:'en-flash en-flash-'+flash.type},flash.type==='over'?'10をこえた':((flash.role&&flash.role!=='役なし'?flash.role:'10！')+(flash.type==='all'?' ＋ 全部同じ色！':flash.type==='pair'?' ＋ 同じ色':'')))),
-  h('div',{className:'en-field','aria-label':'場'},sel.map(id=>hand.find(c=>c.id===id)).filter(Boolean).map(c=>h('button',{key:c.id,className:'en-card en-card-field',onClick:()=>tap(c),style:{background:EN_COLOR[c.c].bg,borderColor:EN_COLOR[c.c].main,color:EN_COLOR[c.c].deep}},h('span',{className:'en-card-dot',style:{background:EN_COLOR[c.c].main}}),c.n)),Array.from({length:Math.max(0,4-sel.length)},(_,i)=>h('div',{key:'e'+i,className:'en-field-slot'}))),
-  h('div',{className:'en-mat'},hand.map(c=>sel.includes(c.id)?h('div',{key:c.id,className:'en-hand-slot'}):h('button',{key:c.id,className:'en-card',onClick:()=>tap(c),style:{background:EN_COLOR[c.c].bg,borderColor:EN_COLOR[c.c].main,color:EN_COLOR[c.c].deep}},h('span',{className:'en-card-dot',style:{background:EN_COLOR[c.c].main}}),c.n))),
-  phase==='win'&&h('div',{className:'en-overlay'},h('div',{className:'en-dialog'},h('h1',null,'撃破！'),h('button',{onClick:restart},'もう一度'),h('button',{className:'en-sub',onClick:onBack},'ホームへ'))));
-}
-// v297: セパレート（試作）。場を2人で分ける：自分の札は自分の場だけ。ぴったり10で役の点、10こえははじき返す。相手が10を作ると自分の場はリセット（札は捨て）。先に15点で勝ち。数値は SEP_CFG
-const SEP_CFG={winPt:15,aiMinMs:1300,aiJitterMs:600,stuckMs:700,flashMs:900};
-function sepPlayable(hand,field){const sum=field.reduce((a,b)=>a+b,0);return hand.map((v,i)=>v!=null&&canPlay(v,sum,field)&&sum+v<=10?i:-1).filter(i=>i>=0);}
-function sepAiPick(hand,field){
- const ids=sepPlayable(hand,field);if(!ids.length)return -1;const sum=field.reduce((a,b)=>a+b,0);
- const ten=ids.filter(i=>sum+hand[i]===10);
- if(ten.length){ten.sort((a,b)=>calcPts([...field,hand[b]]).total-calcPts([...field,hand[a]]).total);return ten[0];}
- return ids[Math.floor(Math.random()*ids.length)];
-}
-function SeparateMode({onBack}){
- const[st,setSt]=useState(()=>({phase:'ready',pH:createDeck(),dH:createDeck(),pF:[],dF:[],pPt:0,dPt:0}));
- const[fx,setFx]=useState({});const[bounce,setBounce]=useState(-1);
- const sR=useRef(st);sR.current=st;
- const flash=(who,text,kind)=>{const k=Date.now()+Math.random();setFx(f=>({...f,[who]:{text,kind,k}}));setTimeout(()=>setFx(f=>f[who]&&f[who].k===k?{...f,[who]:null}:f),SEP_CFG.flashMs);};
- // 札を出す（who: 'p' or 'd'）。10完成なら点数を入れ、相手の場をリセット
- function play(who,i){
-  const s=sR.current;if(s.phase!=='play')return false;
-  const hand=who==='p'?s.pH:s.dH,field=who==='p'?s.pF:s.dF,v=hand[i];if(v==null)return false;
-  const sum=field.reduce((a,b)=>a+b,0);
-  if(!canPlay(v,sum,field))return false;
-  if(sum+v>10){if(who==='p'){setBounce(i);setTimeout(()=>setBounce(-1),320);}return false;}
-  let nh=hand.map((x,j)=>j===i?null:x);if(nh.every(x=>x==null))nh=createDeck();
-  const nf=[...field,v];const n={...s};
-  if(who==='p'){n.pH=nh;n.pF=nf;}else{n.dH=nh;n.dF=nf;}
-  try{playPlaceSE(who==='p');}catch(e){}
-  if(sum+v===10){
-   const r=calcPts(nf);
-   if(who==='p'){n.pPt=s.pPt+r.total;n.pF=[];if(s.dF.length)flash('d','リセット！','reset');n.dF=[];}
-   else{n.dPt=s.dPt+r.total;n.dF=[];if(s.pF.length)flash('p','リセット！','reset');n.pF=[];}
-   flash(who==='p'?'pt':'dt',r.label,'ten');try{fxBell({f:who==='p'?1175:784,v:.09,d:.4});}catch(e){}
-   if(n.pPt>=SEP_CFG.winPt||n.dPt>=SEP_CFG.winPt)n.phase='end';
-  }
-  sR.current=n;setSt(n);return true;
- }
- // 相手AI
- useEffect(()=>{if(st.phase!=='play')return;let alive=true,t;
-  const step=()=>{if(!alive)return;const s=sR.current;if(s.phase!=='play')return;
-   const i=sepAiPick(s.dH,s.dF);if(i>=0)play('d',i);
-   t=setTimeout(step,SEP_CFG.aiMinMs+Math.random()*SEP_CFG.aiJitterMs);};
-  t=setTimeout(step,SEP_CFG.aiMinMs);return()=>{alive=false;clearTimeout(t);};},[st.phase]);
- // 出せる札がなければ、その人の場をリセット（詰み防止）
- useEffect(()=>{if(st.phase!=='play')return;const t=setTimeout(()=>{const s=sR.current;if(s.phase!=='play')return;let n=null;
-  if(s.pF.length&&!sepPlayable(s.pH,s.pF).length){n={...(n||s),pF:[]};flash('p','出せる札がない','reset');}
-  if(s.dF.length&&!sepPlayable(s.dH,s.dF).length){n={...(n||s),dF:[]};flash('d','出せる札がない','reset');}
-  if(n){sR.current=n;setSt(n);}},SEP_CFG.stuckMs);return()=>clearTimeout(t);},[st]);
- const start=()=>{const n={phase:'play',pH:createDeck(),dH:createDeck(),pF:[],dF:[],pPt:0,dPt:0};sR.current=n;setSt(n);setFx({});};
- const sumOf=f=>f.reduce((a,b)=>a+b,0);
- const fieldRow=(f,who)=>h('div',{className:'sp-field sp-field-'+who+(fx[who]&&fx[who].kind==='reset'?' sp-shake':'')},
-  [0,1,2,3].map(k=>f[k]!=null?h('div',{key:k+'_'+f[k]+'_'+f.length,className:'sp-card sp-fcard sp-'+who},f[k]):h('div',{key:'e'+k,className:'sp-slot'})),
-  h('div',{className:'sp-sum'},sumOf(f),h('small',null,' / 10')),
-  fx[who]&&h('div',{key:fx[who].k,className:'sp-tag sp-tag-'+fx[who].kind},fx[who].text),
-  fx[who+'t']&&h('div',{key:fx[who+'t'].k,className:'sp-tag sp-tag-ten'},fx[who+'t'].text));
- const win=st.pPt>=SEP_CFG.winPt;
- return h('main',{className:'sp-screen'},
-  h('div',{className:'sp-top'},h('button',{className:'sp-back',onClick:onBack,'aria-label':'ホームへ'},'‹'),
-   h('div',{className:'sp-score sp-score-d'},h('small',null,'相手'),h('b',null,st.dPt),h('small',null,'/ '+SEP_CFG.winPt))),
-  h('div',{className:'sp-hand sp-hand-d'},st.dH.map((v,i)=>v==null?h('div',{key:i,className:'sp-mini sp-mini-empty'}):h('div',{key:i,className:'sp-mini'},v))),
-  h('div',{className:'sp-label'},'相手の場'),
-  fieldRow(st.dF,'d'),
-  h('div',{className:'sp-divider'}),
-  fieldRow(st.pF,'p'),
-  h('div',{className:'sp-label'},'自分の場'),
-  h('div',{className:'sp-score sp-score-p'},h('small',null,'自分'),h('b',null,st.pPt),h('small',null,'/ '+SEP_CFG.winPt)),
-  h('div',{className:'sp-hand sp-hand-p'},st.pH.map((v,i)=>v==null?h('div',{key:i,className:'sp-card sp-empty'}):h('button',{key:i,className:'sp-card sp-p'+(bounce===i?' sp-bounce':''),onClick:()=>play('p',i)},v))),
-  st.phase!=='play'&&h('div',{className:'sp-overlay'},h('div',{className:'sp-dialog'},
-   st.phase==='ready'?h(React.Fragment,null,h('h1',null,'セパレート'),h('ul',null,h('li',null,'自分の札は自分の場だけに出す'),h('li',null,'ぴったり10で役の点数'),h('li',null,'10をこえる札ははじき返される'),h('li',null,'相手が10を作ると、自分の場はリセット'),h('li',null,'先に'+SEP_CFG.winPt+'点で勝ち')),h('button',{onClick:start},'スタート'))
-   :h(React.Fragment,null,h('h1',{className:win?'sp-win':'sp-lose'},win?'勝ち！':'負け…'),h('p',null,st.pPt+' - '+st.dPt),h('button',{onClick:start},'もう一度')),
-   h('button',{className:'sp-sub',onClick:onBack},'ホームへ'))));
-}
 // ── v318 ネクスト（仮名）：手札なし。自分の「次の札」3枚だけ見える（テトリスのNEXT）。できるのは先頭を「出す」か「捨てる」だけ。相手の次3枚も丸見え ──
 const NX_CFG={mat:false,winPt:10,roundSec:10,queueN:3,countFrom:5,countStepMs:650,goMs:500,tenHoldMs:1500,timeUpMs:1200};
 const NX_AI={easy:{label:'やさしい',delay:1250,jitter:600,read:.3,safe:.4},normal:{label:'ふつう',delay:650,jitter:650,read:.7,safe:.55},hard:{label:'つよい',delay:360,jitter:300,read:.95,safe:.85}};
@@ -5804,194 +5182,6 @@ function NextMode({onBack}){
    h('div',{className:'nx-levels','aria-label':'相手の強さ'},Object.entries(NX_AI).map(([k,v])=>h('button',{key:k,'aria-pressed':level===k,onClick:()=>setLevel(k)},v.label))),
    h('button',{onClick:start},st.phase==='ready'?'はじめる':'もう一度'),h('button',{className:'nx-home',onClick:leave},'ホームへ')))));
 }
-function DiceMode({onBack}){
- const game=useRef(null);if(!game.current)game.current=diceCreate();
- const[,redraw]=useState(0),last=useRef(performance.now()),dialog=useRef(null),pauseRef=useRef(null);
- const s=game.current,paint=()=>redraw(n=>n+1);
- function sync(){const now=performance.now(),before=game.current.event;diceAdvance(game.current,now-last.current);last.current=now;if(game.current.event!==before){try{if(game.current.phase==='point')fxBell({f:game.current.scorer==='player'?1046:784,v:.07,d:.4});else playPlaceSE();}catch(e){}}}
- function roll(index,dir){sync();const ok=diceRoll(game.current,index,dir);paint();return ok;}
- function start(){game.current=diceCreate();diceThrow(game.current);last.current=performance.now();paint();}
- function pause(){sync();if(game.current.phase==='ended'||game.current.phase==='ready')return;game.current.paused=true;paint();}
- function resume(){game.current.paused=false;last.current=performance.now();paint();requestAnimationFrame(()=>pauseRef.current&&pauseRef.current.focus());}
- useEffect(()=>{
-  const timer=setInterval(()=>{sync();paint();},DICE_CFG.frameMs);
-  const blur=()=>pause(),hidden=()=>{if(document.hidden)pause();};
-  const key=e=>{
-   if(e.altKey||e.ctrlKey||e.metaKey||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;
-   if(e.key==='Escape'){e.preventDefault();game.current.paused?resume():pause();return;}
-   const keys={w:[2,'up'],s:[2,'down'],a:[2,'left'],d:[2,'right'],ArrowUp:[3,'up'],ArrowDown:[3,'down'],ArrowLeft:[3,'left'],ArrowRight:[3,'right']};
-   const move=keys[e.key.length===1?e.key.toLowerCase():e.key];if(move){e.preventDefault();if(!e.repeat)roll(...move);}
-  };
-  window.addEventListener('blur',blur);document.addEventListener('visibilitychange',hidden);window.addEventListener('keydown',key);
-  return()=>{clearInterval(timer);window.removeEventListener('blur',blur);document.removeEventListener('visibilitychange',hidden);window.removeEventListener('keydown',key);};
- },[]);
- const modal=s.paused||s.phase==='ready'||s.phase==='ended',active=s.phase==='active'&&!s.paused&&(!DICE_CFG.turnBased||(s.turn==='player'&&!s.dice.some(d=>d.motion)));
- useEffect(()=>{if(modal&&dialog.current)dialog.current.querySelector('button')?.focus();},[modal,s.phase]);
- function trap(e){if(e.key!=='Tab')return;const els=[...e.currentTarget.querySelectorAll('button')],first=els[0],end=els[els.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();end.focus();}else if(!e.shiftKey&&document.activeElement===end){e.preventDefault();first.focus();}}
- return h('main',{className:'dc-screen'+(s.paused?' dc-paused':''),style:{'--dc-roll-ms':DICE_CFG.rollMs+'ms','--dc-drop-ms':DICE_CFG.dropMs+'ms'}},
-  h('div',{className:'dc-shell',inert:modal?'':undefined},
-   h('div',{className:'dc-quiet-hud'},h('span',{className:'dc-time','aria-label':'残り時間'},Math.ceil(s.left/1000)),h('button',{ref:pauseRef,type:'button',onClick:pause,'aria-label':'一時停止'},'Ⅱ')),
-   h('div',{className:'dc-arena'},
-    h('div',{className:'dc-divider'}),
-    h('span',{className:'dc-score dc-dealer-score','aria-label':'相手の得点'},s.score.dealer),h('span',{className:'dc-score dc-player-score','aria-label':'自分の得点'},s.score.player),
-    s.dice.map((die,index)=>h(DiceCube,{key:index,die,index,phase:s.phase,round:s.round})),
-    h('div',{className:'dc-total'+(s.phase==='point'?' dc-ten':''),'aria-label':'上の面の合計'},s.phase==='dropping'?'—':diceSum(s)),
-    s.phase==='point'&&h('div',{className:'dc-point '+(s.scorer==='player'?'dc-point-player':'dc-point-dealer'),role:'status'},s.scorer==='player'?'YOU +'+DICE_CFG.points:'CPU +'+DICE_CFG.points)),
-   h('div',{className:'dc-pads'},h(DicePad,{index:2,enabled:active&&!s.dice[2].motion,onRoll:roll}),h(DicePad,{index:3,enabled:active&&!s.dice[3].motion,onRoll:roll}))),
-  modal&&h('div',{className:'dc-overlay'},h('section',{className:'dc-dialog',role:'dialog','aria-modal':true,'aria-labelledby':'dc-dialog-title',ref:dialog,onKeyDown:trap},
-   h('p',{className:'dc-eyebrow'},'TEN-KURU · PROTOTYPE'),h('h1',{id:'dc-dialog-title'},s.paused?'一時停止':s.phase==='ended'?(s.winner==='draw'?'引き分け':s.winner==='player'?'勝利！':'次は取り返そう'):'サイコロ'),
-   s.phase==='ready'&&h(React.Fragment,null,h('p',{className:'dc-lead'},'4つの上の面で、10をつくる。'),h('p',null,(DICE_CFG.turnBased?'自分と相手で1手ずつ交代。':'')+'左パッドで青の左、右パッドで青の右を上下左右にスワイプ。最後に転がして10にした側が得点。'),h('p',{className:'dc-note'},DICE_CFG.matchMs/1000+'秒勝負 · 10で振り直し · 空白は0'),h('small',null,'PC：左はWASD、右は矢印キー')),
-   s.phase==='ended'&&h('p',{className:'dc-result'},'YOU '+s.score.player+' — '+s.score.dealer+' CPU'),
-   h('button',{className:'dc-primary',onClick:s.paused?resume:start},s.paused?'再開':s.phase==='ended'?'もう一度':'はじめる'),h('button',{className:'dc-secondary',onClick:onBack},'ホームへ'))));
-}
-// ── END DICE MODE ──
-
-// ── COLOR ROOM: independent state, clock, AI and audio ──
-const CR_CFG={paint:[0,4,7,10,14,18],settleMs:700,tapMs:110,
- levels:{easy:{label:'かんたん',step:1300,jitter:450,smart:.12},normal:{label:'ふつう',step:780,jitter:260,smart:.7},hard:{label:'むずかしい',step:430,jitter:150,smart:1}}};
-function crCombinations(hand,field=[]){
- const out=[],base=field.map(c=>typeof c==='number'?c:c.value),sum=base.reduce((a,b)=>a+b,0);
- function visit(start,values,indices,total){
-  if(total===10){const role=calcPts(values);out.push({indices,role});return;}
-  if(values.length>=4)return;
-  for(let i=start;i<hand.length;i++)if(hand[i]&&total+hand[i]<=10)visit(i+1,[...values,hand[i]],[...indices,i],total+hand[i]);
- }visit(0,base,[],sum);return out;
-}
-function crRefill(hand,random=Math.random){
- const next=[...hand];
- for(let i=0;i<10;i++)if(!next[i]){const allowed=[1,2,3,4,5].filter(v=>next.filter(x=>x===v).length<3);next[i]=allowed[Math.min(allowed.length-1,Math.floor(random()*allowed.length))];}
- // Ten cards, values 1–5, at most three of each: at least one four-or-fewer-card 10 exists.
- return next;
-}
-function crCreate(level='normal',random=Math.random){
- const side=()=>({hand:crRefill(Array(10).fill(null),random),field:[],readyAt:0,nextTap:0,combo:null,ten:0,best:0,deals:1});
- return{level:CR_CFG.levels[level]?level:'normal',phase:'ready',paused:false,now:0,blue:50,player:side(),dealer:side(),aiAt:0,events:[],serial:0,winner:null};
-}
-function crStart(s){s.phase='active';s.aiAt=CR_CFG.levels[s.level].step;}
-function crEvent(s,kind,who,extra={}){s.events.push({id:++s.serial,at:s.now,kind,who,...extra});if(s.events.length>24)s.events.shift();}
-function crRefillEmpty(a,random=Math.random){if(a.hand.some(Boolean))return false;a.hand=crRefill(Array(10).fill(null),random);a.deals++;return true;}
-function crPlay(s,who,index,random=Math.random){
- const a=s[who];if(!a||s.phase!=='active'||s.paused||a.readyAt||s.now<a.nextTap||!Number.isInteger(index)||index<0||index>=10||!a.hand[index])return false;
- const value=a.hand[index],sum=a.field.reduce((n,c)=>n+c.value,0)+value;
- if(a.field.length>=4)return false;
- a.field.push({index,value});a.hand[index]=null;a.nextTap=s.now+CR_CFG.tapMs;
- if(sum===10){
-  const role=calcPts(a.field.map(c=>c.value)),gain=CR_CFG.paint[role.total];
-  a.combo={label:role.voice,gain,at:s.now};a.ten++;a.best=Math.max(a.best,role.total);a.readyAt=s.now+CR_CFG.settleMs;
-  s.blue=Math.max(0,Math.min(100,s.blue+(who==='player'?gain:-gain)));
-  crEvent(s,'paint',who,{gain,role:role.total,blue:s.blue,label:role.voice});
-  if(s.blue===0||s.blue===100){s.phase='ended';s.winner=s.blue===100?'player':'dealer';crEvent(s,'end',s.winner);}
- }else if(!crCombinations(a.hand,a.field).length){
-  // A tap always lands. Discard only the field once no remaining-card combination can reach 10.
-  crEvent(s,'reset',who,{sum});a.field=[];crRefillEmpty(a,random);
- }else crEvent(s,'tap',who);
- return true;
-}
-function crUndo(s,index){
- const a=s.player;if(s.phase!=='active'||s.paused||a.readyAt)return false;
- const pos=a.field.findIndex(c=>c.index===index);if(pos<0)return false;
- const card=a.field.splice(pos,1)[0];a.hand[card.index]=card.value;return true;
-}
-function crAiChoice(s,random=Math.random){
- // Deliberately reads only its own hand/field; the player's hand is private.
- const choices=crCombinations(s.dealer.hand,s.dealer.field);
- if(!choices.length){const left=s.dealer.hand.map((v,i)=>v?i:-1).filter(i=>i>=0);return left.length?left[Math.min(left.length-1,Math.floor(random()*left.length))]:null;}
- const cfg=CR_CFG.levels[s.level];
- if(random()>=cfg.smart)return choices[Math.min(choices.length-1,Math.floor(random()*choices.length))].indices[0];
- choices.sort((a,b)=>(CR_CFG.paint[b.role.total]/(b.indices.length*cfg.step+CR_CFG.settleMs))-(CR_CFG.paint[a.role.total]/(a.indices.length*cfg.step+CR_CFG.settleMs))||b.role.total-a.role.total);
- return choices[0].indices[0];
-}
-function crAdvance(s,ms,random=Math.random,withAi=true){
- if(s.phase!=='active'||s.paused)return;
- const end=s.now+Math.max(0,ms),cfg=CR_CFG.levels[s.level];
- while(s.now<end&&s.phase==='active'){
-  const next=Math.min(end,...['player','dealer'].map(w=>s[w].readyAt||Infinity),withAi?s.aiAt:Infinity);s.now=next;
-  for(const who of ['player','dealer']){const a=s[who];if(a.readyAt&&a.readyAt<=s.now){a.field=[];crRefillEmpty(a,random);a.readyAt=0;}}
-  if(withAi&&s.now>=s.aiAt){
-   if(!s.dealer.readyAt){const index=crAiChoice(s,random);if(index!==null)crPlay(s,'dealer',index,random);}
-   s.aiAt=s.now+cfg.step+random()*cfg.jitter;
-  }
- }
-}
-function crAudio(){
- let enabled=true,disposed=false,master=null;const buffers={},sources=new Set();
- try{master=AC.createGain();master.gain.value=.66;master.connect(AC.destination);}catch(e){}
- const loading=Promise.all(['splash','wave','win'].map(async key=>{try{const r=await fetch('assets/color-room/'+key+'.mp3');if(!r.ok)throw Error('audio');const b=await AC.decodeAudioData(await r.arrayBuffer());if(!disposed)buffers[key]=b;}catch(e){}}));
- function tone(f,d=.11,v=.065,delay=0){if(!master||!enabled||disposed)return;const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+delay;o.type='sine';o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(f*.65,t+d);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.006);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(master);sources.add(o);o.onended=()=>{sources.delete(o);o.disconnect();g.disconnect();};o.start(t);o.stop(t+d+.01);}
- function play(key,who='player'){if(!enabled||disposed||!master)return;try{resumeAC();if(key==='tap'){tone(who==='player'?510:350,.08,.045);return;}if(key==='reset'){tone(235,.12,.035);return;}if(key==='lose'){tone(440,.22,.06);tone(294,.32,.06,.19);return;}if(!buffers[key]){tone(key==='win'?1047:190,.25,.07);return;}const src=AC.createBufferSource(),g=AC.createGain();src.buffer=buffers[key];g.gain.value=who==='dealer'?.55:.9;src.connect(g);g.connect(master);sources.add(src);src.onended=()=>{sources.delete(src);src.disconnect();g.disconnect();};src.start();}catch(e){}}
- function stop(){sources.forEach(s=>{try{s.stop();}catch(e){}});sources.clear();}
- return{play,stop,loading,setEnabled(v){enabled=v;if(!v)stop();},dispose(){disposed=true;stop();if(master)master.disconnect();}};
-}
-function ColorRoomCanvas({game}){
- const ref=useRef(null);
- useEffect(()=>{
-  const canvas=ref.current,ctx=canvas.getContext('2d');if(!ctx)return;
-  let frame,visual=game.current.blue,last=performance.now();const reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function draw(t){
-   const s=game.current,rect=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2),w=rect.width,ht=rect.height;
-   if(w&&ht){if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(ht*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(ht*dpr);}ctx.setTransform(dpr,0,0,dpr,0,0);
-    if(!s.paused)visual+= (s.blue-visual)*(reduced?1:Math.min(1,(t-last)/180));
-    const boundary=ht*(1-visual/100),amp=Math.min(7,boundary*.22,(ht-boundary)*.22),time=s.now/800;
-    const wave=x=>boundary+Math.sin(x/w*12+time)*amp+Math.sin(x/w*23-time*.7)*amp*.4;
-    let g=ctx.createLinearGradient(0,0,w,ht);g.addColorStop(0,'#d8ac80');g.addColorStop(.7,'#bc895e');g.addColorStop(1,'#cfa078');ctx.fillStyle=g;ctx.fillRect(0,0,w,ht);
-    ctx.beginPath();ctx.moveTo(0,ht);ctx.lineTo(0,wave(0));for(let x=0;x<=w+4;x+=4)ctx.lineTo(x,wave(x));ctx.lineTo(w,ht);ctx.closePath();g=ctx.createLinearGradient(0,boundary,w,ht);g.addColorStop(0,'#92b8c3');g.addColorStop(.24,'#74a1b4');g.addColorStop(1,'#608b9f');ctx.fillStyle=g;ctx.fill();
-    if(visual>.15&&visual<99.85){
-     // A shaded paint lip and soft reflected streaks give the advancing edge volume.
-     for(const [offset,width,color] of [[5,9,'#3c64731a'],[2,4,'#63879725'],[0,2,'#e8e3cc88']]){ctx.beginPath();for(let x=0;x<=w;x+=4){if(x===0)ctx.moveTo(x,wave(x)+offset);else ctx.lineTo(x,wave(x)+offset);}ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();}
-    }
-    const light=ctx.createRadialGradient(w*.27,ht*.24,0,w*.27,ht*.24,w*.8);light.addColorStop(0,'#fffbd22e');light.addColorStop(1,'#ffffff00');ctx.fillStyle=light;ctx.fillRect(0,0,w,ht);
-    // Light reflected on both pools; no expensive filters or per-frame DOM particles.
-    ctx.fillStyle='#fff';for(let i=0;i<27;i++){const x=(Math.sin(i*91.7)*.5+.5)*w,y=(Math.cos(i*53.1)*.5+.5)*ht;ctx.globalAlpha=.06+Math.sin(time+i)*.02;ctx.beginPath();ctx.ellipse(x,y,3+i%5,1.4,0,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
-    for(const ev of s.events){const age=(s.now-ev.at)/850;if(ev.kind!=='paint'||age<0||age>1||reduced)continue;const blue=ev.who==='player',origin=ht*(1-(ev.blue+(blue?-ev.gain:ev.gain))/100);ctx.globalAlpha=(1-age)*.9;
-     for(let i=0;i<12+ev.role*4;i++){const seed=Math.sin(i*13.7+ev.id)*.5+.5,x=seed*w+Math.sin(i*2.1)*age*35,y=origin+(blue?-1:1)*(Math.sin(age*Math.PI/2)*(25+seed*ev.gain*4))+age*age*20;ctx.fillStyle=i%3?'#f9fcff':blue?'#7dabb9':'#c6a075';ctx.beginPath();ctx.ellipse(x,y,2+seed*4,(2+seed*4)*(1-age*.6),age*2,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
-    }
-   }last=t;frame=requestAnimationFrame(draw);
-  }frame=requestAnimationFrame(draw);return()=>cancelAnimationFrame(frame);
- },[]);
- return h('canvas',{className:'cr-paint',ref,'aria-hidden':true});
-}
-function ColorRoomMode({onBack}){
- const game=useRef(null);if(!game.current)game.current=crCreate();
- const[,redraw]=useState(0),[level,setLevel]=useState('normal'),[muted,setMuted]=useState(false),last=useRef(performance.now()),sound=useRef(null),seen=useRef(0),dialog=useRef(null),pauseButton=useRef(null);
- const s=game.current,paint=()=>redraw(n=>n+1);
- function sync(){const now=performance.now();crAdvance(game.current,Math.min(250,Math.max(0,now-last.current)));last.current=now;
-  for(const ev of game.current.events)if(ev.id>seen.current){seen.current=ev.id;if(sound.current)sound.current.play(ev.kind==='end'?(ev.who==='player'?'win':'lose'):ev.kind==='tap'?'tap':ev.kind==='reset'?'reset':ev.role>=4?'wave':'splash',ev.who);}}
- function start(){if(sound.current){sound.current.stop();sound.current.setEnabled(!muted);}resumeAC();game.current=crCreate(level);crStart(game.current);seen.current=0;last.current=performance.now();paint();}
- function pause(){sync();if(game.current.phase!=='active')return;game.current.paused=true;sound.current?.stop();paint();}
- function resume(){game.current.paused=false;last.current=performance.now();resumeAC();paint();requestAnimationFrame(()=>pauseButton.current?.focus());}
- function play(index){sync();if(crPlay(game.current,'player',index)){sync();paint();}}
- function undo(index){sync();if(crUndo(game.current,index))paint();}
- function reset(){sync();for(const c of [...game.current.player.field])crUndo(game.current,c.index);paint();}
- function toggleSound(){setMuted(v=>{sound.current?.setEnabled(v);return!v;});}
- useEffect(()=>{
-  sound.current=crAudio();const timer=setInterval(()=>{sync();paint();},50);
-  const hidden=()=>{if(document.hidden)pause();},blur=()=>pause(),key=e=>{if(e.key==='Escape'){if(game.current.paused)resume();else pause();}};
-  document.addEventListener('visibilitychange',hidden);window.addEventListener('blur',blur);window.addEventListener('keydown',key);
-  return()=>{clearInterval(timer);sound.current?.dispose();document.removeEventListener('visibilitychange',hidden);window.removeEventListener('blur',blur);window.removeEventListener('keydown',key);};
- },[]);
- const modal=s.phase!=='active'||s.paused;
- useEffect(()=>{if(modal)dialog.current?.querySelector('button')?.focus();},[modal,s.phase]);
- function trap(e){if(e.key!=='Tab')return;const els=[...e.currentTarget.querySelectorAll('button,summary')].filter(el=>el.getClientRects().length),first=els[0],end=els[els.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();end.focus();}else if(!e.shiftKey&&document.activeElement===end){e.preventDefault();first.focus();}}
- const lastCombo=[...s.events].reverse().find(e=>e.kind==='paint'&&s.now-e.at<1100);
- function field(who){const a=s[who],sum=a.field.reduce((n,c)=>n+c.value,0);return h('div',{className:'cr-played '+who},h('span',{className:'cr-sum'},a.readyAt?'10':!a.field.length&&s.events.some(e=>e.kind==='reset'&&e.who===who&&s.now-e.at<550)?'リセット':sum+' / 10'),Array.from({length:4},(_,i)=>{const c=a.field[i];return c?h('button',{className:'cr-slot',key:c.index,disabled:who==='dealer'||modal||!!a.readyAt,onClick:()=>undo(c.index),'aria-label':who==='player'?c.value+'を手札に戻す':'相手の場 '+c.value},c.value):h('span',{key:'empty'+i,className:'cr-slot empty','aria-hidden':true});}));}
- const sum=s.player.field.reduce((n,c)=>n+c.value,0);
- return h('main',{className:'cr-screen'},h('div',{className:'cr-shell'},
-  h('div',{className:'cr-hud',inert:modal?'':undefined},h('span',{className:'cr-pct cr-blue'},s.blue+'%'),h('div',{className:'cr-meter',role:'meter','aria-label':'青の占有率','aria-valuemin':0,'aria-valuemax':100,'aria-valuenow':s.blue},h('i',{style:{width:s.blue+'%'}})),h('span',{className:'cr-pct cr-orange'},100-s.blue+'%'),h('button',{className:'cr-icon',ref:pauseButton,onClick:pause,'aria-label':'一時停止'},'Ⅱ')),
-  h('div',{className:'cr-room',inert:modal?'':undefined},h(ColorRoomCanvas,{game}),field('dealer'),lastCombo&&h('div',{key:lastCombo.id,className:'cr-combo '+lastCombo.who,role:'status'},lastCombo.label,h('small',null,(lastCombo.who==='player'?'青':'オレンジ')+' ＋'+lastCombo.gain+'%')),field('player')),
-  h('div',{className:'cr-tray',inert:modal?'':undefined},h('div',{className:'cr-tray-head'},h('span',null,'● 青が自分 · '+CR_CFG.levels[s.level].label),h('button',{onClick:reset,disabled:modal||!s.player.field.length||!!s.player.readyAt},'場を戻す')),
-   h('div',{className:'cr-hand'},s.player.hand.map((v,i)=>h('button',{key:i,className:'cr-card'+(!v?' blank':sum+v===10?' finish':''),disabled:modal||!v||!!s.player.readyAt,onClick:()=>play(i),'aria-label':v?'手札'+(i+1)+'、'+v:'使用中の手札'+(i+1)},v||'')))),
-  modal&&h('div',{className:'cr-overlay'},h('section',{className:'cr-dialog',role:'dialog','aria-modal':true,'aria-labelledby':'cr-title',ref:dialog,onKeyDown:trap},
-   h('p',{className:'cr-kicker'},'TEN-KURU'),h('h1',{id:'cr-title'},s.paused?'一時停止':s.phase==='ended'?(s.winner==='player'?'部屋を染めきった！':'オレンジの勝ち'):'カラールーム'),
-   s.phase==='ready'&&h('p',null,'10をつくって、色を広げよう。',h('br'),'強い役ほど、一気に塗り返す。'),
-   s.phase==='ended'&&h(React.Fragment,null,h('div',{className:'cr-result-number'},s.blue+'%'),h('p',null,'10の完成 '+s.player.ten+'回 · 最高役 '+(['—','役なし','ワンペア','ツーペア','スリーカード','ストレート'][s.player.best])),h('p',null,CR_CFG.levels[s.level].label)),
-   !s.paused&&h('div',{className:'cr-difficulties','aria-label':'AIの強さ'},Object.entries(CR_CFG.levels).map(([id,c])=>h('button',{key:id,'aria-pressed':level===id,onClick:()=>setLevel(id)},c.label))),
-   h('button',{className:'cr-primary',onClick:s.paused?resume:start},s.paused?'つづける':s.phase==='ended'?'もう一度':'はじめる'),
-   h('button',{className:'cr-secondary',onClick:onBack},'ホームへ'),
-   h('button',{className:'cr-secondary',onClick:toggleSound,'aria-pressed':!muted},muted?'効果音 OFF':'効果音 ON'),
-   h('details',null,h('summary',null,'あそびかた・役の強さ'),h('p',null,'手札10枚を使い切ると新しい10枚を補充。数字の制限なく出せます。残りの手札と4枚の枠で10を作れないと判明したら、場の札だけ自動で消えます。場の札は消える前ならタップで戻せます。'),h('p',null,'青・オレンジ50%ずつで開始。先に100%を塗った側の勝ち。時間制限なし。'),h('div',{className:'cr-role-table'},['役なし','ワンペア','ツーペア','スリーカード','ストレート'].map((r,i)=>h(React.Fragment,{key:r},h('span',null,r),h('b',null,'＋'+CR_CFG.paint[i+1]+'%')))),h('p',null,'5＋5は役なし。ストレートは1＋2＋3＋4。'))))));
-}
-// ── END COLOR ROOM ──
-
 // Logical card order remains chronological; this mapping controls physical slots only.
 function tapFieldPlaces(field,places=[]){
  const used=new Set();return field.map((_,i)=>{let slot=places[i];if(!Number.isInteger(slot)||slot<0||slot>3||used.has(slot))slot=[0,1,2,3].find(n=>!used.has(n));used.add(slot);return slot;});
@@ -8315,22 +7505,15 @@ function App(){
 
   const curStage=stageCtx?STAGES.areas[stageCtx.ar].stages[stageCtx.st]:null;
   if(phase==='billiards')return h(BilliardsMode,{onBack:()=>{setPhase('menu');phaseR.current='menu';}});
-  if(phase==='colorRoom')return h(ColorRoomMode,{onBack:()=>{setPhase('menu');phaseR.current='menu';}});
-  if(phase==='separate')return h(SeparateMode,{onBack:()=>{setPhase('menu');phaseR.current='menu';}});
   if(phase==='next')return h(NextMode,{onBack:()=>{setPhase('menu');phaseR.current='menu';}}); // v318
-  if(phase==='energy')return h(EnergyMode,{onBack:()=>{setPhase('menu');phaseR.current='menu';}});
-  if(phase==='dice')return h(DiceMode,{onBack:()=>{setPhase('menu');phaseR.current='menu';}});
-  if(phase==='shared')return h(SharedBoardMode,{side:controlSide,onSideChange:changeControlSide,onBack:()=>{setPhase('menu');phaseR.current='menu';}});
   if(phase==='controlSettings')return h('main',{className:'rush-screen'},h('section',{className:'rush-card'},h('h1',null,'操作設定'),h(ControlSettings,{side:controlSide,onChange:changeControlSide}),h('p',{className:'rush-lead'},'十字キーで選んで、出すボタンで1枚出します。'),h('button',{className:'rush-secondary',onClick:()=>{setPhase('menu');phaseR.current='menu';}},'ホームへ')));
-  if(phase==='solo')return h(SoloMode,{onBack:()=>{setPhase('menu');phaseR.current='menu';}}); // v280
-  if(phase==='fall')return h(FallMode,{onBack:()=>{setPhase('menu');phaseR.current='menu';}}); // v276
   if(phase==='survival')return h(SurvivalScreen,{onBattle:startSurvivalBattle,onBack:()=>{setPhase('menu');phaseR.current='menu';}});
   if(phase==='charge')return h(ChargeScreen,{onBattle:startChargeBattle,onBack:()=>{setPhase('menu');phaseR.current='menu';}});
   if(phase==='rush')return h(RushScreen,{onBattle:startRushBattle,onBack:()=>{setPhase('menu');phaseR.current='menu';}});
   if(phase==='tune')return h(TuneScreen,{onBattle:startTuneBattle,onBack:()=>{setPhase('menu');phaseR.current='menu';}}); // v239
   if(phase==='pzx')return h(PzxPanel,{save,onBattle:startPzxStage,onEnter:()=>{setPhase('pzxmap');phaseR.current='pzxmap';},onBack:()=>{setPhase('menu');phaseR.current='menu';},onReset:()=>{updSave(s=>{s.pzx={got:[],boss:false};return s;});}}); // v214/v218 リセットは進行だけ消す（本編の★は無関係）
   if(phase==='pzxmap')return h(PzxWorld,{onPick:startPzxStage,onBack:()=>{setPhase('pzx');phaseR.current='pzx';}}); // v225/v231
-  if(phase==='menu')return h(TitleScreen,{onNext:()=>{setPhase('next');phaseR.current='next';},onBilliards:()=>{setPhase('billiards');phaseR.current='billiards';},onColorRoom:()=>{setPhase('colorRoom');phaseR.current='colorRoom';},onSeparate:()=>{setPhase('separate');phaseR.current='separate';},onEnergy:()=>{setPhase('energy');phaseR.current='energy';},onDice:()=>{setPhase('dice');phaseR.current='dice';},onShared:()=>{setPhase('shared');phaseR.current='shared';},onPlay:()=>{setPhase('map');phaseR.current='map';},onPuzzlux:()=>{setPhase('pzx');phaseR.current='pzx';},onRush:goRush,onCharge:goCharge,onSurvival:goSurvival,onFall:()=>{setPhase('fall');phaseR.current='fall';},onSolo:()=>{setPhase('solo');phaseR.current='solo';},onTune:()=>{setPhase('tune');phaseR.current='tune';},onTutorial:()=>openTutorial(null),onSettings:()=>{setPhase('controlSettings');phaseR.current='controlSettings';},musicOn:musicEnabled,toggleMusic});
+  if(phase==='menu')return h(TitleScreen,{onNext:()=>{setPhase('next');phaseR.current='next';},onBilliards:()=>{setPhase('billiards');phaseR.current='billiards';},onPlay:()=>{setPhase('map');phaseR.current='map';},onPuzzlux:()=>{setPhase('pzx');phaseR.current='pzx';},onRush:goRush,onCharge:goCharge,onSurvival:goSurvival,onTune:()=>{setPhase('tune');phaseR.current='tune';},onTutorial:()=>openTutorial(null),onSettings:()=>{setPhase('controlSettings');phaseR.current='controlSettings';},musicOn:musicEnabled,toggleMusic});
   if(phase==='champIntro'&&curStage&&curStage.champion)return h(ChampionIntroScreen,{champ:CHAMPIONS[curStage.champion],stage:curStage,onStart:()=>goIntro(pendingDiff)});
   if(phase==='intro'&&curStage&&curStage.intro)return h(IntroVideoScreen,{src:curStage.intro,onDone:()=>goBrief(pendingDiff)}); // v120
   if(phase==='brief'&&curStage)return h(BriefScreen,{stage:curStage,onStart:()=>startGame(pendingDiff)}); // v119

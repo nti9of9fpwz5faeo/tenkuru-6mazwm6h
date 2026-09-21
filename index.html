@@ -3751,7 +3751,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v313'; // 衝突セーフの対象を「相手の着地」だけでなく「場の合計が自分以外の理由で変わった直後」全部に拡大（0.4秒）
+const APP_VER='v314'; // 相手の札：カーソル移動中・降下中にこちらが場を変えてバーストになる場合は出さない／手札へ返す（相手の理不尽バーストをなくす）
+// const APP_VER='v313'; // 衝突セーフの対象を「相手の着地」だけでなく「場の合計が自分以外の理由で変わった直後」全部に拡大（0.4秒）
 // const APP_VER='v312'; // 場の4枠（2段階タップ）廃止・毎ラウンド5からカウント・カウント/役完成のスキップ廃止・詰みスキップ（両者が押すと残り0秒）
 // const APP_VER='v311'; // 通常対戦・チャレンジの手札を8枚に（HAND_CFG.n、4列×2段）
 // const APP_VER='v310'; // ビリヤード：白玉2回接触で分解・1回目は銅色の輪郭
@@ -7771,7 +7772,7 @@ function App(){
     // v121: この時点で選んだ固有IDを、カーソル→タップ→飛行→着地まで選び直さない。
     const ok=cursorToCard(cardId,()=>commitDealerPlay({id:cardId,value:chosen},rn),()=>{
       const j=dIdsR.current.indexOf(cardId);
-      return phaseR.current==='playing'&&!resolvingR.current&&countNumR.current<0&&!pausedR.current&&j>=0&&!isHoldRing(dRingR.current[j])&&dIdsR.current[j]!==r2PendingCardR.current&&canPlay(dHR.current[j],fieldSumR.current,fieldR.current)&&(!isRush()||fieldSumR.current+dHR.current[j]<=10);
+      return phaseR.current==='playing'&&!resolvingR.current&&countNumR.current<0&&!pausedR.current&&j>=0&&!isHoldRing(dRingR.current[j])&&dIdsR.current[j]!==r2PendingCardR.current&&canPlay(dHR.current[j],fieldSumR.current,fieldR.current)&&(isCharge()||isSurvival()||fieldSumR.current+dHR.current[j]<=10); // v314 通常・チャレンジ・ラッシュ：バーストになる札は途中でやめる
     },()=>{if(phaseR.current==='playing'&&!resolvingR.current)scheduleAi(rn);});
     if(!ok)scheduleAi(rn);
   }
@@ -7782,7 +7783,7 @@ function App(){
     if(flyR.current||resolvingR.current||(linkR.current&&!rStopR.current)||sceneOnR.current||eraseBusyR.current||pausedR.current){if(phaseR.current==='playing'&&!resolvingR.current)scheduleAi(rn);return;}
     const idx=dIdsR.current.indexOf(pick.id);
     const dHand=dHR.current,rf=dRingR.current,cf=fieldR.current,cs=fieldSumR.current;
-    if(idx<0||dHand[idx]!==pick.value||isHoldRing(rf[idx])||pick.id===r2PendingCardR.current||dFrzR.current[pick.id]!=null||!canPlay(dHand[idx],cs,cf)||(isRush()&&cs+dHand[idx]>10)||countNumR.current>=0){scheduleAi(rn);return;}
+    if(idx<0||dHand[idx]!==pick.value||isHoldRing(rf[idx])||pick.id===r2PendingCardR.current||dFrzR.current[pick.id]!=null||!canPlay(dHand[idx],cs,cf)||(cs+dHand[idx]>10&&!isCharge()&&!isSurvival())||countNumR.current>=0){scheduleAi(rn);return;} // v314 移動中に場が変わってバーストになる札は出さず、選び直す
     const placeSlot=isTapPlace()?openFieldSlot():undefined;
     if(isTapPlace()&&placeSlot==null){scheduleAi(rn);return;}
     if(!spendCharge('dealer')){scheduleAi(rn);return;}
@@ -7804,7 +7805,7 @@ function App(){
     const _so2=stageOptsR.current||{};
     // v135: 初手だけ降下も速める
     const FLY_MS=Math.max(120,Math.round(((fieldR.current.length===0&&_so2.flyMsFirst)?_so2.flyMsFirst:(_so2.flyMs||(_so2.speed<1?380:680)))*_csK())); // v240 降下も cardSpeed で速く
-    flyR.current={id:pick.id,value:chosen,face,rf:pickedRf,placeSlot,chargePaid:isCharge(),energyPaid:isStandardEnergy()?chosen:0};setFlyCard({k:Date.now(),value:chosen,face,x0,y0,x1,y1,w:cardW,d:FLY_MS});
+    flyR.current={id:pick.id,value:chosen,face,rf:pickedRf,placeSlot,sumAt:cs,chargePaid:isCharge(),energyPaid:isStandardEnergy()?chosen:0};setFlyCard({k:Date.now(),value:chosen,face,x0,y0,x1,y1,w:cardW,d:FLY_MS});
     try{fxAir({v:0.03,a:0.02,d:0.5,hp:4000,rev:0.5});}catch(e){}
     const flight=flyR.current; // 返却した同じ札を再び投げても、古い着地処理と区別する
     setTimeout(()=>{
@@ -7825,7 +7826,7 @@ function App(){
       if(f.rf==='setra'){const n=freezeHand(SETRA_FREEZE_N,SETRA_FREEZE_SEC);if(n)r2Say('氷結 '+n+'枚',"#8fe0ff");} // v127
       if(f.rf==='orby')orbyRingFire(rn); // v140
       if(isGk(f.rf))gkFire(f.rf,rn,f.value); // v197
-      if(cs2+f.value>10&&COLLISION_MS>0&&recentChangeFor('dealer')){ // v179/v313 場が変わった直後の事故バースト → 相手も返却
+      if(cs2+f.value>10&&((f.sumAt!=null&&f.sumAt+f.value<=10)||(COLLISION_MS>0&&recentChangeFor('dealer')))){ // v179/v313/v314 出した時の合計では正しかった札が、降下中に場が変わってバーストになる → 手札へ返却（時間に関係なく）
         setFlyCard(c=>c?{...c,back:true}:c);setTimeout(()=>setFlyCard(null),380);
         refundCharge(f);const h2=[...dHR.current,f.value],r2=[...dRingR.current,f.rf||false],ids2=[...dIdsR.current,f.id];setDealer(h2,r2,ids2);
         if(phaseR.current==='playing'&&!resolvingR.current)scheduleAi(rn);

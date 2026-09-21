@@ -3825,7 +3825,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v322'; // NEXT：赤青の手札マットを消してみる（NX_CFG.mat で戻せる）
+const APP_VER='v323'; // NEXT：背景をホーム表示後に先読み
+// const APP_VER='v322'; // NEXT：赤青の手札マットを消してみる（NX_CFG.mat で戻せる）
 // const APP_VER='v321'; // NEXT：3枚以下でも役の点が入るよう修正（3-3-4→ワンペア+2）
 // const APP_VER='v320'; // NEXT：新規生成SEと役完成・得点吸い込み演出
 // const APP_VER='v319'; // NEXT：中庭UI・画像数字・出す/捨てるSE・無制限の捨て札・AI三段階
@@ -8559,6 +8560,8 @@ function App(){
   );
 }
 
+// v323: ネクストの背景（court/court-nomat）と札をホーム表示後に先読み（入った時の待ちをなくす）
+setTimeout(()=>{preloadImages(['img/next-v319/'+(NX_CFG.mat?'court':'court-nomat')+'.webp','img/next-v319/card.webp'],8000);},1500);
 ReactDOM.createRoot(document.getElementById('root')).render(h(React.Fragment,null,h(App,null),h(FxLayer,null))); // v233 FxLayer=画面の一番上のエフェクト層
 </script>
 </body>

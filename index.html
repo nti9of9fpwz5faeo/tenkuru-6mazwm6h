@@ -3822,7 +3822,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v320'; // NEXT：新規生成SEと役完成・得点吸い込み演出
+const APP_VER='v321'; // NEXT：3枚以下でも役の点が入るよう修正（3-3-4→ワンペア+2）
+// const APP_VER='v320'; // NEXT：新規生成SEと役完成・得点吸い込み演出
 // const APP_VER='v319'; // NEXT：中庭UI・画像数字・出す/捨てるSE・無制限の捨て札・AI三段階
 // const APP_VER='v318'; // 新モード「ネクスト」（仮名）試作：手札なし・次の札3枚だけ・先頭を出すか捨てるか・相手の次3枚も見える（NX_CFG）
 // const APP_VER='v317'; // 予告（v316）は「見る場所が減ってない」と判断して停止（TELE_CFG.enabled:false、コードは残置）
@@ -5658,7 +5659,8 @@ const NX_AI={easy:{label:'やさしい',delay:1250,jitter:600,read:.3,safe:.4},n
 const NX_ASSET='img/next-v319/';
 function nxDraw(q){while(q.length<NX_CFG.queueN+6){const v=Math.floor(Math.random()*5)+1;if(q.length>=2&&q.slice(-2).every(x=>x===v))continue;q.push(v);}return q;}
 function nxLegal(v,f){return Number.isInteger(v)&&v>=1&&v<=5&&f.length<4&&f.reduce((a,b)=>a+b,0)+v<=10&&canPlay(v,f.reduce((a,b)=>a+b,0),f);}
-function nxPoints(f){const r=f.length===4?calcPts(f):{total:1,label:'役なし'};return{total:r.total,label:r.label.split(' +')[0]};}
+function nxPoints(f){const r=calcPts(f); // v321: 枚数にかかわらず役を判定（3-3-4がワンペアにならなかった）
+return{total:r.total,label:r.label.split(' +')[0]};}
 function NxNumber({value,className=''}){return h('span',{className:'nx-number '+className,role:'img','aria-label':String(value)},String(value).split('').map((d,i)=>h('img',{key:i,src:NX_ASSET+'digit-'+d+'.webp',alt:'','aria-hidden':true,draggable:false})));}
 // Dedicated NEXT audio: newly generated samples, decoded before the first round.
 const NX_SOUND_FILES={play:'place',discard:'discard',complete:'complete'};

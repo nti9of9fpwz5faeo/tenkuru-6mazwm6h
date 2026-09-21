@@ -3757,7 +3757,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v316'; // 予告（TELE_CFG）：相手が札を決めた瞬間に場の合計・「あと」を相手の札込みで表示、札は光って0.7秒かけて飛ぶ。飛んでる間にこちらが押した札は「予約」され着地の直後に出る（10こえは弾く、もう一回押すと取り消し）
+const APP_VER='v317'; // 予告（v316）は「見る場所が減ってない」と判断して停止（TELE_CFG.enabled:false、コードは残置）
+// const APP_VER='v316'; // 予告 試作
 // const APP_VER='v315'; // 詰みスキップのボタンを場の中に重ねる配置に（レイアウトの高さを取らず、手札マットが下がらない）
 // const APP_VER='v314'; // 相手の札：カーソル移動中・降下中にこちらが場を変えてバーストになる場合は出さない／手札へ返す（相手の理不尽バーストをなくす）
 // const APP_VER='v313'; // 衝突セーフの対象を「相手の着地」だけでなく「場の合計が自分以外の理由で変わった直後」全部に拡大（0.4秒）
@@ -4065,7 +4066,7 @@ const CHRONO_CONFIG={
 // v178：1ラウンド目は5から、2ラウンド目以降は3から数える。GO表示あり。演出も元に戻した
 const COUNT_CFG={firstFrom:5,laterFrom:5,stepMs:650,goMs:650,laterSkip:false,tapSkip:false,comboSkip:false}; // v312 毎ラウンド5から。tapSkip=カウント中の手札タップで即GO(v194)、comboSkip=役完成後の「タップでスキップ」(v183)。どちらも廃止
 const TAP_PLACE_CFG={enabled:false}; // v312 v302の「手札→空き枠」2段階タップ（場に4枠）は廃止。札を直接タップ
-const TELE_CFG={enabled:true,flyMs:700}; // v316 予告：相手が札を決めた瞬間に合計を確定表示し、光らせて flyMs かけてゆっくり飛ばす（引っ込めない）。その間にこちらが出した札は相手の着地の直後に出る（通常・チャレンジのみ）
+const TELE_CFG={enabled:false,flyMs:700}; // v316 予告：相手が札を決めた瞬間に合計を確定表示し、光らせて flyMs かけてゆっくり飛ばす（引っ込めない）。その間にこちらが出した札は相手の着地の直後に出る（通常・チャレンジのみ）
 const STUCK_SKIP_CFG={enabled:true,checkMs:300,aiDelayMs:[500,1300]}; // v312 お互い物理的に10が作れない → 場に「スキップ」。両者が押したら残り時間0秒。AIは0.5〜1.3秒で押す
 const HAND_CFG={n:8}; // v311 通常対戦・チャレンジの手札枚数（ラッシュ/チャージ/サバイバルは10のまま）
 // ── v179 衝突事故の救済：相手の札が場に落ちた直後（COLLISION_MS以内）に出した札がバーストになるなら「事故」として手札に戻す。ペナルティなし ──

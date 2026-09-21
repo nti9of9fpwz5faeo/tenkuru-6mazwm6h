@@ -3751,7 +3751,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v312'; // 場の4枠（2段階タップ）廃止・毎ラウンド5からカウント・カウント/役完成のスキップ廃止・詰みスキップ（両者が押すと残り0秒）
+const APP_VER='v313'; // 衝突セーフの対象を「相手の着地」だけでなく「場の合計が自分以外の理由で変わった直後」全部に拡大（0.4秒）
+// const APP_VER='v312'; // 場の4枠（2段階タップ）廃止・毎ラウンド5からカウント・カウント/役完成のスキップ廃止・詰みスキップ（両者が押すと残り0秒）
 // const APP_VER='v311'; // 通常対戦・チャレンジの手札を8枚に（HAND_CFG.n、4列×2段）
 // const APP_VER='v310'; // ビリヤード：白玉2回接触で分解・1回目は銅色の輪郭
 // const APP_VER='v299'; // テンフォール：新デザイン素材（背景・盤面・札・マス・ボタン・合計/点数の枠・10完成/💥の演出・説明パネル）を組み込み。ルールは変更なし
@@ -6142,6 +6143,10 @@ function App(){
   const[skipOn,setSkipOn]=useState(false);const skipR=useRef(null); // v183 役完成の演出スキップ
   const countSkipR=useRef(null); // v194 カウントダウンのスキップ
   const dLandAtR=useRef(0),pLandAtR=useRef(0); // v179 相手／自分の札が場に落ちた時刻
+  // v313 場の合計が「自分以外の理由」で変わった時刻（相手の着地・場のリセット・環やギミックでの消去など全部）。p=自分から見て、d=相手から見て
+  const fieldChgR=useRef({p:0,d:0});
+  useEffect(()=>{const now=Date.now();if(now-pLandAtR.current>80)fieldChgR.current.p=now;if(now-dLandAtR.current>80)fieldChgR.current.d=now;},[fieldSum]);
+  const recentChangeFor=who=>Date.now()-Math.max(who==='player'?dLandAtR.current:pLandAtR.current,who==='player'?fieldChgR.current.p:fieldChgR.current.d)<COLLISION_MS;
   const[burstPos,setBurstPos]=useState({x:'50%',y:'45%'});
   const coreShiftR=useRef({active:false,used:false});
   const[champLine,setChampLine]=useState(null);const champLineT=useRef(null);
@@ -7820,7 +7825,7 @@ function App(){
       if(f.rf==='setra'){const n=freezeHand(SETRA_FREEZE_N,SETRA_FREEZE_SEC);if(n)r2Say('氷結 '+n+'枚',"#8fe0ff");} // v127
       if(f.rf==='orby')orbyRingFire(rn); // v140
       if(isGk(f.rf))gkFire(f.rf,rn,f.value); // v197
-      if(cs2+f.value>10&&COLLISION_MS>0&&Date.now()-pLandAtR.current<COLLISION_MS){ // v179 プレイヤーの札が落ちた直後の事故バースト → 相手も返却
+      if(cs2+f.value>10&&COLLISION_MS>0&&recentChangeFor('dealer')){ // v179/v313 場が変わった直後の事故バースト → 相手も返却
         setFlyCard(c=>c?{...c,back:true}:c);setTimeout(()=>setFlyCard(null),380);
         refundCharge(f);const h2=[...dHR.current,f.value],r2=[...dRingR.current,f.rf||false],ids2=[...dIdsR.current,f.id];setDealer(h2,r2,ids2);
         if(phaseR.current==='playing'&&!resolvingR.current)scheduleAi(rn);
@@ -7869,7 +7874,7 @@ function App(){
       try{resumeAC();}catch(e){}
       setRushBounce({i:idx,k:Date.now()});setTimeout(()=>setRushBounce(null),330);return;
     }
-    if(cs+value>10&&COLLISION_MS>0&&Date.now()-dLandAtR.current<COLLISION_MS){ // v179 相手の札が落ちた直後の事故バースト → 返却
+    if(cs+value>10&&COLLISION_MS>0&&recentChangeFor('player')){ // v179/v313 場が変わった直後（相手の着地・リセット・消去など何でも）の事故バースト → 返却
       if(!bounceMsgR.current){bounceMsgR.current=true;fxCollisionStamp();setTimeout(()=>{bounceMsgR.current=false;},900);}
       return;
     }

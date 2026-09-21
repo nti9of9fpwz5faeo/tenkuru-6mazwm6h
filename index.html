@@ -2140,6 +2140,11 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .gp-hand-area{position:relative;}
 .skip-veil{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(4,6,20,.62);cursor:pointer;-webkit-tap-highlight-color:transparent;animation:fadeUp .25s ease both;border-radius:inherit;}
 .skip-veil.light{background:rgba(4,6,20,.35);}
+/* v312 詰みスキップ（場の中） */
+.stuck-skip{display:flex;flex-direction:column;align-items:center;gap:calc(4 * var(--u));animation:fadeUp .25s ease both;}
+.stuck-skip-btn{font-family:'Noto Serif JP',serif;font-size:calc(15 * var(--u));letter-spacing:.2em;color:#e8ecff;padding:calc(8 * var(--u)) calc(22 * var(--u));border:1px solid rgba(200,210,255,.55);border-radius:999px;background:rgba(10,14,40,.7);box-shadow:0 0 12px rgba(140,180,255,.5);animation:skipPulse 1.4s ease-in-out infinite;cursor:pointer;}
+.stuck-skip-btn.pressed{opacity:.55;animation:none;}
+.stuck-skip-note{font-size:calc(10 * var(--u));color:#9fb0e0;letter-spacing:.08em;}
 .skip-veil span{font-family:'Noto Serif JP',serif;font-size:calc(15 * var(--u));letter-spacing:.25em;color:#e8ecff;text-shadow:0 0 12px rgba(140,180,255,.8);padding:calc(8 * var(--u)) calc(18 * var(--u));border:1px solid rgba(200,210,255,.45);border-radius:999px;background:rgba(10,14,40,.55);animation:skipPulse 1.4s ease-in-out infinite;}
 @keyframes skipPulse{0%,100%{opacity:.75}50%{opacity:1}}
 
@@ -3746,7 +3751,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v311'; // 通常対戦・チャレンジの手札を8枚に（HAND_CFG.n、4列×2段）
+const APP_VER='v312'; // 場の4枠（2段階タップ）廃止・毎ラウンド5からカウント・カウント/役完成のスキップ廃止・詰みスキップ（両者が押すと残り0秒）
+// const APP_VER='v311'; // 通常対戦・チャレンジの手札を8枚に（HAND_CFG.n、4列×2段）
 // const APP_VER='v310'; // ビリヤード：白玉2回接触で分解・1回目は銅色の輪郭
 // const APP_VER='v299'; // テンフォール：新デザイン素材（背景・盤面・札・マス・ボタン・合計/点数の枠・10完成/💥の演出・説明パネル）を組み込み。ルールは変更なし
 // const APP_VER='v298'; // テンフォール：手札10枚をやめて1〜5の数字ボタン5つに（何回でも押せる・押した数字が下のマスの左から入る）。入れ替えスワイプと案内文は削除。落ち札・💥・点数はそのまま
@@ -4047,11 +4053,13 @@ const CHRONO_CONFIG={
 // v174：2ラウンド目からはGO表示もなし（laterSkip:true）。開花が終わったらそのまま札が押せる。トランプの「スピード」のように区切りなく流れる
 // 戻す時は laterSkip:false（GOだけ出る）／firstFrom:5 stepMs:650 goMs:650 で v172 以前の形
 // v178：1ラウンド目は5から、2ラウンド目以降は3から数える。GO表示あり。演出も元に戻した
-const COUNT_CFG={firstFrom:5,laterFrom:3,stepMs:650,goMs:650,laterSkip:false};
+const COUNT_CFG={firstFrom:5,laterFrom:5,stepMs:650,goMs:650,laterSkip:false,tapSkip:false,comboSkip:false}; // v312 毎ラウンド5から。tapSkip=カウント中の手札タップで即GO(v194)、comboSkip=役完成後の「タップでスキップ」(v183)。どちらも廃止
+const TAP_PLACE_CFG={enabled:false}; // v312 v302の「手札→空き枠」2段階タップ（場に4枠）は廃止。札を直接タップ
+const STUCK_SKIP_CFG={enabled:true,checkMs:300,aiDelayMs:[500,1300]}; // v312 お互い物理的に10が作れない → 場に「スキップ」。両者が押したら残り時間0秒。AIは0.5〜1.3秒で押す
 const HAND_CFG={n:8}; // v311 通常対戦・チャレンジの手札枚数（ラッシュ/チャージ/サバイバルは10のまま）
 // ── v179 衝突事故の救済：相手の札が場に落ちた直後（COLLISION_MS以内）に出した札がバーストになるなら「事故」として手札に戻す。ペナルティなし ──
 // 自分で見て出したバーストはそのまま。相手側（AI）にも同じ救済がかかる。0にすると無効
-const COLLISION_MS=220;
+const COLLISION_MS=400; // v312 220→400：相手の札が落ちてから0.4秒以内（人の反応時間内）に出した札がバーストになるなら「衝突セーフ」で手札へ返す
 // ── v196 通常ステージのディーラー全体強化：数値はここだけで調整 ──
 // diffUp：判断の賢さを何段階上げるか（easy→normal→hard→master）。speed：出す速さの倍率（小さいほど速い。10を作る一手の下限220msは残る）
 // チャレンジ（ルナ・モルフォ・セトラ・オルビィ）は元から専用調整なので対象外。戻す時は enabled:false
@@ -6035,7 +6043,7 @@ function App(){
   const[tapPick,setTapPick]=useState(null),tapPickR=useRef(null);
   function setPlaces(values){fieldPlacesR.current=values;setFieldPlaces(values);}
   function clearTapPick(){tapPickR.current=null;setTapPick(null);}
-  function isTapPlace(){return !isTimedMode()&&!isStandardEnergy();}
+  function isTapPlace(){return TAP_PLACE_CFG.enabled&&!isTimedMode()&&!isStandardEnergy();} // v312
   function openFieldSlot(){const used=tapFieldPlaces(fieldR.current,fieldPlacesR.current);return [0,1,2,3].find(slot=>!used.includes(slot));}
   function fieldSlotEmpty(slot){return Number.isInteger(slot)&&slot>=0&&slot<4&&!tapFieldPlaces(fieldR.current,fieldPlacesR.current).includes(slot);}
   function chooseHandCard(index){
@@ -6721,6 +6729,44 @@ function App(){
   const[comboShow,setComboShow]=useState(null);const comboOnR=useRef(false);
   // v101: 監視。対戦中、相手の手札が環だけ／空になってたら補充する（どの経路で起きても拾う）
   const flowChkR=useRef(null);flowChkR.current=flowStuckCheck; // v176 補充・詰みチェックを0.7秒ごとに
+  // ── v312 詰みスキップ：場に出ている札＋両者の手札の全部を使っても10にできない → 「スキップ」ボタン。両者が押したら残り時間0秒 ──
+  const[stuckSkip,setStuckSkip]=useState(null);const stuckR=useRef(null);const stuckAiT=useRef(null);
+  function tenReachable(){
+    const fd=fieldR.current,fs=fieldSumR.current;if(fs===10)return true;
+    const cnt=[0,0,0,0,0,0];
+    pHR.current.forEach((v,i)=>{if(v!=null&&pFrzR.current[i]==null&&!pLockR.current[i])cnt[v]++;});
+    dHR.current.forEach((v,i)=>{if(v!=null&&!isHoldRing(dRingR.current[i]))cnt[v]++;});
+    const f=flyR.current;if(f&&f.value)cnt[f.value]++;
+    const dfs=(len,sum)=>{
+      if(sum===10)return true;if(sum>10||len>=4)return false;
+      for(let v=1;v<=5;v++){if(!cnt[v])continue;if(!canPlay(v,sum,Array(len).fill(1)))continue;cnt[v]--;const ok=dfs(len+1,sum+v);cnt[v]++;if(ok)return true;}
+      return false;
+    };
+    return dfs(fd.length,fs);
+  }
+  function clearStuck(){clearTimeout(stuckAiT.current);if(stuckR.current){stuckR.current=null;setStuckSkip(null);}}
+  function stuckSkipCheck(){
+    if(!STUCK_SKIP_CFG.enabled||isTimedMode()||FLOW_CFG.enabled){clearStuck();return;}
+    if(phaseR.current!=='playing'||countNumR.current>=0||resolvingR.current||lockR.current||pausedR.current||pStopR.current||rStopR.current||sceneOnR.current||eraseBusyR.current){clearStuck();return;}
+    if(!pHR.current.some(v=>v!=null)||!dHR.current.length){clearStuck();return;} // 補充待ち
+    if(tenReachable()){clearStuck();return;}
+    const key=rnR.current+':'+fieldR.current.join(',')+':'+pHR.current.join(',')+':'+dHR.current.join(',');
+    if(stuckR.current&&stuckR.current.key===key)return;
+    clearTimeout(stuckAiT.current);
+    const st={key,p:false,d:false,rn:rnR.current};stuckR.current=st;setStuckSkip({...st});
+    const[a,b]=STUCK_SKIP_CFG.aiDelayMs;
+    stuckAiT.current=setTimeout(()=>{if(stuckR.current===st)pressStuckSkip('dealer');},a+Math.random()*(b-a));
+  }
+  function pressStuckSkip(who){
+    const st=stuckR.current;if(!st||phaseR.current!=='playing'||resolvingR.current)return;
+    if(who==='player')st.p=true;else st.d=true;setStuckSkip({...st});
+    if(st.p&&st.d){ // 両者スキップ → 残り時間を0秒にして時間切れの流れへ
+      clearTimeout(stuckAiT.current);stuckR.current=null;setStuckSkip(null);
+      clearInterval(timerRef.current);clearTimeout(aiRef.current);setTimeLeft(0);timeLeftR.current=0;doTimeUp(st.rn);
+    }
+  }
+  const stuckChkR=useRef(null);stuckChkR.current=stuckSkipCheck;
+  useEffect(()=>{const id=setInterval(()=>{try{stuckChkR.current&&stuckChkR.current();}catch(e){}},STUCK_SKIP_CFG.checkMs);return()=>clearInterval(id);},[]);
   useEffect(()=>{if(!FLOW_CFG.enabled)return;const id=setInterval(()=>{try{flowChkR.current&&flowChkR.current();}catch(e){}},FLOW_CFG.stuckCheckMs);return()=>clearInterval(id);},[]);
   useEffect(()=>{const id=setInterval(()=>{try{const so=stageOptsR.current;if(!so||!so.challenge||phaseR.current!=='playing'||countNumR.current>=0||resolvingR.current||sceneOnR.current)return;ensureDealerRefill();}catch(e){}},800);return()=>clearInterval(id);},[]);
   useEffect(()=>{comboOnR.current=!!comboShow;if(comboShow)setSkillFx(null);else setTimeout(flushSkillQ,250);},[comboShow]);
@@ -7007,7 +7053,7 @@ function App(){
     const skip=rn>1&&COUNT_CFG.laterSkip; // v174 区切りなし
     let c=isTimedMode()?(rn===1?3:0):(goOnly?0:(rn===1?COUNT_CFG.firstFrom:COUNT_CFG.laterFrom));if(!skip){setCountNum(c);countNumR.current=c;} // v173 / v183 スキップ時はGOだけ
     // v194 カウント中に手札エリアをタップ → 残りを飛ばして即GO
-    countSkipR.current=()=>{if(c<=0)return;clearTimeout(countRef.current);c=0;tick();};
+    countSkipR.current=COUNT_CFG.tapSkip?()=>{if(c<=0)return;clearTimeout(countRef.current);c=0;tick();}:null; // v312 廃止
     const countTok=roundTokR.current;
     function tick(){
       if(countTok!==roundTokR.current)return;
@@ -7973,7 +8019,7 @@ function App(){
         const nr=rn+1;setRNum(nr);doCountdown(pHR.current,dHR.current,newPP,newDP,nr,skipped); // スキップ時は 3-2-1 を飛ばして GO から
       };
       const waitT=setTimeout(()=>proceed(false),waitMs);
-      if(!flow&&!shiftNow){skipR.current=()=>proceed(true);setSkipOn(true);}
+      if(!flow&&!shiftNow&&COUNT_CFG.comboSkip){skipR.current=()=>proceed(true);setSkipOn(true);} // v312 廃止
         }
   function resetField(){setField([]);setPlaces([]);clearTapPick();setFieldSum(0);fieldR.current=[];fieldSumR.current=0;setFieldColors([]);colorsR.current=[];setFieldSp([]);setFieldShift([]);setFieldRing([]);}
   function endGame(pp,dp,byTime,afterFx){
@@ -8203,6 +8249,9 @@ function App(){
         standardEnergy&&Array.from({length:Math.max(0,4-field.length)},(_,i)=>h('div',{key:'energy-slot'+i,className:'energy-field-slot','aria-hidden':true}))
       ),
       tapPlace&&h('div',{className:'tp-hint',role:'status'},tapPick?'置く枠をタップ':'手札 → 空き枠'),
+      stuckSkip&&h('div',{className:'stuck-skip'}, // v312 詰みスキップ
+        h('button',{type:'button',className:'stuck-skip-btn'+(stuckSkip.p?' pressed':''),disabled:stuckSkip.p,onClick:()=>{try{resumeAC();}catch(e){}pressStuckSkip('player');}},stuckSkip.p?'スキップ待ち…':'スキップ'),
+        h('div',{className:'stuck-skip-note'},'10にできない　',stuckSkip.d?'相手：スキップ済':'相手：考え中')),
       // FIELD SUM（場のカードの下・前の配置に戻す＋少し強化）
       h('div',{className:'gp-field-sum gp-field-sum-strong',style:{visibility:fieldSum>0?'visible':'hidden'}},
         h('div',{className:'main'},
@@ -8225,7 +8274,7 @@ function App(){
       onClickCapture:so.survival?(e=>{if(swipedR.current){e.stopPropagation();e.preventDefault();}}):undefined},
       so.survival&&h('div',{className:'survival-reserve'},h('span',{className:'ic'},'🂠'),h('b',null,resv.p)),
       skipOn&&h('div',{className:'skip-veil',onClick:()=>{const f=skipR.current;if(f){try{resumeAC();}catch(e){}f();}}},h('span',null,'タップでスキップ')), // v183
-      !skipOn&&countNum>0&&phase==='playing'&&h('div',{className:'skip-veil light',onClick:()=>{const f=countSkipR.current;if(f){try{resumeAC();}catch(e){}f();}}},h('span',null,'タップで開始')), // v194 カウント中も手札タップで即GO
+      COUNT_CFG.tapSkip&&!skipOn&&countNum>0&&phase==='playing'&&h('div',{className:'skip-veil light',onClick:()=>{const f=countSkipR.current;if(f){try{resumeAC();}catch(e){}f();}}},h('span',null,'タップで開始')), // v194 カウント中も手札タップで即GO
       r2Banner&&h('div',{className:'hand-hud'},
         h('div',{className:'sr-banner',style:{borderColor:r2Banner.color,boxShadow:'0 0 16px '+r2Banner.color}},r2Banner.text)
       ),

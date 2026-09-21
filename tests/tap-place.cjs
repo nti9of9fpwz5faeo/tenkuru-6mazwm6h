@@ -1,5 +1,6 @@
 const assert=require('node:assert/strict');
 const {engine}=require('./rush-mode.cjs');
+if(/TAP_PLACE_CFG=\{enabled:false\}/.test(require('node:fs').readFileSync(require('node:path').join(__dirname,'..','index.html'),'utf8'))){console.log('SKIP: tap-place is disabled (v312 TAP_PLACE_CFG.enabled=false)');process.exit(0);}
 const walk=(x,out=[])=>{if(x&&typeof x==='object'){out.push(x);(x.children||[]).flat(Infinity).forEach(y=>walk(y,out));}return out;};
 const has=(x,c)=>(x.props.className||'').split(' ').includes(c);
 function start(){const e=engine();e.app.startGame('normal');while(e.app.countNumR.current>=0)e.clock.advance(1);e.app.dealPlayer([1,2,3,4,5,1,2,3,4,5]);return e;}

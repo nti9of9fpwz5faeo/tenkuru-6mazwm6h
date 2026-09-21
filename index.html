@@ -1597,6 +1597,11 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .bf-btn:active{transform:scale(.97);filter:brightness(1.1);}
 @keyframes flyDown{0%{transform:translate(var(--x0),var(--y0)) scale(.62);opacity:.9;}25%{opacity:1;}100%{transform:translate(var(--x1),var(--y1)) scale(1);opacity:1;}}
 .fly-card.back{animation:flyBack .35s ease-in both;}
+/* v316 予告：光って飛ぶ */
+.fly-card.tele{box-shadow:0 0 calc(10 * var(--u)) calc(3 * var(--u)) rgba(255,214,120,.85),0 0 calc(26 * var(--u)) calc(8 * var(--u)) rgba(255,180,80,.45);animation:flyDown var(--d) cubic-bezier(.3,.1,.5,1) both,telePulse .35s ease-in-out infinite alternate;}
+@keyframes telePulse{from{filter:brightness(1)}to{filter:brightness(1.35)}}
+.gp-field-sum .num.pend{color:#ffd270;text-shadow:0 0 10px rgba(255,200,90,.9);}
+.player-hand-slot.queued .card-stage{filter:brightness(1.25) drop-shadow(0 0 calc(6 * var(--u)) rgba(120,200,255,.9));transform:translateY(calc(-6 * var(--u)));transition:transform .15s;}
 @keyframes flyBack{0%{transform:translate(var(--x1),var(--y1)) scale(1);opacity:1;}100%{transform:translate(var(--x0),var(--y0)) scale(.6);opacity:0;}}
 /* v91: 一時停止ボタン（曲ボタンの真下）とオーバーレイ */
 .gp-pause-btn{position:absolute;right:calc(12 * var(--u));top:calc(84 * var(--u));width:calc(40 * var(--u));height:calc(30 * var(--u));border-radius:calc(10 * var(--u));z-index:6;
@@ -3752,7 +3757,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v315'; // 詰みスキップのボタンを場の中に重ねる配置に（レイアウトの高さを取らず、手札マットが下がらない）
+const APP_VER='v316'; // 予告（TELE_CFG）：相手が札を決めた瞬間に場の合計・「あと」を相手の札込みで表示、札は光って0.7秒かけて飛ぶ。飛んでる間にこちらが押した札は「予約」され着地の直後に出る（10こえは弾く、もう一回押すと取り消し）
+// const APP_VER='v315'; // 詰みスキップのボタンを場の中に重ねる配置に（レイアウトの高さを取らず、手札マットが下がらない）
 // const APP_VER='v314'; // 相手の札：カーソル移動中・降下中にこちらが場を変えてバーストになる場合は出さない／手札へ返す（相手の理不尽バーストをなくす）
 // const APP_VER='v313'; // 衝突セーフの対象を「相手の着地」だけでなく「場の合計が自分以外の理由で変わった直後」全部に拡大（0.4秒）
 // const APP_VER='v312'; // 場の4枠（2段階タップ）廃止・毎ラウンド5からカウント・カウント/役完成のスキップ廃止・詰みスキップ（両者が押すと残り0秒）
@@ -4059,6 +4065,7 @@ const CHRONO_CONFIG={
 // v178：1ラウンド目は5から、2ラウンド目以降は3から数える。GO表示あり。演出も元に戻した
 const COUNT_CFG={firstFrom:5,laterFrom:5,stepMs:650,goMs:650,laterSkip:false,tapSkip:false,comboSkip:false}; // v312 毎ラウンド5から。tapSkip=カウント中の手札タップで即GO(v194)、comboSkip=役完成後の「タップでスキップ」(v183)。どちらも廃止
 const TAP_PLACE_CFG={enabled:false}; // v312 v302の「手札→空き枠」2段階タップ（場に4枠）は廃止。札を直接タップ
+const TELE_CFG={enabled:true,flyMs:700}; // v316 予告：相手が札を決めた瞬間に合計を確定表示し、光らせて flyMs かけてゆっくり飛ばす（引っ込めない）。その間にこちらが出した札は相手の着地の直後に出る（通常・チャレンジのみ）
 const STUCK_SKIP_CFG={enabled:true,checkMs:300,aiDelayMs:[500,1300]}; // v312 お互い物理的に10が作れない → 場に「スキップ」。両者が押したら残り時間0秒。AIは0.5〜1.3秒で押す
 const HAND_CFG={n:8}; // v311 通常対戦・チャレンジの手札枚数（ラッシュ/チャージ/サバイバルは10のまま）
 // ── v179 衝突事故の救済：相手の札が場に落ちた直後（COLLISION_MS以内）に出した札がバーストになるなら「事故」として手札に戻す。ペナルティなし ──
@@ -6458,6 +6465,16 @@ function App(){
   }
   function showSkillCustom(jp,en,color){const item={k:Date.now(),jp,en,color};if(comboOnR.current||resolvingR.current){skillQ.current.push(item);return;}setSkillFx(item);setTimeout(()=>setSkillFx(s=>s&&s.k===item.k?null:s),2000);} // v143: 技名を読む時間を確保
   const flyR=useRef(null);const[flyCard,setFlyCard]=useState(null); // v107 降りてくる相手の札
+  // v316 予告：pending=飛んでる相手の札の数字（表示用）、pQueue=その間にこちらが押した札（着地後に出す）
+  const[pending,setPending]=useState(null);const pendingR=useRef(null);function setPend(v){pendingR.current=v;setPending(v);}
+  const[pQueue,setPQueue]=useState(null);const pQueueR=useRef(null);function setPQ(v){pQueueR.current=v;setPQueue(v);}
+  function teleOn(){return TELE_CFG.enabled&&!isTimedMode();}
+  function flushPQueue(){ // 相手の着地直後：予約した札を出す（もう出せなければ黙って解除）
+    const q=pQueueR.current;if(!q)return;setPQ(null);
+    const v=pHR.current[q.idx],cs=fieldSumR.current,cf=fieldR.current;
+    if(v!==q.value||phaseR.current!=='playing'||resolvingR.current||lockR.current||!canPlay(v,cs,cf)||cs+v>10)return;
+    playCard(q.idx);
+  }
   // v109 選択カーソル：常に相手の手札のどこかにいて、出す札まで1枚ずつ移動→タップ→降下
   const[dCur,setDCur]=useState({id:null,tap:false});const dCurR=useRef(null);const curBusyR=useRef(false);const curT=useRef([]);const curTokR=useRef(0);
   // cardSpeed still scales thinking/flight, but both cursors use HAND_NAV.stepMs.
@@ -7048,7 +7065,7 @@ function App(){
       return;
     }
     const keepT=FLOW_CFG.enabled&&rn>1;rnR.current=rn;skipR.current=null;setSkipOn(false); // v175 2回目以降は試合タイマーを止めない / v183
-    setEnergyReward(null);
+    setEnergyReward(null);setPend(null);setPQ(null); // v316
     roundTokR.current++;    // 古い遷移予約を全部無効化
     if(keepT){clearTimeout(aiRef.current);clearTimeout(countRef.current);}else clearTimers(); // 残ってるカウントダウン/タイマーも掃除
     resolvingR.current=false;exitLink(); // v54: 時間停止の残骸を必ず解除
@@ -7806,8 +7823,8 @@ function App(){
     setDealer(newDH,newRf,newIds);
     const _so2=stageOptsR.current||{};
     // v135: 初手だけ降下も速める
-    const FLY_MS=Math.max(120,Math.round(((fieldR.current.length===0&&_so2.flyMsFirst)?_so2.flyMsFirst:(_so2.flyMs||(_so2.speed<1?380:680)))*_csK())); // v240 降下も cardSpeed で速く
-    flyR.current={id:pick.id,value:chosen,face,rf:pickedRf,placeSlot,sumAt:cs,chargePaid:isCharge(),energyPaid:isStandardEnergy()?chosen:0};setFlyCard({k:Date.now(),value:chosen,face,x0,y0,x1,y1,w:cardW,d:FLY_MS});
+    const FLY_MS=teleOn()?TELE_CFG.flyMs:Math.max(120,Math.round(((fieldR.current.length===0&&_so2.flyMsFirst)?_so2.flyMsFirst:(_so2.flyMs||(_so2.speed<1?380:680)))*_csK())); // v240 降下も cardSpeed で速く / v316 予告はゆっくり
+    flyR.current={id:pick.id,value:chosen,face,rf:pickedRf,placeSlot,sumAt:cs,chargePaid:isCharge(),energyPaid:isStandardEnergy()?chosen:0};setFlyCard({k:Date.now(),value:chosen,face,x0,y0,x1,y1,w:cardW,d:FLY_MS,tele:teleOn()});if(teleOn())setPend(chosen); // v316
     try{fxAir({v:0.03,a:0.02,d:0.5,hp:4000,rev:0.5});}catch(e){}
     const flight=flyR.current; // 返却した同じ札を再び投げても、古い着地処理と区別する
     setTimeout(()=>{
@@ -7816,8 +7833,9 @@ function App(){
       flyR.current=null;
       const cf2=fieldR.current,cs2=fieldSumR.current;
       const ok=phaseR.current==='playing'&&countNumR.current<0&&!resolvingR.current&&!eraseBusyR.current&&!pausedR.current&&!pStopR.current&&(!isTapPlace()||fieldSlotEmpty(f.placeSlot))&&canPlay(f.value,cs2,cf2)&&!(isRush()&&cs2+f.value>10); // v293 ラッシュは10こえを着地させず手札へ返す / v137: 時間停止中は着地させず手札へ返す（10超えはバーストとして着地する）
+      setPend(null); // v316
       if(!ok){ // 戻す
-        setFlyCard(c=>c?{...c,back:true}:c);setTimeout(()=>setFlyCard(null),380);
+        setFlyCard(c=>c?{...c,back:true}:c);setTimeout(()=>setFlyCard(null),380);setPQ(null);
         refundCharge(f);const h2=[...dHR.current,f.value],r2=[...dRingR.current,f.rf||false],ids2=[...dIdsR.current,f.id];setDealer(h2,r2,ids2);
         if(phaseR.current==='playing'&&!resolvingR.current)scheduleAi(rn);
         return;
@@ -7841,6 +7859,7 @@ function App(){
       dLandAtR.current=Date.now(); // v179
       const ended=resolvePlay(f.value,cf2,cs2,'dealer',rn,false,false,f.placeSlot);
       if(isSurvival()&&checkSurvivalEmpty())return;
+      if(!ended&&pQueueR.current)setTimeout(flushPQueue,40); else setPQ(null); // v316 予約した札を続けて出す
       if(!ended)scheduleAi(rn);
     },FLY_MS);
   }
@@ -7872,6 +7891,14 @@ function App(){
     let value=hand[idx];
     if(confuseR.current[idx]!=null){value=confuseR.current[idx];} // v112: 幻惑中は見えてる数字が出る
     // v163: バースト制に戻す。canPlayが通す手はそのまま出せる（10超えはバースト）
+    if(teleOn()&&flyR.current&&pendingR.current!=null&&!resolvingR.current){ // v316 相手の札が飛んでる間：相手の札込みの合計で判定して「予約」
+      const rs=cs+pendingR.current,rf=[...cf,pendingR.current];
+      if(!value||!canPlay(value,rs,rf))return;
+      if(rs+value>10){try{resumeAC();}catch(e){}setRushBounce({i:idx,k:Date.now()});setTimeout(()=>setRushBounce(null),330);return;} // 10こえは弾く（相手の着地後に理不尽バーストにしない）
+      if(pQueueR.current&&pQueueR.current.idx===idx){setPQ(null);return;} // もう一回押したら取り消し
+      try{resumeAC();playPlaceSE(true);}catch(e){}
+      setPQ({idx,value});return;
+    }
     if(!value||!canPlay(value,cs,cf))return;
     if(isRush()&&cs+value>10){ // v293 10秒ラッシュ：バーストなし。10をこえる札ははじき返す
       try{resumeAC();}catch(e){}
@@ -8218,7 +8245,7 @@ function App(){
       lkFx.smoke.map(sm=>h('div',{key:sm.k,className:'bf-smoke'+(sm.f?' f':'')+(lkFx.dust==='out'?' out':' hold'),style:{left:sm.x+'px',top:sm.y+'px','--dx':sm.dx,'--r0':sm.r0,'--r1':sm.r1,'--d':sm.d,'--dl':'0s'}})),
       lkFx.scales.map(s=>h('div',{key:s.k,className:'bf-scale',style:{left:s.x+'px',top:s.y+'px','--dx':s.dx,'--dy':s.dy,'--d':s.d}}))
     ),
-    flyCard&&h('div',{key:flyCard.k,className:'fly-card'+(flyCard.back?' back':'')+(flyCard.face?' face-'+flyCard.face:''),style:{'--fw':flyCard.w+'px','--x0':flyCard.x0+'px','--y0':flyCard.y0+'px','--x1':flyCard.x1+'px','--y1':flyCard.y1+'px','--d':flyCard.d+'ms'}},flyCard.value),
+    flyCard&&h('div',{key:flyCard.k,className:'fly-card'+(flyCard.back?' back':'')+(flyCard.face?' face-'+flyCard.face:'')+(flyCard.tele?' tele':''),style:{'--fw':flyCard.w+'px','--x0':flyCard.x0+'px','--y0':flyCard.y0+'px','--x1':flyCard.x1+'px','--y1':flyCard.y1+'px','--d':flyCard.d+'ms'}},flyCard.value),
     // v91: 一時停止
     paused&&!survivalHelp&&h('div',{className:'pause-veil'},h('section',{className:'cursor-pause-card',role:'dialog','aria-modal':true,'aria-label':'一時停止'},h('h2',null,'一時停止'),h(ControlSettings,{side:controlSide,onChange:changeControlSide}),h('button',{onClick:togglePause,autoFocus:true},'再開'),h('button',{onClick:goHome},'対戦を終了'))),
 
@@ -8263,10 +8290,10 @@ function App(){
       // FIELD SUM（場のカードの下・前の配置に戻す＋少し強化）
       h('div',{className:'gp-field-sum gp-field-sum-strong',style:{visibility:fieldSum>0?'visible':'hidden'}},
         h('div',{className:'main'},
-          h('span',{className:'num'+((fieldSum>=8&&fieldSum<10)?(fieldColors[fieldColors.length-1]==='player'?' alert-blue':' alert'):fieldSum>=5?' warn':'')},mist?'?':fieldSum), // v197 霧
+          h('span',{className:'num'+((fieldSum>=8&&fieldSum<10)?(fieldColors[fieldColors.length-1]==='player'?' alert-blue':' alert'):fieldSum>=5?' warn':'')+(pending!=null?' pend':'')},mist?'?':(pending!=null?fieldSum+pending:fieldSum)), // v197 霧 / v316 予告中は相手の札込み
           h('span',{className:'sep'},'/ 10')
         ),
-        h('div',{className:'ato'},'あと ',h('b',null,10-fieldSum))
+        h('div',{className:'ato'},'あと ',h('b',null,10-fieldSum-(pending!=null?pending:0)))
       )
     ),
 
@@ -8299,7 +8326,7 @@ function App(){
           const unavailable=v==null||chargeEmpty||(standardEnergy&&energy.player+1e-9<dv)||countNum>=0||!canPlay(dv,fieldSum,field)||rStop||!!pLock[i]||pFrz[i]!=null||(cmdIdx!=null&&cmdIdx!==i);
           const directTap=tapPlace||standardEnergy||so.rush; // v293 ラッシュはカーソルをやめて直接タップ
           const legacyTap=!directTap&&!so.charge&&!so.survival; // v296 通常・チャレンジは十字キー前と同じく札そのものをタップ
-          return h(directTap?'button':'div',{key:i,type:directTap?'button':undefined,onClick:tapPlace?()=>chooseHandCard(i):standardEnergy?()=>playCard(i):so.rush?()=>{if(countNumR.current>0){countSkipR.current&&countSkipR.current();return;}if(skipR.current&&resolvingR.current){skipR.current();return;}playCard(i);}:undefined,disabled:tapPlace?(unavailable||!playerCanNavigate()):standardEnergy?(unavailable||paused||resolvingR.current||lockR.current):so.rush?(v==null||paused):undefined,className:'player-hand-slot'+(legacyTap?' legacy-tap':'')+(v==null?' empty':'')+((tapPlace&&tapPick&&tapPick.index===i)||(!directTap&&!legacyTap&&pCursor===i)?' selected':'')+(so.rush&&rushBounce&&rushBounce.i===i?' rush-bounce':''),'data-slot':i,'aria-label':v==null?'空き枠':(dk?'裏向き':dv)+'のカード','aria-pressed':tapPlace?!!(tapPick&&tapPick.index===i):undefined,'aria-current':!directTap&&!legacyTap&&pCursor===i?'true':undefined},
+          return h(directTap?'button':'div',{key:i,type:directTap?'button':undefined,onClick:tapPlace?()=>chooseHandCard(i):standardEnergy?()=>playCard(i):so.rush?()=>{if(countNumR.current>0){countSkipR.current&&countSkipR.current();return;}if(skipR.current&&resolvingR.current){skipR.current();return;}playCard(i);}:undefined,disabled:tapPlace?(unavailable||!playerCanNavigate()):standardEnergy?(unavailable||paused||resolvingR.current||lockR.current):so.rush?(v==null||paused):undefined,className:'player-hand-slot'+(legacyTap?' legacy-tap':'')+(v==null?' empty':'')+(pQueue&&pQueue.idx===i?' queued':'')+((tapPlace&&tapPick&&tapPick.index===i)||(!directTap&&!legacyTap&&pCursor===i)?' selected':'')+(so.rush&&rushBounce&&rushBounce.i===i?' rush-bounce':''),'data-slot':i,'aria-label':v==null?'空き枠':(dk?'裏向き':dv)+'のカード','aria-pressed':tapPlace?!!(tapPick&&tapPick.index===i):undefined,'aria-current':!directTap&&!legacyTap&&pCursor===i?'true':undefined},
             v!=null&&h(SlideCard,{value:dk?'?':dv,dark:dk,onPlay:legacyTap?()=>playCard(i):()=>{},disabled:unavailable,cardState:countNum>=0?null:handCardState(dv,fieldSum,field),frozen:pFrz[i],justFrozen:justFrz.includes(i),pRing:pRing===i,shuffling:shufAll,marked:marked.includes(i),newRefill:so.survival&&survivalReward&&survivalReward.who==='player'&&performance.now()<survivalReward.until&&survivalReward.slots.includes(i),cardRole:'player',isSpecial:!!pSp[i],linkPick:linkMode&&canPlay(dv,fieldSum,field),rLock:!!pLock[i],rCmd:cmdIdx===i,rWait:cmdIdx!=null&&cmdIdx!==i,confused:confuse[i]!=null}));
         }))))
     ),

@@ -2523,6 +2523,9 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .nx-card.nx-preview-1{left:49.3%;}.nx-card.nx-preview-2{left:62.4%;}
 .nx-next-label{position:absolute;left:29.6%;width:17.3%;text-align:center;color:#fff5db;font:700 clamp(11px,3.6vw,20px) Georgia,serif;line-height:1;text-shadow:0 1px 2px #351b04;pointer-events:none;}
 .nx-next-label.d{top:18.2%;}.nx-next-label.p{top:62.2%;}
+/* v322: NX_CFG.mat:false で赤青の手札マットなし背景（court-nomat.webp）。戻すときは mat:true */
+.nx-stage.nx-nomat{background-image:url('img/next-v319/court-nomat.webp');}
+.nx-stage.nx-nomat .nx-next-label{color:#734512;text-shadow:0 1px 0 #fff3d6;}.nx-stage.nx-nomat .nx-next-label.p{color:#16447b;}
 .nx-field-card{top:39.45%;animation:nx-land .18s ease-out;}
 .nx-sum{position:absolute;left:25.7%;top:54%;width:48%;height:4.4%;display:flex;align-items:center;justify-content:center;gap:5%;white-space:nowrap;}
 .nx-sum .nx-target{height:52%;display:flex;align-items:center;gap:3px;}.nx-sum .nx-target i{font:normal clamp(15px,4.5vw,27px) Georgia,serif;}.nx-sum .nx-left{display:flex;align-items:center;height:100%;gap:5px;margin-left:6%;}.nx-left small{font:bold clamp(10px,2.8vw,16px) sans-serif;}
@@ -3822,7 +3825,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v321'; // NEXT：3枚以下でも役の点が入るよう修正（3-3-4→ワンペア+2）
+const APP_VER='v322'; // NEXT：赤青の手札マットを消してみる（NX_CFG.mat で戻せる）
+// const APP_VER='v321'; // NEXT：3枚以下でも役の点が入るよう修正（3-3-4→ワンペア+2）
 // const APP_VER='v320'; // NEXT：新規生成SEと役完成・得点吸い込み演出
 // const APP_VER='v319'; // NEXT：中庭UI・画像数字・出す/捨てるSE・無制限の捨て札・AI三段階
 // const APP_VER='v318'; // 新モード「ネクスト」（仮名）試作：手札なし・次の札3枚だけ・先頭を出すか捨てるか・相手の次3枚も見える（NX_CFG）
@@ -5654,7 +5658,7 @@ function SeparateMode({onBack}){
    h('button',{className:'sp-sub',onClick:onBack},'ホームへ'))));
 }
 // ── v318 ネクスト（仮名）：手札なし。自分の「次の札」3枚だけ見える（テトリスのNEXT）。できるのは先頭を「出す」か「捨てる」だけ。相手の次3枚も丸見え ──
-const NX_CFG={winPt:10,roundSec:10,queueN:3,countFrom:5,countStepMs:650,goMs:500,tenHoldMs:1500,timeUpMs:1200};
+const NX_CFG={mat:false,winPt:10,roundSec:10,queueN:3,countFrom:5,countStepMs:650,goMs:500,tenHoldMs:1500,timeUpMs:1200};
 const NX_AI={easy:{label:'やさしい',delay:1250,jitter:600,read:.3,safe:.4},normal:{label:'ふつう',delay:650,jitter:650,read:.7,safe:.55},hard:{label:'つよい',delay:360,jitter:300,read:.95,safe:.85}};
 const NX_ASSET='img/next-v319/';
 function nxDraw(q){while(q.length<NX_CFG.queueN+6){const v=Math.floor(Math.random()*5)+1;if(q.length>=2&&q.slice(-2).every(x=>x===v))continue;q.push(v);}return q;}
@@ -5775,7 +5779,7 @@ function NextMode({onBack}){
   h('span',{className:'nx-next-label '+who},'NEXT'),
   (who==='p'?st.pQ:st.dQ).slice(0,3).map((v,i)=>card(v,who,i===0?'nx-head'+(who==='p'&&bounce?' nx-reject':' nx-discarding'):'nx-preview nx-preview-'+i,
    {key:who+'-'+i+'-'+(who==='p'?st.pSerial:st.dSerial)+(i===0&&who==='p'?'-'+bounce:''),...(i===0&&who==='p'?{onClick:()=>play('p'),disabled:st.phase!=='play'}:{})})));
- return h('main',{className:'nx-screen'},h('div',{className:'nx-stage'+(st.msg?.points?' nx-completed':'')},
+ return h('main',{className:'nx-screen'},h('div',{className:'nx-stage'+(NX_CFG.mat?'':' nx-nomat')+(st.msg?.points?' nx-completed':'')},
   h('button',{className:'nx-back',onClick:leave,'aria-label':'ホームへ戻る'},'‹'),
   h('div',{className:scoreClass('d'),'aria-label':'相手のスコア '+visibleScore('d')},h(NxNumber,{value:visibleScore('d')})),
   h('span',{className:'nx-score-label d'},'相手'),

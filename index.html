@@ -3597,7 +3597,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v324'; // 軽量化①：カラールーム・セパレート・エナジー・サイコロ・4×4対戦・ひとりモード・テンフォールをコードごと削除（画像・shared-board.js/css も）
+const APP_VER='v325'; // 自動更新：version.txt を見て新しい版があれば読み直す
+// const APP_VER='v324'; // 軽量化①：カラールーム・セパレート・エナジー・サイコロ・4×4対戦・ひとりモード・テンフォールをコードごと削除（画像・shared-board.js/css も）
 // const APP_VER='v323'; // NEXT：背景をホーム表示後に先読み
 // const APP_VER='v322'; // NEXT：赤青の手札マットを消してみる（NX_CFG.mat で戻せる）
 // const APP_VER='v321'; // NEXT：3枚以下でも役の点が入るよう修正（3-3-4→ワンペア+2）
@@ -7745,6 +7746,23 @@ function App(){
 
 // v323: ネクストの背景（court/court-nomat）と札をホーム表示後に先読み（入った時の待ちをなくす）
 setTimeout(()=>{preloadImages(['img/next-v319/'+(NX_CFG.mat?'court':'court-nomat')+'.webp','img/next-v319/card.webp'],8000);},1500);
+// v325 自動更新：起動時と、アプリが前面に戻った時に version.txt（キャッシュ無視）を見て、APP_VER と違えば新しい版を読み直す。
+// 同じ版への読み直しは1回だけ（GitHub Pages 側がまだ古い時の無限リロード防止）。version.txt は APP_VER と一緒に必ず更新する。
+(function(){
+  const KEY='tenkuru-reload-for';let last=0;
+  async function check(){
+    if(Date.now()-last<30000)return;last=Date.now();
+    try{
+      const r=await fetch('version.txt?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;
+      const v=(await r.text()).trim();if(!v||v===APP_VER)return;
+      if(localStorage.getItem(KEY)===v)return;
+      localStorage.setItem(KEY,v);
+      location.replace(location.pathname+'?v='+encodeURIComponent(v));
+    }catch(e){}
+  }
+  check();
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')check();});
+})();
 ReactDOM.createRoot(document.getElementById('root')).render(h(React.Fragment,null,h(App,null),h(FxLayer,null))); // v233 FxLayer=画面の一番上のエフェクト層
 </script>
 </body>

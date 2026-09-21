@@ -3746,7 +3746,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v310'; // ビリヤード：白玉2回接触で分解・1回目は銅色の輪郭
+const APP_VER='v311'; // 通常対戦・チャレンジの手札を8枚に（HAND_CFG.n、4列×2段）
+// const APP_VER='v310'; // ビリヤード：白玉2回接触で分解・1回目は銅色の輪郭
 // const APP_VER='v299'; // テンフォール：新デザイン素材（背景・盤面・札・マス・ボタン・合計/点数の枠・10完成/💥の演出・説明パネル）を組み込み。ルールは変更なし
 // const APP_VER='v298'; // テンフォール：手札10枚をやめて1〜5の数字ボタン5つに（何回でも押せる・押した数字が下のマスの左から入る）。入れ替えスワイプと案内文は削除。落ち札・💥・点数はそのまま
 // const APP_VER='v297'; // セパレート（試作）：場を2人で分ける。自分の札は自分の場だけ、ぴったり10で役の点、10こえははじき返す、相手が10を作ると自分の場はリセット（札は捨て）、先に15点で勝ち。出せる札がなければその場をリセット。数値は SEP_CFG
@@ -4047,6 +4048,7 @@ const CHRONO_CONFIG={
 // 戻す時は laterSkip:false（GOだけ出る）／firstFrom:5 stepMs:650 goMs:650 で v172 以前の形
 // v178：1ラウンド目は5から、2ラウンド目以降は3から数える。GO表示あり。演出も元に戻した
 const COUNT_CFG={firstFrom:5,laterFrom:3,stepMs:650,goMs:650,laterSkip:false};
+const HAND_CFG={n:8}; // v311 通常対戦・チャレンジの手札枚数（ラッシュ/チャージ/サバイバルは10のまま）
 // ── v179 衝突事故の救済：相手の札が場に落ちた直後（COLLISION_MS以内）に出した札がバーストになるなら「事故」として手札に戻す。ペナルティなし ──
 // 自分で見て出したバーストはそのまま。相手側（AI）にも同じ救済がかかる。0にすると無効
 const COLLISION_MS=220;
@@ -6068,6 +6070,8 @@ function App(){
   function isCharge(){return !!(stageOptsR.current&&stageOptsR.current.charge);}
   function isSurvival(){return !!(stageOptsR.current&&stageOptsR.current.survival);}
   function isTimedMode(){return isRush()||isCharge()||isSurvival();}
+  function handN(){return isTimedMode()?10:HAND_CFG.n;} // v311 手札枚数
+  function newHand(){return createDeck().slice(0,handN());} // v311 createDeckは触らず、枚数だけ切る
   function isStandardEnergy(){return ENERGY_CFG.enabled&&!isTimedMode();} // v296 通常・チャレンジはエネルギーなしの元のルールに戻す
   const energyR=useRef({player:ENERGY_CFG.initial,dealer:ENERGY_CFG.initial,at:0});
   const[energy,setEnergy]=useState(energyR.current);
@@ -6579,7 +6583,7 @@ function App(){
     for(let i=0;i<ids.length;i++){const id=ids[i];if(!slots.includes(id)){let s=slots.indexOf(null);if(s<0){if(slots.length<DEALER_MAX)slots.push(id);}else slots[s]=id;}}
     // 枠にあるが手札に無いIDは掃除
     const alive=new Set(ids);for(let s=0;s<slots.length;s++)if(slots[s]!=null&&!alive.has(slots[s]))slots[s]=null;
-    while(slots.length>10&&slots[slots.length-1]==null)slots.pop();
+    while(slots.length>handN()&&slots[slots.length-1]==null)slots.pop();
     dIdsR.current=ids;dSlotsR.current=slots;setDSlots(slots);
     setDH(hand);dHR.current=hand;const r=ring||hand.map(()=>false);setDRing(r);dRingR.current=r;
     dCurR.current=slots[dCursorSlotR.current]??null;setDCur({id:dCurR.current,tap:false});
@@ -6594,9 +6598,9 @@ function App(){
     if(isSurvival())return;
     let hand=dHR.current,rf=dRingR.current;
     if(rf.length!==hand.length){rf=hand.map((v,i)=>rf[i]||false);setDRing(rf);dRingR.current=rf;} // 環の配列がズレてたら揃える
-    if(hand.length>=10)return;
+    if(hand.length>=handN())return;
     if(hand.filter((v,i)=>!isHoldRing(rf[i])).length)return; // 環なしが1枚でもあれば不要（v117: モルフォの環は出せるので在庫に数える）
-    const nd=createDeck().slice(0,10-hand.length);
+    const nd=newHand().slice(0,handN()-hand.length);
     setDealer([...hand,...nd],[...rf.slice(0,hand.length),...nd.map(()=>false)],[...dIdsR.current,...nd.map(()=>null)]);
   }
   // 手札1枚に星環を付ける。合計が10ちょうどになったら完成処理へ
@@ -6701,7 +6705,7 @@ function App(){
     at(LK_T.reveal,()=>{setLkFx(s=>s&&({...s,dust:'out'}));try{playPlaceSE(false);fxBell({f:1760,v:0.06,d:1.0,bright:1.2,rev:0.7});}catch(e){}});
     at(LK_T.reveal+500,()=>{setLkFx(s=>s&&({...s,out:true}));completeTen(ringed,'dealer',rn,true);});
     at(LK_T.done+300,()=>setLkFx(null));
-    if(!rest.length){const nd=createDeck();at(LK_T.done+600,()=>setDealer(nd));}
+    if(!rest.length){const nd=newHand();at(LK_T.done+600,()=>setDealer(nd));}
   }
   const LUNA_SKILL={jp:'幸福標本',en:'SPECIMEN OF BLISS',color:'#ff9fd6'};
   function showLunaSkill(){const item={k:Date.now(),jp:LUNA_SKILL.jp,en:LUNA_SKILL.en,color:LUNA_SKILL.color};setSkillFx(item);setTimeout(()=>setSkillFx(s=>s&&s.k===item.k?null:s),1500);}
@@ -6828,7 +6832,7 @@ function App(){
     if(!alive.length)return false;
     const frozen=alive.filter(i=>frz[i]!=null);
     if(frozen.length!==alive.length)return false; // 出せる札がまだある
-    const nd=createDeck();
+    const nd=newHand();
     const nh=hand.slice(),sp=pSpR.current.slice();
     let k=0;
     for(let i=0;i<nh.length;i++){
@@ -6956,8 +6960,8 @@ function App(){
     clearTimers();lockR.current=false;
     clearTimeout(pMoveTimerR.current);pCursorR.current=HAND_NAV.start;setPCursor(HAND_NAV.start);pMoveUntilR.current=0;setPMoving(false);dCursorSlotR.current=HAND_NAV.start;setDCursorSlot(HAND_NAV.start);dMoveUntilR.current=0;
     setSurvivalReward(null);setSurvivalHelp(false);
-    const p=createDeck(),d=createDeck();
     const opts=stageR.current?(stageOptsR.current||{}):{};
+    const p=newHand(),d=newHand(); // v311
     energyR.current={player:ENERGY_CFG.initial,dealer:ENERGY_CFG.initial,at:performance.now()};setEnergy(energyR.current);energyAwardRoundR.current=-1;setEnergyReward(null);
     chargeR.current={player:CHARGE_CFG.initial,dealer:CHARGE_CFG.initial,at:performance.now()};setCharge(chargeR.current);
     rushMatchR.current={pWins:0,dWins:0,history:[]};setRushMatch(rushMatchR.current);setRushBreak(null);rushClosedR.current=true;setPtFly(null);
@@ -6965,7 +6969,7 @@ function App(){
     chronoR.current={armed:!!opts.chrono,count:0,pending:false,deals:0};
     roundSecR.current=opts.survival?60:FLOW_CFG.enabled?FLOW_CFG.matchSec:(opts.timeLimit||10); // v175 試合全体で1本
     coreShiftR.current={active:opts.ability==='coreShift',used:false};setCoreShiftUsed(false);
-    form2R.current=false;setForm2(false);shiftPendingR.current=false;setShiftScene(null);sceneOnR.current=false;setScreenPop(false);setPtBurst(false);srPendingR.current=false;setFieldRing([]);setSrBanner(false);setLkFx(null);dIdsR.current=[];dSlotsR.current=Array(10).fill(null);setDSlots(Array(10).fill(null));dCurR.current=null;setDCur({id:null,tap:false});r2R.current={rounds:0,timeLeft:0,cmdNext:null,tappedThisRound:false};r2PendingCardR.current=null;setTimeRounds(0);setTapCardId(null);setLocks([]);setCmd(null);rStopR.current=false;setRStop(false);setEraseIdx([]);colorsR.current=[]; // v70/v75/v79/v85/v121
+    form2R.current=false;setForm2(false);shiftPendingR.current=false;setShiftScene(null);sceneOnR.current=false;setScreenPop(false);setPtBurst(false);srPendingR.current=false;setFieldRing([]);setSrBanner(false);setLkFx(null);dIdsR.current=[];dSlotsR.current=Array(handN()).fill(null);setDSlots(Array(handN()).fill(null));dCurR.current=null;setDCur({id:null,tap:false});r2R.current={rounds:0,timeLeft:0,cmdNext:null,tappedThisRound:false};r2PendingCardR.current=null;setTimeRounds(0);setTapCardId(null);setLocks([]);setCmd(null);rStopR.current=false;setRStop(false);setEraseIdx([]);colorsR.current=[]; // v70/v75/v79/v85/v121
     dealPlayer(p);setDealer(d);exitLink();
     setPPt(0);setDPt(0);pPtR.current=0;dPtR.current=0;
     setRNum(1);setField([]);setPlaces([]);clearTapPick();setFieldSum(0);fieldR.current=[];fieldSumR.current=0;
@@ -7102,13 +7106,13 @@ function App(){
       if(tok!==roundTokR.current||!isTimedMode()||phaseR.current!=='playing'||rushExpired())return;
       resetField();dLandAtR.current=0;pLandAtR.current=0;
       lockR.current=false;resolvingR.current=false;
-      if(!isSurvival()&&!pHR.current.some(v=>v!==null))dealPlayer(createDeck());
+      if(!isSurvival()&&!pHR.current.some(v=>v!==null))dealPlayer(newHand());
       ensureDealerRefill();scheduleAi(rnR.current);
     },RUSH_CFG.settleMs);
   }
   function refillSurvival(who,n){
     const before=who==='player'?pHR.current.filter(v=>v!=null).length:dHR.current.length;
-    const room=Math.max(0,10-before-(who==='dealer'&&flyR.current?1:0)); // v263 手札に入る分
+    const room=Math.max(0,handN()-before-(who==='dealer'&&flyR.current?1:0)); // v263 手札に入る分
     const drawn=createDeck().slice(0,Math.max(0,n));
     const over=drawn.slice(room);                                        // v263 あふれた分は予備へ（上限なし）
     if(over.length){(who==='player'?pResR:dResR).current.push(...over);}
@@ -7251,10 +7255,10 @@ function App(){
     const dOk=dHR.current.some(v=>v!==null&&safe(v));
     if(pOk||dOk)return;
     resetField();
-    const np=createDeck(),nd=createDeck();
+    const np=newHand(),nd=newHand();
     dealPlayer(np);
     { const keep=dHR.current.filter((v,i)=>dRingR.current[i]),keepRf=dRingR.current.filter(f=>f),keepIds=dIdsR.current.filter((id,i)=>dRingR.current[i]);
-      const fill=nd.slice(0,10-keep.length);setDealer([...keep,...fill],[...keepRf,...fill.map(()=>false)],[...keepIds,...fill.map(()=>null)]); }
+      const fill=nd.slice(0,handN()-keep.length);setDealer([...keep,...fill],[...keepRf,...fill.map(()=>false)],[...keepIds,...fill.map(()=>null)]); }
     r2Say('手札を配り直した','#9fe8ff');
     try{resumeAC();fxBell({f:1318,v:0.06,d:0.8,bright:1.2,rev:0.7});}catch(e){}
     clearTimeout(aiRef.current);scheduleAi(rnR.current,600);
@@ -7268,11 +7272,11 @@ function App(){
     clearTimers();lockR.current=true;resolvingR.current=true; // 時間切れ演出中はカードを出せない
     resumeAC();playMissSE();
     setTimeUpShow(true);
-    const newP=createDeck(),newD=createDeck();
+    const newP=newHand(),newD=newHand();
     dealPlayer(newP);
     { // v79: 時間切れでも環付きカードは残す
       const keep=dHR.current.filter((v,i)=>dRingR.current[i]),keepRf=dRingR.current.filter(f=>f),keepIds=dIdsR.current.filter((id,i)=>dRingR.current[i]); // 環の種類と固有IDも保つ
-      const fill=newD.slice(0,10-keep.length);setDealer([...keep,...fill],[...keepRf,...fill.map(()=>false)],[...keepIds,...fill.map(()=>null)]);
+      const fill=newD.slice(0,handN()-keep.length);setDealer([...keep,...fill],[...keepRf,...fill.map(()=>false)],[...keepIds,...fill.map(()=>null)]);
     }
     const tok=roundTokR.current;
     setTimeout(()=>{
@@ -7585,7 +7589,7 @@ function App(){
     setFxNote({t:'手札を補充しています',c:'#9fe8ff'});
     setChronoFx('in');playChronoStopSE();duckBGM(true);
     setTimeout(()=>{
-      dealPlayer(createDeck());
+      dealPlayer(newHand());
       try{resumeAC();fxBell({f:1318,v:0.07,d:0.8,bright:1.2,rev:0.7});}catch(e){}
     },420);
     setTimeout(()=>{
@@ -7777,7 +7781,7 @@ function App(){
         return;
       }
       if(!isSurvival()&&!dHR.current.filter((v,i)=>!isHoldRing(dRingR.current[i])).length){ // 環付きだけ残った → 補充
-        const keep=dHR.current,keepRf=dRingR.current;const nd=createDeck().slice(0,10-keep.length);
+        const keep=dHR.current,keepRf=dRingR.current;const nd=newHand().slice(0,handN()-keep.length);
         setDealer([...keep,...nd],[...keepRf,...nd.map(()=>false)],[...dIdsR.current,...nd.map(()=>null)]);
       }
       dLandAtR.current=Date.now(); // v179
@@ -7845,7 +7849,7 @@ function App(){
     if(pLockR.current.length)r2CheckUnlock(newPH); // v84
     if(confuseR.current[idx]!=null){const m={...confuseR.current};delete m[idx];setConf(m);} // v112
     const emptied=!newPH.filter(Boolean).length;
-    if(emptied&&!isSurvival()){const nd=createDeck();if(isTimedMode())dealPlayer(nd);else setTimeout(()=>{dealPlayer(nd);},100);}
+    if(emptied&&!isSurvival()){const nd=newHand();if(isTimedMode())dealPlayer(nd);else setTimeout(()=>{dealPlayer(nd);},100);}
     // v136: 凍った札しか残っていない＝手詰まり。凍った札は残したまま他を配り直す
     else if(Object.keys(pFrzR.current).length&&!newPH.some((v,i)=>v!==null&&pFrzR.current[i]==null)){
       setTimeout(()=>{refillAroundFrozen();},120);
@@ -8050,7 +8054,7 @@ function App(){
   }
 
   const so=stageOptsR.current||{};
-  const standardEnergy=isStandardEnergy(),tapPlace=isTapPlace();
+  const standardEnergy=isStandardEnergy(),tapPlace=isTapPlace();const hcols=Math.ceil(handN()/2); // v311 8枚なら4列×2段
   const physicalPlaces=tapFieldPlaces(field,fieldPlaces),pickReady=tapPlace&&tapPick&&playerCanNavigate()&&canPlay(tapPick.shown,fieldSum,field);
   const chargeEmpty=so.charge&&charge.player+1e-9<1;
   const selectedValue=confuse[pCursor]!=null?confuse[pCursor]:pH[pCursor];
@@ -8233,8 +8237,8 @@ function App(){
       !standardEnergy&&hideLeft>0&&h('div',{className:'hide-badge'},'不可観測  あと '+hideLeft+' ラウンド'), // v150 効果が続いている間ずっと出す
       !standardEnergy&&(so.charge?h('div',{className:'charge-hand-header'},h('div',{className:'gp-area-label'},'YOU'),h(ChargeMeter,{value:charge.player,who:'player'})):h('div',{className:'gp-area-label'},'YOU — '+pH.filter(Boolean).length+'枚')),
       h('div',{className:'gp-hand-rows'},[0,1].map(row=>h('div',{key:row,className:'gp-hand-row'},
-        Array.from({length:5},(_,col)=>{
-          const i=row*5+col,v=pH[i]??null,dv=confuse[i]!=null?confuse[i]:v,dk=lantern&&!lantern.lit.includes(i);
+        Array.from({length:hcols},(_,col)=>{
+          const i=row*hcols+col,v=pH[i]??null,dv=confuse[i]!=null?confuse[i]:v,dk=lantern&&!lantern.lit.includes(i);
           const unavailable=v==null||chargeEmpty||(standardEnergy&&energy.player+1e-9<dv)||countNum>=0||!canPlay(dv,fieldSum,field)||rStop||!!pLock[i]||pFrz[i]!=null||(cmdIdx!=null&&cmdIdx!==i);
           const directTap=tapPlace||standardEnergy||so.rush; // v293 ラッシュはカーソルをやめて直接タップ
           const legacyTap=!directTap&&!so.charge&&!so.survival; // v296 通常・チャレンジは十字キー前と同じく札そのものをタップ

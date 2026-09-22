@@ -3608,7 +3608,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v328'; // NEXT：相手の次の札を場の空き枠にゴースト表示（NX_CFG.ghost）
+const APP_VER='v329'; // NEXT：ゴースト表示をオフ（ややこしいので v327 の見た目に戻す。NX_CFG.ghost）
+// const APP_VER='v328'; // NEXT：相手の次の札を場の空き枠にゴースト表示（NX_CFG.ghost）
 // const APP_VER='v327'; // NEXT：上下配置に戻す（row:false）
 // const APP_VER='v326'; // NEXT：相手と自分のNEXTを場の上に横並び（相手は左に詰め、自分は右上。NX_CFG.row）
 // const APP_VER='v325'; // 自動更新：version.txt を見て新しい版があれば読み直す
@@ -5052,7 +5053,7 @@ function HandControls({side,onMove,onPlay,canMove,canPlay,playLabel='出す'}){
 }
 
 // ── v318 ネクスト（仮名）：手札なし。自分の「次の札」3枚だけ見える（テトリスのNEXT）。できるのは先頭を「出す」か「捨てる」だけ。相手の次3枚も丸見え ──
-const NX_CFG={mat:false,row:false,ghost:true,winPt:10,roundSec:10,queueN:3,countFrom:5,countStepMs:650,goMs:500,tenHoldMs:1500,timeUpMs:1200};
+const NX_CFG={mat:false,row:false,ghost:false,winPt:10,roundSec:10,queueN:3,countFrom:5,countStepMs:650,goMs:500,tenHoldMs:1500,timeUpMs:1200};
 const NX_AI={easy:{label:'やさしい',delay:1250,jitter:600,read:.3,safe:.4},normal:{label:'ふつう',delay:650,jitter:650,read:.7,safe:.55},hard:{label:'つよい',delay:360,jitter:300,read:.95,safe:.85}};
 const NX_ASSET='img/next-v319/';
 function nxDraw(q){while(q.length<NX_CFG.queueN+6){const v=Math.floor(Math.random()*5)+1;if(q.length>=2&&q.slice(-2).every(x=>x===v))continue;q.push(v);}return q;}

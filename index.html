@@ -2372,6 +2372,9 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .nx-stage.nx-row .nx-card.nx-p.nx-preview-1{left:69.5%;}.nx-stage.nx-row .nx-card.nx-p.nx-preview-2{left:81.2%;}
 .nx-stage.nx-row .nx-next-label{width:15.5%;top:18.2%;}.nx-stage.nx-row .nx-next-label.d{left:4%;}.nx-stage.nx-row .nx-next-label.p{left:52%;top:18.2%;}
 .nx-field-card{top:39.45%;animation:nx-land .18s ease-out;}
+.nx-card.nx-ghost{opacity:.42;border-style:dashed;border-color:#c2412f;box-shadow:none;animation:nx-ghost-in .25s ease-out;pointer-events:none;}
+@keyframes nx-ghost-in{from{opacity:0;transform:translateY(-6px)}to{opacity:.42;transform:none}}
+.nx-completed .nx-card.nx-ghost{display:none;}
 .nx-sum{position:absolute;left:25.7%;top:54%;width:48%;height:4.4%;display:flex;align-items:center;justify-content:center;gap:5%;white-space:nowrap;}
 .nx-sum .nx-target{height:52%;display:flex;align-items:center;gap:3px;}.nx-sum .nx-target i{font:normal clamp(15px,4.5vw,27px) Georgia,serif;}.nx-sum .nx-left{display:flex;align-items:center;height:100%;gap:5px;margin-left:6%;}.nx-left small{font:bold clamp(10px,2.8vw,16px) sans-serif;}
 .nx-action{position:absolute;top:81.25%;width:39%;height:11.7%;background:transparent;border:0;border-radius:12%;padding:0;}
@@ -3605,7 +3608,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v327'; // NEXT：上下配置に戻す（row:false）
+const APP_VER='v328'; // NEXT：相手の次の札を場の空き枠にゴースト表示（NX_CFG.ghost）
+// const APP_VER='v327'; // NEXT：上下配置に戻す（row:false）
 // const APP_VER='v326'; // NEXT：相手と自分のNEXTを場の上に横並び（相手は左に詰め、自分は右上。NX_CFG.row）
 // const APP_VER='v325'; // 自動更新：version.txt を見て新しい版があれば読み直す
 // const APP_VER='v324'; // 軽量化①：カラールーム・セパレート・エナジー・サイコロ・4×4対戦・ひとりモード・テンフォールをコードごと削除（画像・shared-board.js/css も）
@@ -5048,7 +5052,7 @@ function HandControls({side,onMove,onPlay,canMove,canPlay,playLabel='出す'}){
 }
 
 // ── v318 ネクスト（仮名）：手札なし。自分の「次の札」3枚だけ見える（テトリスのNEXT）。できるのは先頭を「出す」か「捨てる」だけ。相手の次3枚も丸見え ──
-const NX_CFG={mat:false,row:false,winPt:10,roundSec:10,queueN:3,countFrom:5,countStepMs:650,goMs:500,tenHoldMs:1500,timeUpMs:1200};
+const NX_CFG={mat:false,row:false,ghost:true,winPt:10,roundSec:10,queueN:3,countFrom:5,countStepMs:650,goMs:500,tenHoldMs:1500,timeUpMs:1200};
 const NX_AI={easy:{label:'やさしい',delay:1250,jitter:600,read:.3,safe:.4},normal:{label:'ふつう',delay:650,jitter:650,read:.7,safe:.55},hard:{label:'つよい',delay:360,jitter:300,read:.95,safe:.85}};
 const NX_ASSET='img/next-v319/';
 function nxDraw(q){while(q.length<NX_CFG.queueN+6){const v=Math.floor(Math.random()*5)+1;if(q.length>=2&&q.slice(-2).every(x=>x===v))continue;q.push(v);}return q;}
@@ -5178,6 +5182,8 @@ function NextMode({onBack}){
   h('div',{className:'nx-time'+(st.time<=3&&st.phase==='play'?' low':''),role:'timer','aria-label':'残り '+st.time+' 秒'},h(NxNumber,{value:st.time})),
   queue('d'),
   h('section',{className:'nx-field','aria-label':'場の札'},st.field.map((v,k)=>card(v,st.by[k],'nx-field-card',{key:st.rn+'-'+k,style:{left:[10.5,31,51.6,72.2][k]+'%','--slot':k}})),
+   // v328: 相手の次の札を、場の次の空き枠にゴースト表示（出せる時だけ）。NX_CFG.ghost:false で消える
+   (NX_CFG.ghost&&st.phase==='play'&&st.field.length<4&&nxLegal(st.dQ[0],st.field))?card(st.dQ[0],'d','nx-field-card nx-ghost',{key:'ghost-'+st.rn+'-'+st.field.length+'-'+st.dQ[0],style:{left:[10.5,31,51.6,72.2][st.field.length]+'%'},'aria-hidden':true}):null,
    h('div',{className:'nx-sum','aria-label':'場の合計 '+fs+' / 10、あと '+(10-fs)},h(NxNumber,{value:fs}),
     h('span',{className:'nx-target'},h('i',null,'/'),h(NxNumber,{value:10})),
     h('span',{className:'nx-left'},h('small',null,'あと'),h(NxNumber,{value:10-fs})))),

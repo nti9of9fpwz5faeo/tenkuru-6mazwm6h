@@ -2363,6 +2363,14 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 /* v322: NX_CFG.mat:false で赤青の手札マットなし背景（court-nomat.webp）。戻すときは mat:true */
 .nx-stage.nx-nomat{background-image:url('img/next-v319/court-nomat.webp');}
 .nx-stage.nx-nomat .nx-next-label{color:#734512;text-shadow:0 1px 0 #fff3d6;}.nx-stage.nx-nomat .nx-next-label.p{color:#16447b;}
+/* v326: NX_CFG.row:true で相手のNEXTと自分のNEXTを同じ段（場の上）に横並び。相手＝左に詰める、自分＝右上。戻すときは row:false */
+.nx-stage.nx-row .nx-card.nx-head{width:15.5%;height:11.8%;top:19.6%;}
+.nx-stage.nx-row .nx-card.nx-preview{width:9.7%;height:7.2%;top:24.2%;}
+.nx-stage.nx-row .nx-card.nx-d.nx-head{left:4%;}
+.nx-stage.nx-row .nx-card.nx-d.nx-preview-1{left:21.5%;}.nx-stage.nx-row .nx-card.nx-d.nx-preview-2{left:33.2%;}
+.nx-stage.nx-row .nx-card.nx-p.nx-head{left:52%;top:19.6%;}
+.nx-stage.nx-row .nx-card.nx-p.nx-preview-1{left:69.5%;}.nx-stage.nx-row .nx-card.nx-p.nx-preview-2{left:81.2%;}
+.nx-stage.nx-row .nx-next-label{width:15.5%;top:18.2%;}.nx-stage.nx-row .nx-next-label.d{left:4%;}.nx-stage.nx-row .nx-next-label.p{left:52%;top:18.2%;}
 .nx-field-card{top:39.45%;animation:nx-land .18s ease-out;}
 .nx-sum{position:absolute;left:25.7%;top:54%;width:48%;height:4.4%;display:flex;align-items:center;justify-content:center;gap:5%;white-space:nowrap;}
 .nx-sum .nx-target{height:52%;display:flex;align-items:center;gap:3px;}.nx-sum .nx-target i{font:normal clamp(15px,4.5vw,27px) Georgia,serif;}.nx-sum .nx-left{display:flex;align-items:center;height:100%;gap:5px;margin-left:6%;}.nx-left small{font:bold clamp(10px,2.8vw,16px) sans-serif;}
@@ -3597,7 +3605,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v325'; // 自動更新：version.txt を見て新しい版があれば読み直す
+const APP_VER='v326'; // NEXT：相手と自分のNEXTを場の上に横並び（相手は左に詰め、自分は右上。NX_CFG.row）
+// const APP_VER='v325'; // 自動更新：version.txt を見て新しい版があれば読み直す
 // const APP_VER='v324'; // 軽量化①：カラールーム・セパレート・エナジー・サイコロ・4×4対戦・ひとりモード・テンフォールをコードごと削除（画像・shared-board.js/css も）
 // const APP_VER='v323'; // NEXT：背景をホーム表示後に先読み
 // const APP_VER='v322'; // NEXT：赤青の手札マットを消してみる（NX_CFG.mat で戻せる）
@@ -5038,7 +5047,7 @@ function HandControls({side,onMove,onPlay,canMove,canPlay,playLabel='出す'}){
 }
 
 // ── v318 ネクスト（仮名）：手札なし。自分の「次の札」3枚だけ見える（テトリスのNEXT）。できるのは先頭を「出す」か「捨てる」だけ。相手の次3枚も丸見え ──
-const NX_CFG={mat:false,winPt:10,roundSec:10,queueN:3,countFrom:5,countStepMs:650,goMs:500,tenHoldMs:1500,timeUpMs:1200};
+const NX_CFG={mat:false,row:true,winPt:10,roundSec:10,queueN:3,countFrom:5,countStepMs:650,goMs:500,tenHoldMs:1500,timeUpMs:1200};
 const NX_AI={easy:{label:'やさしい',delay:1250,jitter:600,read:.3,safe:.4},normal:{label:'ふつう',delay:650,jitter:650,read:.7,safe:.55},hard:{label:'つよい',delay:360,jitter:300,read:.95,safe:.85}};
 const NX_ASSET='img/next-v319/';
 function nxDraw(q){while(q.length<NX_CFG.queueN+6){const v=Math.floor(Math.random()*5)+1;if(q.length>=2&&q.slice(-2).every(x=>x===v))continue;q.push(v);}return q;}
@@ -5159,7 +5168,7 @@ function NextMode({onBack}){
   h('span',{className:'nx-next-label '+who},'NEXT'),
   (who==='p'?st.pQ:st.dQ).slice(0,3).map((v,i)=>card(v,who,i===0?'nx-head'+(who==='p'&&bounce?' nx-reject':' nx-discarding'):'nx-preview nx-preview-'+i,
    {key:who+'-'+i+'-'+(who==='p'?st.pSerial:st.dSerial)+(i===0&&who==='p'?'-'+bounce:''),...(i===0&&who==='p'?{onClick:()=>play('p'),disabled:st.phase!=='play'}:{})})));
- return h('main',{className:'nx-screen'},h('div',{className:'nx-stage'+(NX_CFG.mat?'':' nx-nomat')+(st.msg?.points?' nx-completed':'')},
+ return h('main',{className:'nx-screen'},h('div',{className:'nx-stage'+(NX_CFG.mat?'':' nx-nomat')+(NX_CFG.row?' nx-row':'')+(st.msg?.points?' nx-completed':'')},
   h('button',{className:'nx-back',onClick:leave,'aria-label':'ホームへ戻る'},'‹'),
   h('div',{className:scoreClass('d'),'aria-label':'相手のスコア '+visibleScore('d')},h(NxNumber,{value:visibleScore('d')})),
   h('span',{className:'nx-score-label d'},'相手'),

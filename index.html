@@ -3609,7 +3609,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v331'; // NEXT：段ルールをオフ（元のNEXTに戻す。NX_CFG.stairs:true で再現）
+const APP_VER='v332'; // NEXT：捨てた札が相手のNEXTの先頭に割り込む（NX_CFG.pushDiscard）
+// const APP_VER='v331'; // NEXT：段ルールをオフ（元のNEXTに戻す。NX_CFG.stairs:true で再現）
 // const APP_VER='v330'; // NEXT：段ルール（10→20→…→50、11・22・33・44は地雷。NX_CFG.stairs / NX_STAIR）
 // const APP_VER='v329'; // NEXT：ゴースト表示をオフ（ややこしいので v327 の見た目に戻す。NX_CFG.ghost）
 // const APP_VER='v328'; // NEXT：相手の次の札を場の空き枠にゴースト表示（NX_CFG.ghost）
@@ -5058,7 +5059,8 @@ function HandControls({side,onMove,onPlay,canMove,canPlay,playLabel='出す'}){
 // ── v318 ネクスト（仮名）：手札なし。自分の「次の札」3枚だけ見える（テトリスのNEXT）。できるのは先頭を「出す」か「捨てる」だけ。相手の次3枚も丸見え ──
 // v330: stairs:true で「段」ルール：10をこえたら目標が20→30→40→50に上がる。ぴったり止めたら 段ボーナス＋その段の札の役。11・22・33・44（と50こえ）は地雷＝出した人の点が全部相手へ。false で元のNEXT
 const NX_STAIR={max:50,traps:[11,22,33,44],bonus:{10:1,20:2,30:3,40:4,50:5},overIsTrap:true,roundSec:20,winPt:20};
-const NX_CFG={stairs:false,mat:false,row:false,ghost:false,winPt:10,roundSec:10,queueN:3,countFrom:5,countStepMs:650,goMs:500,tenHoldMs:1500,timeUpMs:1200};
+// v332: pushDiscard:true で「捨てた札は相手のNEXTの先頭に割り込む」（押しつけ）。false で元どおり消える
+const NX_CFG={pushDiscard:true,stairs:false,mat:false,row:false,ghost:false,winPt:10,roundSec:10,queueN:3,countFrom:5,countStepMs:650,goMs:500,tenHoldMs:1500,timeUpMs:1200};
 const NX_AI={easy:{label:'やさしい',delay:1250,jitter:600,read:.3,safe:.4},normal:{label:'ふつう',delay:650,jitter:650,read:.7,safe:.55},hard:{label:'つよい',delay:360,jitter:300,read:.95,safe:.85}};
 const NX_ASSET='img/next-v319/';
 function nxDraw(q){while(q.length<NX_CFG.queueN+6){const v=Math.floor(Math.random()*5)+1;if(q.length>=2&&q.slice(-2).every(x=>x===v))continue;q.push(v);}return q;}
@@ -5191,7 +5193,9 @@ function NextMode({onBack}){
   set(n);return true;
  }
  function discard(who){if(!active())return false;const s=sR.current,key=who==='p'?'pQ':'dQ',serial=who==='p'?'pSerial':'dSerial';
-  if(who==='p')setBounce(0);set({...s,[key]:nxDraw(s[key].slice(1)),[serial]:s[serial]+1});nxSE('discard',who);return true;
+  if(who==='p')setBounce(0);const n={...s,[key]:nxDraw(s[key].slice(1)),[serial]:s[serial]+1};
+  if(NX_CFG.pushDiscard){const ok=who==='p'?'dQ':'pQ',os=who==='p'?'dSerial':'pSerial';n[ok]=[s[key][0],...s[ok]].slice(0,NX_CFG.queueN+8);n[os]=s[os]+1;} // v332: 相手の先頭へ
+  set(n);nxSE('discard',who);return true;
  }
 
  // v330: 段ルールの相手。地雷はふむ前に読む／ぴったりは取る／こっちにぴったりを渡さない
@@ -5210,6 +5214,7 @@ function NextMode({onBack}){
    const givesTen=ok&&nxLegal(pv,[...s.field,v])&&fs+v+pv===10;
    const threatened=nxLegal(pv,s.field)&&fs+pv===10;
    if(ok&&fs+v===10)play('d');
+   else if(NX_CFG.pushDiscard&&threatened&&Math.random()<ai.read)discard('d'); // v332: 押しつけてこっちの10をつぶす
    else if(nxLegal(s.dQ[1],s.field)&&fs+s.dQ[1]===10&&Math.random()<ai.read)discard('d');
    else if(ok&&threatened&&!givesTen&&Math.random()<ai.read)play('d');
    else if(ok&&(!givesTen||Math.random()>ai.read)&&Math.random()<ai.safe)play('d');

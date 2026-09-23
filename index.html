@@ -3609,7 +3609,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v332'; // NEXT：捨てた札が相手のNEXTの先頭に割り込む（NX_CFG.pushDiscard）
+const APP_VER='v333'; // NEXT：押しつけをオフ（捨てた札は消える、元どおり。NX_CFG.pushDiscard）
+// const APP_VER='v332'; // NEXT：捨てた札が相手のNEXTの先頭に割り込む（NX_CFG.pushDiscard）
 // const APP_VER='v331'; // NEXT：段ルールをオフ（元のNEXTに戻す。NX_CFG.stairs:true で再現）
 // const APP_VER='v330'; // NEXT：段ルール（10→20→…→50、11・22・33・44は地雷。NX_CFG.stairs / NX_STAIR）
 // const APP_VER='v329'; // NEXT：ゴースト表示をオフ（ややこしいので v327 の見た目に戻す。NX_CFG.ghost）
@@ -5060,7 +5061,7 @@ function HandControls({side,onMove,onPlay,canMove,canPlay,playLabel='出す'}){
 // v330: stairs:true で「段」ルール：10をこえたら目標が20→30→40→50に上がる。ぴったり止めたら 段ボーナス＋その段の札の役。11・22・33・44（と50こえ）は地雷＝出した人の点が全部相手へ。false で元のNEXT
 const NX_STAIR={max:50,traps:[11,22,33,44],bonus:{10:1,20:2,30:3,40:4,50:5},overIsTrap:true,roundSec:20,winPt:20};
 // v332: pushDiscard:true で「捨てた札は相手のNEXTの先頭に割り込む」（押しつけ）。false で元どおり消える
-const NX_CFG={pushDiscard:true,stairs:false,mat:false,row:false,ghost:false,winPt:10,roundSec:10,queueN:3,countFrom:5,countStepMs:650,goMs:500,tenHoldMs:1500,timeUpMs:1200};
+const NX_CFG={pushDiscard:false,stairs:false,mat:false,row:false,ghost:false,winPt:10,roundSec:10,queueN:3,countFrom:5,countStepMs:650,goMs:500,tenHoldMs:1500,timeUpMs:1200};
 const NX_AI={easy:{label:'やさしい',delay:1250,jitter:600,read:.3,safe:.4},normal:{label:'ふつう',delay:650,jitter:650,read:.7,safe:.55},hard:{label:'つよい',delay:360,jitter:300,read:.95,safe:.85}};
 const NX_ASSET='img/next-v319/';
 function nxDraw(q){while(q.length<NX_CFG.queueN+6){const v=Math.floor(Math.random()*5)+1;if(q.length>=2&&q.slice(-2).every(x=>x===v))continue;q.push(v);}return q;}

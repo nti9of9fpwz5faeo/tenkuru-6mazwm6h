@@ -2375,6 +2375,7 @@ body{background:linear-gradient(180deg,#0a0020 0%,#12002e 40%,#180040 70%,#1a003
 .nx-card.nx-ghost{opacity:.42;border-style:dashed;border-color:#c2412f;box-shadow:none;animation:nx-ghost-in .25s ease-out;pointer-events:none;}
 @keyframes nx-ghost-in{from{opacity:0;transform:translateY(-6px)}to{opacity:.42;transform:none}}
 .nx-completed .nx-card.nx-ghost{display:none;}
+.nx-trap{position:absolute;left:50%;top:59.2%;transform:translateX(-50%);font:bold clamp(11px,3.2vw,17px) sans-serif;color:#b3261e;background:#fff8e9e6;border-radius:10px;padding:1px 8px;white-space:nowrap;pointer-events:none;}
 .nx-sum{position:absolute;left:25.7%;top:54%;width:48%;height:4.4%;display:flex;align-items:center;justify-content:center;gap:5%;white-space:nowrap;}
 .nx-sum .nx-target{height:52%;display:flex;align-items:center;gap:3px;}.nx-sum .nx-target i{font:normal clamp(15px,4.5vw,27px) Georgia,serif;}.nx-sum .nx-left{display:flex;align-items:center;height:100%;gap:5px;margin-left:6%;}.nx-left small{font:bold clamp(10px,2.8vw,16px) sans-serif;}
 .nx-action{position:absolute;top:81.25%;width:39%;height:11.7%;background:transparent;border:0;border-radius:12%;padding:0;}
@@ -3608,7 +3609,8 @@ function TutorialScreen({pendingDiff,onFinish,onExit,trackNum,toggleMusic,coachN
 
 
 // ── MenuScreen ──
-const APP_VER='v329'; // NEXT：ゴースト表示をオフ（ややこしいので v327 の見た目に戻す。NX_CFG.ghost）
+const APP_VER='v330'; // NEXT：段ルール（10→20→…→50、11・22・33・44は地雷。NX_CFG.stairs / NX_STAIR）
+// const APP_VER='v329'; // NEXT：ゴースト表示をオフ（ややこしいので v327 の見た目に戻す。NX_CFG.ghost）
 // const APP_VER='v328'; // NEXT：相手の次の札を場の空き枠にゴースト表示（NX_CFG.ghost）
 // const APP_VER='v327'; // NEXT：上下配置に戻す（row:false）
 // const APP_VER='v326'; // NEXT：相手と自分のNEXTを場の上に横並び（相手は左に詰め、自分は右上。NX_CFG.row）
@@ -5053,11 +5055,20 @@ function HandControls({side,onMove,onPlay,canMove,canPlay,playLabel='出す'}){
 }
 
 // ── v318 ネクスト（仮名）：手札なし。自分の「次の札」3枚だけ見える（テトリスのNEXT）。できるのは先頭を「出す」か「捨てる」だけ。相手の次3枚も丸見え ──
-const NX_CFG={mat:false,row:false,ghost:false,winPt:10,roundSec:10,queueN:3,countFrom:5,countStepMs:650,goMs:500,tenHoldMs:1500,timeUpMs:1200};
+// v330: stairs:true で「段」ルール：10をこえたら目標が20→30→40→50に上がる。ぴったり止めたら 段ボーナス＋その段の札の役。11・22・33・44（と50こえ）は地雷＝出した人の点が全部相手へ。false で元のNEXT
+const NX_STAIR={max:50,traps:[11,22,33,44],bonus:{10:1,20:2,30:3,40:4,50:5},overIsTrap:true,roundSec:20,winPt:20};
+const NX_CFG={stairs:true,mat:false,row:false,ghost:false,winPt:10,roundSec:10,queueN:3,countFrom:5,countStepMs:650,goMs:500,tenHoldMs:1500,timeUpMs:1200};
 const NX_AI={easy:{label:'やさしい',delay:1250,jitter:600,read:.3,safe:.4},normal:{label:'ふつう',delay:650,jitter:650,read:.7,safe:.55},hard:{label:'つよい',delay:360,jitter:300,read:.95,safe:.85}};
 const NX_ASSET='img/next-v319/';
 function nxDraw(q){while(q.length<NX_CFG.queueN+6){const v=Math.floor(Math.random()*5)+1;if(q.length>=2&&q.slice(-2).every(x=>x===v))continue;q.push(v);}return q;}
 function nxLegal(v,f){return Number.isInteger(v)&&v>=1&&v<=5&&f.length<4&&f.reduce((a,b)=>a+b,0)+v<=10&&canPlay(v,f.reduce((a,b)=>a+b,0),f);}
+function nxSum(f){return f.reduce((a,b)=>a+b,0);}
+function nxTarget(sum){return Math.min(NX_STAIR.max,Math.max(10,Math.ceil(sum/10)*10));}
+function nxIsTrap(sum){return NX_STAIR.traps.includes(sum)||(NX_STAIR.overIsTrap&&sum>NX_STAIR.max);}
+function nxIsExact(sum){return sum>0&&sum%10===0&&sum<=NX_STAIR.max;}
+function nxCanPut(v,f){return NX_CFG.stairs?(Number.isInteger(v)&&v>=1&&v<=5):nxLegal(v,f);}
+function nxRoundSec(){return NX_CFG.stairs?NX_STAIR.roundSec:NX_CFG.roundSec;}
+function nxWinPt(){return NX_CFG.stairs?NX_STAIR.winPt:NX_CFG.winPt;}
 function nxPoints(f){const r=calcPts(f); // v321: 枚数にかかわらず役を判定（3-3-4がワンペアにならなかった）
 return{total:r.total,label:r.label.split(' +')[0]};}
 function NxNumber({value,className=''}){return h('span',{className:'nx-number '+className,role:'img','aria-label':String(value)},String(value).split('').map((d,i)=>h('img',{key:i,src:NX_ASSET+'digit-'+d+'.webp',alt:'','aria-hidden':true,draggable:false})));}
@@ -5110,7 +5121,7 @@ function NxCelebration({message}){
   h('div',{className:'nx-point-flight','aria-hidden':true,style:{'--score-x':message.kind==='p'?'77%':'23%'}},'+',h(NxNumber,{value:message.points})));
 }
 function NextMode({onBack}){
- const[st,setSt]=useState(()=>({phase:'ready',pQ:[3,1,4],dQ:[3,2,5],field:[],by:[],pPt:0,dPt:0,rn:0,count:-1,time:NX_CFG.roundSec,msg:null,pSerial:0,dSerial:0}));
+ const[st,setSt]=useState(()=>({phase:'ready',pQ:[3,1,4],dQ:[3,2,5],field:[],by:[],pPt:0,dPt:0,rn:0,count:-1,time:nxRoundSec(),msg:null,pSerial:0,dSerial:0,seg:0}));
  const[level,setLevel]=useState('normal'),[bounce,setBounce]=useState(0);
  const sR=useRef(st);sR.current=st;const tok=useRef(0),timers=useRef([]),deadline=useRef(0);
  const set=n=>{sR.current=n;setSt(n);};
@@ -5119,11 +5130,11 @@ function NextMode({onBack}){
  useEffect(()=>{nxPrepareAudio();return()=>{++tok.current;clearAll();nxStopAudio();};},[]);
  function startRound(base,rn){
   const my=++tok.current;clearAll();let c=NX_CFG.countFrom;
-  set({...base,phase:'count',rn,field:[],by:[],count:c,time:NX_CFG.roundSec,msg:null});
+  set({...base,phase:'count',rn,field:[],by:[],seg:0,count:c,time:nxRoundSec(),msg:null});
   const tick=()=>{if(my!==tok.current)return;c--;
    if(c>0){set({...sR.current,count:c});at(NX_CFG.countStepMs,tick);return;}
    set({...sR.current,count:0});nxSE('go');
-   at(NX_CFG.goMs,()=>{if(my!==tok.current)return;deadline.current=performance.now()+NX_CFG.roundSec*1000;set({...sR.current,phase:'play',count:-1});runTimer(my);});};
+   at(NX_CFG.goMs,()=>{if(my!==tok.current)return;deadline.current=performance.now()+nxRoundSec()*1000;set({...sR.current,phase:'play',count:-1});runTimer(my);});};
   at(NX_CFG.countStepMs,tick);
  }
  function runTimer(my){const step=()=>{if(my!==tok.current||sR.current.phase!=='play')return;
@@ -5136,6 +5147,7 @@ function NextMode({onBack}){
  function active(){if(sR.current.phase!=='play')return false;if(performance.now()>=deadline.current){timeUp(tok.current);return false;}return true;}
  function play(who){
   if(!active())return false;const s=sR.current,q=who==='p'?s.pQ:s.dQ,v=q[0];
+  if(NX_CFG.stairs)return playStair(who,s,q,v);
   if(!nxLegal(v,s.field)){if(who==='p'){setBounce(n=>n+1);nxSE('reject');}return false;}
   const nq=nxDraw(q.slice(1)),nf=[...s.field,v],n={...s,field:nf,by:[...s.by,who]};
   n[who==='p'?'pQ':'dQ']=nq;n[who==='p'?'pSerial':'dSerial']++;
@@ -5146,15 +5158,54 @@ function NextMode({onBack}){
    at(100,()=>{if(my===tok.current)nxSE('complete',who,r.total);});
    at(830,()=>{if(my!==tok.current||sR.current.phase!=='hold')return;set({...sR.current,msg:{...sR.current.msg,landed:true}});nxSE('score',who,r.total);});
    at(NX_CFG.tenHoldMs,()=>{if(my!==tok.current)return;const c=sR.current;
-    if(c.pPt>=NX_CFG.winPt||c.dPt>=NX_CFG.winPt){clearAll();if(c.pPt>=NX_CFG.winPt)nxSE('victory');set({...c,phase:'end',msg:null});return;}
+    if(c.pPt>=nxWinPt()||c.dPt>=nxWinPt()){clearAll();if(c.pPt>=nxWinPt())nxSE('victory');set({...c,phase:'end',msg:null});return;}
     startRound(c,c.rn+1);});return true;
   }set(n);return true;
+ }
+
+ // v330: 段ルールの「出す」
+ function finishHold(ms){const my=tok.current;at(ms,()=>{if(my!==tok.current)return;const c=sR.current;
+  if(c.pPt>=nxWinPt()||c.dPt>=nxWinPt()){clearAll();if(c.pPt>=nxWinPt())nxSE('victory');set({...c,phase:'end',msg:null});return;}
+  startRound(c,c.rn+1);});}
+ function playStair(who,s,q,v){
+  if(!nxCanPut(v,s.field))return false;
+  const before=nxSum(s.field),nf=[...s.field,v],sum=before+v,n={...s,field:nf,by:[...s.by,who]};
+  n[who==='p'?'pQ':'dQ']=nxDraw(q.slice(1));n[who==='p'?'pSerial':'dSerial']++;
+  if(nxTarget(sum)>nxTarget(before)&&!nxIsExact(before))n.seg=nf.length-1; // 目標が上がった札から新しい段
+  if(who==='p')setBounce(0);nxSE('play',who);
+  const me=who==='p'?'pPt':'dPt',op=who==='p'?'dPt':'pPt';
+  if(nxIsTrap(sum)){
+   const lost=s[me];n[op]+=lost;n[me]=0;n.phase='hold';
+   n.msg={k:Date.now(),kind:'miss',text:(sum>NX_STAIR.max?'50こえ':'💣'+sum)+'！'+(who==='p'?'自分':'相手')+'の'+lost+'点が'+(who==='p'?'相手':'自分')+'へ'};
+   set(n);nxSE('timeout');finishHold(1800);return true;
+  }
+  if(nxIsExact(sum)){
+   const r=nxPoints(nf.slice(n.seg)),bonus=NX_STAIR.bonus[sum]||0,total=r.total+bonus;
+   n[me]+=total;n.phase='hold';n.msg={k:s.rn,text:sum+'ぴったり '+r.label,points:total,kind:who,landed:false};
+   set(n);const my=tok.current;
+   at(100,()=>{if(my===tok.current)nxSE('complete',who,total);});
+   at(830,()=>{if(my!==tok.current||sR.current.phase!=='hold')return;set({...sR.current,msg:{...sR.current.msg,landed:true}});nxSE('score',who,total);});
+   finishHold(NX_CFG.tenHoldMs);return true;
+  }
+  set(n);return true;
  }
  function discard(who){if(!active())return false;const s=sR.current,key=who==='p'?'pQ':'dQ',serial=who==='p'?'pSerial':'dSerial';
   if(who==='p')setBounce(0);set({...s,[key]:nxDraw(s[key].slice(1)),[serial]:s[serial]+1});nxSE('discard',who);return true;
  }
+
+ // v330: 段ルールの相手。地雷はふむ前に読む／ぴったりは取る／こっちにぴったりを渡さない
+ function stairAI(ai){const s=sR.current,fs=nxSum(s.field),v=s.dQ[0],pv=s.pQ[0],after=fs+v,read=Math.random()<ai.read;
+  if(nxIsExact(after)){play('d');return;}
+  if(nxIsTrap(after)){if(read||Math.random()<ai.safe)discard('d');else play('d');return;}
+  if(read&&nxIsExact(fs+pv)&&!nxIsExact(after+pv)){play('d');return;} // 相手のぴったりをつぶす
+  if(read&&nxIsExact(after+pv)){discard('d');return;} // 出すと相手にぴったりを渡す
+  if(read&&nxIsTrap(after+pv)){play('d');return;} // 相手を地雷に追い込む
+  if(Math.random()<ai.safe)play('d');else discard('d');
+ }
  useEffect(()=>{if(st.phase!=='play')return;let alive=true,t;const ai=NX_AI[level];
-  const step=()=>{if(!alive||sR.current.phase!=='play')return;const s=sR.current,fs=s.field.reduce((a,b)=>a+b,0),v=s.dQ[0],pv=s.pQ[0],ok=nxLegal(v,s.field);
+  const step=()=>{if(!alive||sR.current.phase!=='play')return;
+   if(NX_CFG.stairs){stairAI(ai);t=setTimeout(step,ai.delay+Math.random()*ai.jitter);return;}
+   const s=sR.current,fs=s.field.reduce((a,b)=>a+b,0),v=s.dQ[0],pv=s.pQ[0],ok=nxLegal(v,s.field);
    const givesTen=ok&&nxLegal(pv,[...s.field,v])&&fs+v+pv===10;
    const threatened=nxLegal(pv,s.field)&&fs+pv===10;
    if(ok&&fs+v===10)play('d');
@@ -5166,7 +5217,7 @@ function NextMode({onBack}){
   t=setTimeout(step,ai.delay);return()=>{alive=false;clearTimeout(t);};},[st.phase,level]);
  const start=()=>{nxStopAudio();nxPrepareAudio();try{resumeAC();}catch(e){}startRound({pQ:nxDraw([]),dQ:nxDraw([]),pPt:0,dPt:0,pSerial:0,dSerial:0},1);};
  const leave=()=>{++tok.current;clearAll();nxStopAudio();onBack();};
- const fs=st.field.reduce((a,b)=>a+b,0),canP=st.phase==='play'&&nxLegal(st.pQ[0],st.field),win=st.pPt>=NX_CFG.winPt;
+ const fs=st.field.reduce((a,b)=>a+b,0),canP=st.phase==='play'&&nxCanPut(st.pQ[0],st.field),win=st.pPt>=nxWinPt(),tgt=NX_CFG.stairs?nxTarget(fs):10,trapNext=NX_STAIR.traps.find(x=>x>fs),shownFrom=Math.max(0,st.field.length-4);
  const visibleScore=who=>{const pts=who==='p'?st.pPt:st.dPt;return st.msg?.points&&st.msg.kind===who&&!st.msg.landed?pts-st.msg.points:pts;};
  const scoreClass=who=>'nx-score nx-score-'+who+(st.msg?.landed&&st.msg.kind===who?' nx-earned':'');
  const card=(v,who,extra,props={})=>h(props.onClick?'button':'div',{...props,className:'nx-card nx-'+who+' '+extra,'aria-label':(who==='p'?'自分':'相手')+'の札 '+v+(props.onClick?'、出す':''),type:props.onClick?'button':undefined},h(NxNumber,{value:v}));
@@ -5182,12 +5233,14 @@ function NextMode({onBack}){
   h('span',{className:'nx-score-label p'},'自分'),
   h('div',{className:'nx-time'+(st.time<=3&&st.phase==='play'?' low':''),role:'timer','aria-label':'残り '+st.time+' 秒'},h(NxNumber,{value:st.time})),
   queue('d'),
-  h('section',{className:'nx-field','aria-label':'場の札'},st.field.map((v,k)=>card(v,st.by[k],'nx-field-card',{key:st.rn+'-'+k,style:{left:[10.5,31,51.6,72.2][k]+'%','--slot':k}})),
+  h('section',{className:'nx-field','aria-label':'場の札'},st.field.slice(shownFrom).map((v,j)=>{const k=shownFrom+j;return card(v,st.by[k],'nx-field-card',{key:st.rn+'-'+k,style:{left:[10.5,31,51.6,72.2][j]+'%','--slot':j}});}), // v330: 5枚目からは新しい4枚だけ見せる
+
    // v328: 相手の次の札を、場の次の空き枠にゴースト表示（出せる時だけ）。NX_CFG.ghost:false で消える
    (NX_CFG.ghost&&st.phase==='play'&&st.field.length<4&&nxLegal(st.dQ[0],st.field))?card(st.dQ[0],'d','nx-field-card nx-ghost',{key:'ghost-'+st.rn+'-'+st.field.length+'-'+st.dQ[0],style:{left:[10.5,31,51.6,72.2][st.field.length]+'%'},'aria-hidden':true}):null,
-   h('div',{className:'nx-sum','aria-label':'場の合計 '+fs+' / 10、あと '+(10-fs)},h(NxNumber,{value:fs}),
-    h('span',{className:'nx-target'},h('i',null,'/'),h(NxNumber,{value:10})),
-    h('span',{className:'nx-left'},h('small',null,'あと'),h(NxNumber,{value:10-fs})))),
+   h('div',{className:'nx-sum','aria-label':'場の合計 '+fs+' / '+tgt+'、あと '+(tgt-fs)},h(NxNumber,{value:fs}),
+    h('span',{className:'nx-target'},h('i',null,'/'),h(NxNumber,{value:tgt})),
+    h('span',{className:'nx-left'},h('small',null,'あと'),h(NxNumber,{value:Math.max(0,tgt-fs)}))),
+   NX_CFG.stairs&&trapNext?h('div',{className:'nx-trap','aria-label':'地雷 '+trapNext},'💣'+trapNext):null),
   queue('p'),
   h('button',{className:'nx-action discard','aria-label':'先頭の札を捨てる',disabled:st.phase!=='play',onClick:()=>discard('p')}),
   h('button',{className:'nx-action play'+(!canP?' blocked':''),'aria-label':'先頭の札を出す','aria-disabled':!canP,disabled:st.phase!=='play',onClick:()=>play('p')}),
@@ -5195,7 +5248,7 @@ function NextMode({onBack}){
   st.msg&&(st.msg.points?h(NxCelebration,{message:st.msg,key:'reward-'+st.msg.k}):h('div',{className:'nx-message',role:'status',key:st.msg.k},st.msg.text)),
   (st.phase==='ready'||st.phase==='end')&&h('div',{className:'nx-overlay'},h('section',{className:'nx-dialog',role:'dialog','aria-modal':true,'aria-label':st.phase==='ready'?'NEXTをはじめる':'対戦結果'},
    h('h1',null,st.phase==='ready'?'NEXT':win?'勝ち！':'もう一歩！'),
-   st.phase==='ready'?h('p',null,'先頭の札を出すか、捨てるか。',h('br'), 'ぴったり十をつくろう。',h('br'),'青が自分・橙が相手。先に十点で勝ち。'):
+   st.phase==='ready'?(NX_CFG.stairs?h('p',null,'10・20・30・40・50にぴったりで得点。',h('br'),'こえたら目標が上がる（50まで）。',h('br'),'💣11・22・33・44を作ったら自分の点が全部相手へ。',h('br'),'先に'+nxWinPt()+'点で勝ち。'):h('p',null,'先頭の札を出すか、捨てるか。',h('br'), 'ぴったり十をつくろう。',h('br'),'青が自分・橙が相手。先に十点で勝ち。')):
     h('div',{className:'nx-result'},h(NxNumber,{value:st.pPt}),h('span',null,'−'),h(NxNumber,{value:st.dPt})),
    h('div',{className:'nx-levels','aria-label':'相手の強さ'},Object.entries(NX_AI).map(([k,v])=>h('button',{key:k,'aria-pressed':level===k,onClick:()=>setLevel(k)},v.label))),
    h('button',{onClick:start},st.phase==='ready'?'はじめる':'もう一度'),h('button',{className:'nx-home',onClick:leave},'ホームへ')))));
